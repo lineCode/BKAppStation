@@ -10,7 +10,6 @@ object GlobalData {
 
     fun storeAppConfig(config: AppConf) {
         mAppConf = config
-        0x45 ushr 4
     }
 
     fun getAppConfig() = mAppConf

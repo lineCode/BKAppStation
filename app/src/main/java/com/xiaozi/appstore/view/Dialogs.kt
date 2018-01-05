@@ -6,9 +6,8 @@ import android.content.Context
 import android.view.Gravity
 import android.view.WindowManager
 import com.xiaozi.appstore.R
-import com.xiaozi.appstore.component.Framework
 import com.xiaozi.appstore.component.Framework.Math.limitL
-import com.xiaozi.appstore.plugin.call
+import com.xiaozi.appstore.plugin.Call
 import com.xiaozi.appstore.plugin.safety
 
 /**
@@ -38,14 +37,14 @@ class AsyncWaiter {
     var mActivity: Activity? = null
     fun show(ctx: Activity) {
         if (dialog?.isShowing == true) return
-        dialog = Dialogs.createWaiter(ctx).apply { show() }
+        dialog = Dialogs.createWaiter(ctx).apply { safety(Dialog::show) }
         showTime = System.currentTimeMillis()
         mActivity = ctx
     }
 
     fun hide(minDelay: Long) {
         if (dialog?.isShowing == true && !isActivityDead(mActivity)) {
-            Framework._H.call(limitL(minDelay, System.currentTimeMillis() - showTime))
+            Call(limitL(minDelay, System.currentTimeMillis() - showTime))
             { dialog.safety(Dialog::cancel) }
         }
     }
@@ -59,6 +58,10 @@ class AsyncWaiter {
     }
 }
 
+class CommonDialog(ctx: Context) {
+    val mCtx = ctx
+}
+
 
 fun Dialog.fullShow() {
     window.decorView.setPadding(0, 0, 0, 0)
@@ -67,5 +70,5 @@ fun Dialog.fullShow() {
         width = WindowManager.LayoutParams.MATCH_PARENT
         height = WindowManager.LayoutParams.MATCH_PARENT
     }
-    show()
+    safety(Dialog::show)
 }

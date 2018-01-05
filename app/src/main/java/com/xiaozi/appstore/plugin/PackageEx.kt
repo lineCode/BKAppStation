@@ -1,11 +1,14 @@
 package com.xiaozi.appstore.plugin
 
 import android.util.Log
+import com.google.gson.Gson
 
 /**
  * Created by fish on 18-1-2.
  */
 val _DEBUG = true
+
+val _GSON = Gson()
 
 
 private val _LOG_D = true

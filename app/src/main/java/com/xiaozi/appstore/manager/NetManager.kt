@@ -12,9 +12,9 @@ import java.io.Serializable
 object NetManager {
 
     val SUCCESS_CODE = 0
-    val _TEST_URL = ""
-    val _PRODUCT_URL = ""
-    val MAIN_URL = if (_DEBUG) _TEST_URL else _PRODUCT_URL
+    private val _TEST_URL = ""
+    private val _PRODUCT_URL = ""
+    private val MAIN_URL = if (_DEBUG) _TEST_URL else _PRODUCT_URL
 
     inline fun <reified T> fastCall(url: String, crossinline success: T.() -> Unit = {}, crossinline failed: String.() -> Unit = {}) = createOri<T>(url, success, failed).get(Framework._C, Framework._H)
 
@@ -51,10 +51,11 @@ object NetManager {
         Failed { it.failed() }
     }
 
-    fun loadAppConfig() {
-        createBase<AppConf>("$MAIN_URL/app/conf", {
-
-        }){}
+    fun loadAppConfig(success: ()-> Unit) {
+        success()
+//        createBase<AppConf>("$MAIN_URL/app/conf", {
+//            success()
+//        }){}
     }
 
 

@@ -1,10 +1,12 @@
 package cc.fish.cld_ctrl.appstate.entity;
 
+import java.io.Serializable;
+
 /**
  * Created by fish on 16-12-15.
  */
 
-public class RespUpdate {
+public class RespUpdate implements Serializable {
     private String  download_url;
     private int     version_code;
     private String  version_name;

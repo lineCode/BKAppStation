@@ -27,7 +27,7 @@ abstract public class BaseFragment extends Fragment implements View.OnClickListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = initView(inflater);
-        initData();
+        onSelected();
         return v;
     }
 
@@ -47,8 +47,9 @@ abstract public class BaseFragment extends Fragment implements View.OnClickListe
 
     abstract protected View initView(LayoutInflater inflater);
 
-    abstract protected void initData();
+    /*** will be called when the tab selected ***/
+    abstract protected void onSelected();
 
-    abstract protected void click(View v);
+    protected void click(View v){}
 
 }

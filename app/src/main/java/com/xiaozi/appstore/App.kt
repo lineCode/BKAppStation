@@ -1,6 +1,8 @@
 package com.xiaozi.appstore
 
 import android.app.Application
+import cc.fish.cld_ctrl.ad.CldAd
+import cc.fish.cld_ctrl.common.net.NetManager
 import com.xiaozi.appstore.component.Framework
 
 /**
@@ -9,6 +11,7 @@ import com.xiaozi.appstore.component.Framework
 class App : Application(){
     override fun onCreate() {
         super.onCreate()
-        Framework.mContext = this.applicationContext
+        Framework.mContext = applicationContext
+        CldAd.init(applicationContext)
     }
 }

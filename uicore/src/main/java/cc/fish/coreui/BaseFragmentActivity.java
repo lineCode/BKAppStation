@@ -72,7 +72,7 @@ abstract public class BaseFragmentActivity extends Activity {
                     }
                 } else {
                     ft.show(fragments[index]);
-                    fragments[index].initData();
+                    fragments[index].onSelected();
                 }
             } else if (fragments[i] != null) {
                 ft.hide(fragments[i]);
