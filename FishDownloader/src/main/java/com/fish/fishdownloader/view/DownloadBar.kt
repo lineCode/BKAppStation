@@ -26,8 +26,8 @@ import com.fish.fishdownloader.view.ColorChangedTextView
 class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) {
 
     companion object {
-        val DOWNLOADING_COLOR: Int = 0xff1a96fc.toInt()
-        val COMPLETE_COLOR: Int = 0xff1a96fc.toInt()
+        val DOWNLOADING_COLOR: Int = 0xfffde179.toInt()
+        val COMPLETE_COLOR: Int = 0xfffff1ba.toInt()
         val TEXT_COLOR: Int = 0xff1a96fc.toInt()
     }
 
@@ -151,9 +151,9 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
 
     enum class CK_TYPE { COMPLETE, CANCELED, FAILED }
 
-    data class DownloadBarConfigure(var initText: String = "开始下载",
-                                    var downloadingText: String = "下载中  %.2f%%",
-                                    var completeText: String = "下载完成",
+    data class DownloadBarConfigure(var initText: String = "下载",
+                                    var downloadingText: String = "下载",
+                                    var completeText: String = "完成",
                                     var textColor: Int = TEXT_COLOR,
                                     var downloadingTextColor: Int = TEXT_COLOR,
                                     var compileTextColor: Int = TEXT_COLOR,
@@ -163,13 +163,13 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
                                     var completeBGColor: Int = DownloadBar.COMPLETE_COLOR,
                                     var downloadingBGRes: Int? = null,
                                     var completeBGRes: Int? = null,
-                                    var baseBGColor: Int = 0xffffffff.toInt(),
+                                    var baseBGColor: Int = 0xfffff1ba.toInt(),
                                     var baseBGRes: Int? = null,
-                                    var maskRes: Int = R.drawable.progress_top_gray,
+                                    var maskRes: Int = R.drawable.i_download_top,
                                     var pogressCK: (parentView: View, progressBar: FrameLayout, pg: Double, colorChangableTV: ColorChangedTextView) -> Unit = { view, img, pg, ctv ->
                                         {
                                             img.layoutParams = img.layoutParams.apply { this@apply.width = (view.width * pg).toInt() }
-                                            ctv.setTextProg(String.format(downloadingText, pg * 100), (view.width * pg).toInt())
+                                            ctv.setTextProg(String.format(downloadingText), (view.width * pg).toInt())
 
                                         }()
                                     },

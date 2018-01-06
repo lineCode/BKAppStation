@@ -4,11 +4,15 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.view.Gravity
+import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
+import android.widget.TextView
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.component.Framework.Math.limitL
-import com.xiaozi.appstore.plugin.Call
-import com.xiaozi.appstore.plugin.safety
+import com.xiaozi.appstore.Call
+import com.xiaozi.appstore.safety
+import com.xiaozi.appstore.safetySelf
 
 /**
  * Created by fish on 18-1-4.
@@ -22,28 +26,27 @@ object Dialogs {
         }
     }
 
-    fun createWaiter(ctx: Context): Dialog {
+    fun createWaiter(ctx: Context, cancelable: Boolean = false): Dialog {
         return Dialog(ctx, R.style.staticDialog).apply {
             setContentView(R.layout.d_waiter)
-            setCanceledOnTouchOutside(false)
+            setCanceledOnTouchOutside(cancelable)
+            setCancelable(cancelable)
         }
     }
 
 }
 
-class AsyncWaiter {
+class AsyncWaiter(val activity: Activity) {
     var showTime = 0L
     var dialog: Dialog? = null
-    var mActivity: Activity? = null
-    fun show(ctx: Activity) {
+    fun show(cancelable: Boolean) {
         if (dialog?.isShowing == true) return
-        dialog = Dialogs.createWaiter(ctx).apply { safety(Dialog::show) }
+        dialog = Dialogs.createWaiter(activity, cancelable).safetySelf(Dialog::show)
         showTime = System.currentTimeMillis()
-        mActivity = ctx
     }
 
     fun hide(minDelay: Long) {
-        if (dialog?.isShowing == true && !isActivityDead(mActivity)) {
+        if (dialog?.isShowing == true && !isActivityDead(activity)) {
             Call(limitL(minDelay, System.currentTimeMillis() - showTime))
             { dialog.safety(Dialog::cancel) }
         }
@@ -52,14 +55,47 @@ class AsyncWaiter {
     private fun isActivityDead(activity: Activity?) = activity == null || activity.isFinishing || activity.isDestroyed
 
     fun hide() {
-        if (dialog?.isShowing == true && !isActivityDead(mActivity)) {
+        if (dialog?.isShowing == true && !isActivityDead(activity)) {
             dialog.safety(Dialog::cancel)
         }
     }
 }
 
-class CommonDialog(ctx: Context) {
-    val mCtx = ctx
+class CommonDialog(val ctx: Context) {
+    val mDialog = Dialogs.create(ctx, R.layout.d_common)
+    fun title(title: String) = mDialog.findViewById<TextView>(R.id.tv_d_common_title).safety {
+        if (title.isEmpty())
+            visibility = View.INVISIBLE
+        else {
+            visibility = View.VISIBLE
+            text = title
+        }
+    }
+
+    fun content(content: String) = mDialog.findViewById<TextView>(R.id.tv_d_common_content).safety {
+        text = content
+    }
+
+    fun applyBtn(tip: String, ck: () -> Unit) = mDialog.findViewById<TextView>(R.id.tv_d_common_apply).safety {
+        text = tip
+        setOnClickListener { ck() }
+    }
+
+    fun cancelBtn(tip: String?, ck: () -> Unit) = mDialog.findViewById<TextView>(R.id.tv_d_common_cancel).safety {
+        if (tip.isNullOrEmpty()) {
+            visibility = View.GONE
+            mDialog.findViewById<View>(R.id.v_d_common_line).visibility = View.GONE
+            mDialog.findViewById<ImageView>(R.id.img_d_common_alpha).setImageResource(R.drawable.d_btn_top_single)
+        } else {
+            visibility = View.VISIBLE
+            mDialog.findViewById<View>(R.id.v_d_common_line).visibility = View.VISIBLE
+            text = tip
+            setOnClickListener { ck() }
+        }
+    }
+
+    fun show() = safety { mDialog.show() }
+    fun hide() = safety { mDialog.hide() }
 }
 
 

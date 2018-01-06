@@ -7,17 +7,17 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import cc.fish.cld_ctrl.appstate.entity.RespUpdate
-import cc.fish.coreui.BaseFragment
+import cc.fish.cld_ctrl.common.util.DownloadUtils
 import cc.fish.coreui.BaseFragmentActivity
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.activity.fragments.AppFragment
 import com.xiaozi.appstore.activity.fragments.GameFragment
 import com.xiaozi.appstore.activity.fragments.HomeFragment
 import com.xiaozi.appstore.activity.fragments.MineFragment
-import com.xiaozi.appstore.plugin.ZToast
-import com.xiaozi.appstore.plugin.safety
+import com.xiaozi.appstore.ZToast
+import com.xiaozi.appstore.safety
+import com.xiaozi.appstore.view.CommonDialog
 import kotlinx.android.synthetic.main.a_home.*
 
 /**
@@ -27,7 +27,7 @@ class HomeActivity : BaseFragmentActivity() {
 
     companion object {
         private val KEY_IS_UPDATE = "IS_UPDATE"
-        private val KEY_UPDATE_DATA = "IS_UPDATE"
+        private val KEY_UPDATE_DATA = "UPDATE_DATA"
         fun open(ctx: Context, update: RespUpdate?) {
             ctx.startActivity(Intent(ctx, HomeActivity::class.java).apply {
                 putExtra(KEY_IS_UPDATE, update != null)
@@ -66,9 +66,29 @@ class HomeActivity : BaseFragmentActivity() {
         setContentView(R.layout.a_home)
         super.onCreate(savedInstanceState)
         if (intent.getBooleanExtra(KEY_IS_UPDATE, false))
-            ZToast("null update info")
-        else
-            ZToast(intent.getSerializableExtra(KEY_UPDATE_DATA).toString())
+            showUpdateDialog(intent.getSerializableExtra(KEY_UPDATE_DATA) as RespUpdate?)
+    }
+
+    private fun showUpdateDialog(update: RespUpdate?) {
+        if (update == null) {
+            ZToast("拉取更新信息失败\n请在WIFI环境中下载")
+            finish()
+            return
+        }
+        CommonDialog(this).safety {
+            title("有新版本更新！")
+            content(update.content)
+            applyBtn("更新") {
+                DownloadUtils.startDownService(this@HomeActivity, update.download_url, "com.xiaozi.appstore")
+                if (update.is_force == 0)
+                    hide()
+            }
+            if (update.is_force == 0)
+                cancelBtn("取消") {
+                    hide()
+                }
+            show()
+        }
     }
 
     override fun onItemClick(item: View?, index: Int) {

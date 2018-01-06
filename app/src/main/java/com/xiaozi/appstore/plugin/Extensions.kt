@@ -1,7 +1,7 @@
-package com.xiaozi.appstore.plugin
+package com.xiaozi.appstore
 
 import android.content.Context
-import android.os.Handler
+import android.view.View
 import android.widget.Toast
 import com.xiaozi.appstore.component.Framework
 
@@ -12,20 +12,17 @@ fun Call(delay: Long = 0, success: () -> Unit) = Framework._H.postDelayed(succes
 
 fun Context.ZToast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
 
-inline fun <T> T?.safety(action: T.() -> Any?) = try {
+fun <T : View> View.bind(id: Int) = lazy { findViewById<T>(id) }
+
+inline fun <T, R> T?.safety(action: T.() -> R): R? = try {
     this?.action()
 } catch (ex: Exception) {
     ex.printStackTrace()
+    null
 }
 
-inline fun <T> T?.safetyNullable(action: T?.() -> Any?) = try {
+inline fun <T, R> T?.safetyNullable(action: T?.() -> R?): R? = try {
     this.action()
-} catch (ex: Exception) {
-    ex.printStackTrace()
-}
-
-inline fun <T, R> T?.safetyRun(action: T.() -> R): R? = try {
-    this?.action()
 } catch (ex: Exception) {
     ex.printStackTrace()
     null

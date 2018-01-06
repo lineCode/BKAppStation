@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE
 import android.util.AttributeSet
 import android.util.Log
 import com.xiaozi.appstore.plugin.ForceObb
+import com.xiaozi.appstore.plugin.TypedOB
 import java.util.*
 
 /**
@@ -20,13 +21,12 @@ class LoadableSwipeLayout(ctx: Context, attrs: AttributeSet) : SwipeRefreshLayou
     var mRecyclerView: RecyclerView? = null
     var mLoadData: () -> Unit = {}
     var isLoading = false
-    val mDataOB = object : Observer {
-        override fun update(o: Observable?, arg: Any?) {
-            //JUST FLUSH ADAPTER
+    val mDataOB = object : TypedOB<Any> {
+        override fun update(o: ForceObb<Any>, arg: Any?) {
             getChildAdapter()?.notifyDataSetChanged()
         }
     }
-    val mAdapterOBB: ForceObb = ForceObb().apply { addObserver(mDataOB) }
+    val mAdapterOBB: ForceObb<Any> = ForceObb<Any>().apply { addObserver(mDataOB) }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
@@ -76,7 +76,7 @@ class LoadableSwipeLayout(ctx: Context, attrs: AttributeSet) : SwipeRefreshLayou
                     dataList.apply {
                         clear()
                         addAll(it)
-                        mAdapterOBB.notifyObservers()
+                        mAdapterOBB.notifyObs()
                         mLimPoi = 0
                         isRefreshing = false
                     }
@@ -89,7 +89,7 @@ class LoadableSwipeLayout(ctx: Context, attrs: AttributeSet) : SwipeRefreshLayou
                     Log.e("added size", "${it.size}")
                     Log.e("added list size", "${dataList.size}")
                     Log.e("load", "ok")
-                    mAdapterOBB.notifyObservers()
+                    mAdapterOBB.notifyObs()
                     Handler(Looper.getMainLooper()).postDelayed({ Log.e("notified size", "${dataList.size}") }, 300)
                     isLoading = false
                 }

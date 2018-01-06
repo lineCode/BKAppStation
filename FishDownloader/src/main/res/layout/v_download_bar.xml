@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/fl_dlbar_bg"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="#ffffff">
+    android:background="#fff1ba">
     <FrameLayout
         android:id="@+id/fl_dlbar_progress"
         android:layout_width="match_parent"
@@ -11,7 +11,7 @@
         android:id="@+id/img_dlbar_mask"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/progress_top_gray"/>
+        android:background="@drawable/i_download_top"/>
 
     <com.fish.fishdownloader.view.ColorChangedTextView
         android:id="@+id/tv_dlbar_pg"

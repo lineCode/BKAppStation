@@ -5,21 +5,24 @@ import java.util.*
 /**
  * Created by fish on 17-7-3.
  */
-class ForceObb : Observable() {
-    private var mCache: Any? = null
+class ForceObb<T>  {
+    private var mCache: T? = null
+    private val mObs: Vector<TypedOB<T>> = Vector()
 
-    override fun hasChanged() = true
-
-    fun addObserver(o: Observer?, useCache: Boolean) {
-        super.addObserver(o)
+    fun addObserver(o: TypedOB<T>, useCache: Boolean = false) {
+        mObs.addElement(o)
         if (useCache && mCache != null) {
             o?.update(this@ForceObb, mCache)
         }
     }
 
-    override fun notifyObservers(data: Any?) {
+    fun deleteObserver(o: TypedOB<T>) {
+        mObs.remove(o)
+    }
+
+    fun notifyObs(data: T? = null) {
         mCache = data
-        super.notifyObservers(data)
+        mObs.map { synchronized(this){it.update(this@ForceObb, data)} }
     }
 
     fun cleanCache() {

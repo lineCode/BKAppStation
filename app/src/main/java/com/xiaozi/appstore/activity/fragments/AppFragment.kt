@@ -1,10 +1,9 @@
 package com.xiaozi.appstore.activity.fragments
 
 import android.view.LayoutInflater
-import android.view.View
 import cc.fish.coreui.BaseFragment
 import com.xiaozi.appstore.R
-import com.xiaozi.appstore.plugin.safetySelf
+import com.xiaozi.appstore.safetySelf
 
 /**
  * Created by fish on 18-1-4.

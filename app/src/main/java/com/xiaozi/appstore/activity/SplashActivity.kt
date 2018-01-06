@@ -5,7 +5,9 @@ import android.os.Bundle
 import cc.fish.cld_ctrl.appstate.CldApp
 import cc.fish.cld_ctrl.appstate.entity.RespUpdate
 import com.xiaozi.appstore.manager.NetManager
-import com.xiaozi.appstore.plugin.*
+import com.xiaozi.appstore.Call
+import com.xiaozi.appstore.plugin._GSON
+import com.xiaozi.appstore.safetyNullable
 
 class SplashActivity : Activity() {
 
@@ -18,7 +20,7 @@ class SplashActivity : Activity() {
         CldApp.checkUpdateForString {
             _GSON.fromJson(it, RespUpdate::class.java).safetyNullable {
                 if (it == null || this!!.is_force == 0)
-                    NetManager.loadAppConfig { Call(2000) { HomeActivity.open(this@SplashActivity, this@safetyNullable) } }
+                    NetManager.loadAppConfig { Call(2000) { HomeActivity.open(this@SplashActivity, this) } }
                 else
                     Call(2000) { HomeActivity.open(this@SplashActivity, this@safetyNullable) }
             }

@@ -24,8 +24,8 @@ public class DownloadService extends Service {
     /**
      * 下载文件存放目录
      */
-    private static String downloadDir = "ad/download/";
-    final private static String UPDATE_DIR = "ad/update";
+    private static String downloadDir = "youzi/download/";
+    final private static String UPDATE_DIR = "youzi/update";
 
     private String downloadUrl;
 
@@ -64,10 +64,10 @@ public class DownloadService extends Service {
             }if (!Environment.getExternalStoragePublicDirectory(UPDATE_DIR).getParentFile().exists()) {
                 Environment.getExternalStoragePublicDirectory(UPDATE_DIR).getParentFile().mkdirs();
             }
-            if (appName.contains("youqianzhuan")) {
-                request.setDestinationInExternalPublicDir(UPDATE_DIR, appName + System.currentTimeMillis() + ".apk");
+            if (appName.contains("com.xiaozi.appstore")) {
+                request.setDestinationInExternalPublicDir(UPDATE_DIR, appName + "-" + System.currentTimeMillis() + ".apk");
             }else {
-                request.setDestinationInExternalPublicDir(downloadDir, appName + System.currentTimeMillis() + ".apk");
+                request.setDestinationInExternalPublicDir(downloadDir, appName+ "-"  + System.currentTimeMillis() + ".apk");
             }
             enqueueID = downloadManager.enqueue(request);
 //            DownloadQueueConfigure.putRecord(this, appName, enqueueID);    // used for cancel

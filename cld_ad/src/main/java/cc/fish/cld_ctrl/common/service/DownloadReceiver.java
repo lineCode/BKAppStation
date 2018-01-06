@@ -72,25 +72,7 @@ public class DownloadReceiver extends BroadcastReceiver {
         ZLog.e("DOWNLOAD", info.packageName);
         install.setDataAndType(downloadFileUri, "application/vnd.android.package-archive");
         install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        try {
-            if (DownloadUtils.appSuccCK.get(packageName) != null) {
-                for (String s : DownloadUtils.appSuccCK.get(packageName)) {
-                    NetManager.getInstance().simple(s);
-                }
-                DownloadUtils.appSuccCK.remove(packageName);
-                if (DownloadUtils.appNeedInstall.get(packageName) != null && DownloadUtils.appNeedInstall.get(packageName)) {
-                    context.startActivity(install);
-                }
-            } else {
-                throw new RuntimeException("to install");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            context.startActivity(install);
-            return;
-        }
-//        NetManager.getInstance().upload(context, DownloadUtils.appToken, NetManager.UploadAction.app_finished_download, NetManager.UploadFrom.wdj,
-//                DownloadUtils.appUid, packageName, "");
+        context.startActivity(install);
 
     }
 }

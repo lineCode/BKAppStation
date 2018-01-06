@@ -8,7 +8,7 @@ import android.net.wifi.WifiManager
 import android.os.Build
 import android.telephony.TelephonyManager
 import android.view.WindowManager
-import com.xiaozi.appstore.plugin.ZToast
+import com.xiaozi.appstore.ZToast
 import java.net.NetworkInterface
 
 /**

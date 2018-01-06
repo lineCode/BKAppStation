@@ -51,18 +51,28 @@ object NetManager {
         Failed { it.failed() }
     }
 
-    fun loadAppConfig(success: ()-> Unit) {
+    fun loadAppConfig(success: () -> Unit) {
         success()
 //        createBase<AppConf>("$MAIN_URL/app/conf", {
 //            success()
 //        }){}
     }
 
+    fun loadAppList(type: AppListType, success: Array<RespAppInfo>.() -> Unit, failed: String.() -> Unit) {
+        createBase<Array<RespAppInfo>>("$MAIN_URL/app/list", success, failed)
+                .Method(RequestHelper.Method.GET)
+                .get(Framework._C, Framework._H)
 
-
+    }
 
 
 }
 
+enum class AppListType(type: String) {
+    HOT_APP("hot_app"),
+    HOT_GAME("hot_game")
+}
+
 data class BaseResp<Data>(var code: Int, var msg: String, var data: Data) : Serializable
-data class AppConf(var conf: String)
+data class RespAppConf(var conf: String)
+data class RespAppInfo(var pkg: String)

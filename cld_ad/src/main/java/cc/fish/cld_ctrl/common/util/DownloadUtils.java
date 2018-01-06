@@ -19,18 +19,13 @@ public class DownloadUtils {
     /**
      * 启动下载友商App服务
      */
-    public static Map<String, String[]> appSuccCK = new HashMap<>();
-    public static Map<String, Boolean> appNeedInstall = new HashMap<>();
-    public static String appToken = "";
-    public static String appUid = "";
-
     public static void startDownService(Context context, String url, String appName) {
         startDownService(context, url, appName, false);
     }
 
-    public static boolean startDownService(Context context, String url, String appName, boolean onlyWifi, Object... exData) {
+    public static boolean startDownService(Context context, String url, String appName, boolean onlyWifi) {
         if (!isHaveWifi(context) && onlyWifi) {
-            Toast.makeText(context, "只在无线环境下载已打开，请前往设置关闭按钮，或加入无线网络", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "'只在无线环境下载'已打开，请前往设置关闭按钮，或加入无线网络", Toast.LENGTH_SHORT).show();
             return false;
         }
         if (!isHaveWifi(context)) {
@@ -40,12 +35,6 @@ public class DownloadUtils {
         intent.putExtra("downloadUrl", url);
         intent.putExtra("appName", appName);
         context.startService(intent);
-        if (exData.length >= 5) {
-            appSuccCK.put((String)exData[0], (String[])exData[1]);
-            appToken = (String) exData[2];
-            appUid = (String) exData[3];
-            appNeedInstall.put((String)exData[0], (Boolean) exData[4]);
-        }
         return true;
     }
 
