@@ -58,19 +58,22 @@ object NetManager {
 //        }){}
     }
 
-    fun loadAppList(type: AppListType, success: Array<RespAppInfo>.() -> Unit, failed: String.() -> Unit) {
+    fun loadAppList(type: AppListType = AppListType.ALL, filter: String = "", success: Array<RespAppInfo>.() -> Unit, failed: String.() -> Unit) {
         createBase<Array<RespAppInfo>>("$MAIN_URL/app/list", success, failed)
                 .Method(RequestHelper.Method.GET)
+                .UrlParam("type", type.str)
+                .apply { if(filter.isEmpty()) UrlParam("filter", filter) }
                 .get(Framework._C, Framework._H)
 
     }
-
-
 }
 
-enum class AppListType(type: String) {
+enum class AppListType(val str: String) {
+    ALL("all"),
     HOT_APP("hot_app"),
-    HOT_GAME("hot_game")
+    HOT_GAME("hot_game"),
+    CHART_APP("chart_app"),
+    CHART_GAME("chart_game")
 }
 
 data class BaseResp<Data>(var code: Int, var msg: String, var data: Data) : Serializable

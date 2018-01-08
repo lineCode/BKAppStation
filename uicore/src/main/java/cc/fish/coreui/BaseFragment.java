@@ -48,7 +48,7 @@ abstract public class BaseFragment extends Fragment implements View.OnClickListe
     abstract protected View initView(LayoutInflater inflater);
 
     /*** will be called when the tab selected ***/
-    abstract protected void onSelected();
+    protected void onSelected(){}
 
     protected void click(View v){}
 

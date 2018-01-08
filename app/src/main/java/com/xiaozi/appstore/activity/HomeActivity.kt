@@ -11,11 +11,11 @@ import cc.fish.cld_ctrl.appstate.entity.RespUpdate
 import cc.fish.cld_ctrl.common.util.DownloadUtils
 import cc.fish.coreui.BaseFragmentActivity
 import com.xiaozi.appstore.R
-import com.xiaozi.appstore.activity.fragments.AppFragment
 import com.xiaozi.appstore.activity.fragments.GameFragment
 import com.xiaozi.appstore.activity.fragments.HomeFragment
 import com.xiaozi.appstore.activity.fragments.MineFragment
 import com.xiaozi.appstore.ZToast
+import com.xiaozi.appstore.activity.fragments.AppFragment
 import com.xiaozi.appstore.safety
 import com.xiaozi.appstore.view.CommonDialog
 import kotlinx.android.synthetic.main.a_home.*
