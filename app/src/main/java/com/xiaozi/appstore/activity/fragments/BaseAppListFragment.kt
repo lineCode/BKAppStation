@@ -64,7 +64,7 @@ sealed class BaseAppListFragment : BaseFragment() {
             override fun getItemCount() = mData.size
 
             override fun onBindViewHolder(holder: TypedAppListVH, position: Int) {
-                holder.load(mData[position], position)
+                holder.load(mData[position], position + 1)
             }
 
             override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = TypedAppListVH(parent)
@@ -85,7 +85,7 @@ sealed class BaseAppListFragment : BaseFragment() {
         mTvChart.setCompoundDrawables(null, null, null, if (index == 0) mDrawableTab else mDrawableTabWhite)
         mTvCategory.setCompoundDrawables(null, null, null, if (index == 1) mDrawableTab else mDrawableTabWhite)
         if (index == 0) {
-            mListLoader.load(mType)
+            mListLoader.load(mType.str)
         } else if (index == 1) {
         }
     }

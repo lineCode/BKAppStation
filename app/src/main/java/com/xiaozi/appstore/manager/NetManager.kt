@@ -58,10 +58,10 @@ object NetManager {
 //        }){}
     }
 
-    fun loadAppList(type: AppListType = AppListType.ALL, filter: String = "", success: Array<RespAppInfo>.() -> Unit, failed: String.() -> Unit) {
+    fun loadAppList(type: String = AppListType.ALL.str, filter: String = "", success: Array<RespAppInfo>.() -> Unit, failed: String.() -> Unit) {
         createBase<Array<RespAppInfo>>("$MAIN_URL/app/list", success, failed)
                 .Method(RequestHelper.Method.GET)
-                .UrlParam("type", type.str)
+                .UrlParam("type", type)
                 .apply { if(filter.isEmpty()) UrlParam("filter", filter) }
                 .get(Framework._C, Framework._H)
 

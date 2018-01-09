@@ -14,6 +14,8 @@ fun Context.ZToast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_LONG).s
 
 fun <T : View> View.bind(id: Int) = lazy { findViewById<T>(id) }
 
+fun View.onClick(clk: () -> Unit) = setOnClickListener { clk }
+
 inline fun <T, R> T?.safety(action: T.() -> R): R? = try {
     this?.action()
 } catch (ex: Exception) {

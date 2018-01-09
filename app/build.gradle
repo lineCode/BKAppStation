@@ -37,4 +37,5 @@ dependencies {
     implementation project(':FishDownloader')
     implementation project(':uicore')
     implementation 'com.jude:rollviewpager:+'
+    implementation 'com.umeng.analytics:analytics:latest.integration'
 }

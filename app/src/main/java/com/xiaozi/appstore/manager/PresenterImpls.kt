@@ -8,10 +8,10 @@ import com.xiaozi.appstore.view.AsyncWaiter
  */
 class AppListDataPresenterImpl(private val waiter: AsyncWaiter, private val onLoaded: Array<DataManager.AppInfo>.() -> Unit) : INetAppsPresenter {
     var isLoading = false
-    override fun load(type: AppListType, filter: String) {
+    override fun load(type: String, filter: String) {
         if (isLoading) return
         waiter.show(false)
-        NetManager.loadAppList(type, {
+        NetManager.loadAppList(type, filter, {
             DataManager.AppInfoDM.importApps(this)
             DataManager.AppInfoDM.getAppInfos().onLoaded()
             isLoading = false
@@ -25,3 +25,14 @@ class AppListDataPresenterImpl(private val waiter: AsyncWaiter, private val onLo
 }
 
 class CategoryPresenterImpl(private val waiter: AsyncWaiter, private val onLoaded: Array<DataManager>.() -> Unit)
+
+object PresenterImpls {
+    val AppInfoCachedPresenterImpl = object : ICachedDataPresenter<DataManager.AppInfo> {
+        override fun get(pkg: String) = DataManager.AppInfoDM.getAppInfo(pkg)
+    }
+    val AppUpdateCachedPresenterImpl = object : ICachedDataPresenter<DataManager.UploadInfo> {
+        override fun get(pkg: String) = DataManager.AppInfoDM.getAppUploadInfo(pkg)
+    }
+}
+
+

@@ -80,9 +80,9 @@ class HomeFragment : BaseFragment() {
         mTvTabApp.setCompoundDrawables(null, null, null, if (index == 0) mDrawableTab else mDrawableTabWhite)
         mTvTabGame.setCompoundDrawables(null, null, null, if (index == 1) mDrawableTab else mDrawableTabWhite)
         if (index == 0) {
-            mDataloader.load(AppListType.HOT_APP)
+            mDataloader.load(AppListType.HOT_APP.str)
         } else if (index == 1) {
-            mDataloader.load(AppListType.HOT_GAME)
+            mDataloader.load(AppListType.HOT_GAME.str)
         }
     }
 

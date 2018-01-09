@@ -38,6 +38,8 @@ class DataManager {
                        val tip: String, val content: String, val dlUrl: String, val installCnt: String)
 
     data class UploadInfo(val pkg: String)
+    data class Category(val name: String, val icon: String, val type: String, val tabs: Array<SecCategory>)
+    data class SecCategory(val name: String, val type: String)
 
 }
 
