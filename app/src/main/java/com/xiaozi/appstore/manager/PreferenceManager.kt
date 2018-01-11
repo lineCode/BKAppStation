@@ -29,7 +29,7 @@ sealed class PreferenceManager(module: Module) {
 
     fun addItem(key: String, data: String) {
         getSP().getStringSet(key, setOf()).let {
-            with (mutableSetOf<String>()) {
+            with(mutableSetOf<String>()) {
                 addAll(it)
                 add(data)
                 getSP().edit().putStringSet(key, it).apply()
@@ -40,6 +40,9 @@ sealed class PreferenceManager(module: Module) {
     fun getBooleanValue(key: String) = getSP().getBoolean(key, false)
     fun getIntValue(key: String, defaultValue: Int) = getSP().getInt(key, defaultValue)
     fun getIntValue(key: String) = getIntValue(key, -1)
+    fun getStringValue(key: String) = getSP().getString(key, "")
+
+    fun haveKey(key: String) = getSP().getString(key, null) != null
 
     enum class Module {
         Account,
@@ -47,6 +50,19 @@ sealed class PreferenceManager(module: Module) {
         Config,
     }
 }
+
+object AccountManager {
+    val KEY_TOKEN = "TOKEN"
+
+    var userName = ""
+    var userHeadIcon = ""
+    var userId = 0
+
+    fun storeToken(token: String) = AccountSPMgr.putValue(KEY_TOKEN, token)
+    fun isLoggedIn() = AccountSPMgr.haveKey(KEY_TOKEN)
+    fun token() = AccountSPMgr.getStringValue(KEY_TOKEN)
+}
+
 object AccountSPMgr : PreferenceManager(Module.Account)
 object AppSPMgr : PreferenceManager(Module.App)
 object ConfSPMgr : PreferenceManager(Module.Config)

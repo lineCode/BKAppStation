@@ -20,7 +20,7 @@ class SplashActivity : Activity() {
         CldApp.checkUpdateForString {
             _GSON.fromJson(it, RespUpdate::class.java).safetyNullable {
                 if (it == null || this!!.is_force == 0)
-                    NetManager.loadAppConfig { Call(2000) { HomeActivity.open(this@SplashActivity, this) } }
+                    NetManager.loadAppConfig(this@SplashActivity) { Call(2000) { HomeActivity.open(this@SplashActivity, this) } }
                 else
                     Call(2000) { HomeActivity.open(this@SplashActivity, this@safetyNullable) }
             }

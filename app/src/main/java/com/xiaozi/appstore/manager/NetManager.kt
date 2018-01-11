@@ -1,9 +1,18 @@
 package com.xiaozi.appstore.manager
 
+import android.app.Activity
+import cc.fish.cld_ctrl.common.util.AppUtils
 import cc.fish.fishhttp.net.RequestHelper
+import cc.fish.fishhttp.util.MD5Utils
 import com.google.gson.reflect.TypeToken
+import com.xiaozi.appstore.ZToast
+import com.xiaozi.appstore.component.Device
 import com.xiaozi.appstore.component.Framework
+import com.xiaozi.appstore.component.GlobalData
+import com.xiaozi.appstore.manager.NetManager.UrlPassNullParam
+import com.xiaozi.appstore.plugin._CLIENT_ID
 import com.xiaozi.appstore.plugin._DEBUG
+import com.xiaozi.appstore.plugin._KEY
 import java.io.Serializable
 
 /**
@@ -17,20 +26,28 @@ object NetManager {
     private val MAIN_URL = if (_DEBUG) _TEST_URL else _PRODUCT_URL
 
     inline fun <reified T> fastCall(url: String, crossinline success: T.() -> Unit = {}, crossinline failed: String.() -> Unit = {}) = createOri<T>(url, success, failed).get(Framework._C, Framework._H)
+    inline fun <reified T : BaseResp> fastCallBaseResp(url: String, crossinline success: T.() -> Unit = {}, crossinline failed: String.() -> Unit = {}) = createBase(url, success, failed).get(Framework._C, Framework._H)
 
-    inline fun <reified T> fastCallBaseResp(url: String, crossinline success: T.() -> Unit = {}, crossinline failed: String.() -> Unit = {}) = createBase(url, success, failed).get(Framework._C, Framework._H)
-
-
-    inline fun <reified T> createBase(url: String, crossinline success: T.() -> Unit, crossinline failed: String.() -> Unit) = RequestHelper<BaseResp<T>?>().apply {
+    inline fun <reified T : BaseResp> createBase(url: String, crossinline success: T.() -> Unit, crossinline failed: String.() -> Unit) = RequestHelper<T?>().apply {
         Url(url)
         Method(RequestHelper.Method.GET)
-        UrlParam("ts", "${System.currentTimeMillis()}", true)
-        ResultType(object : TypeToken<BaseResp<T?>>() {})
+        System.currentTimeMillis().apply {
+            UrlParam("timestamp", "${this}", true)
+            UrlParam("apiToken", MD5Utils.md5Encrypt("$_CLIENT_ID$_KEY$this"))
+        }
+        UrlParam("androidId", Device.getAndroidID())
+        UrlParam("clientVersion", "${AppUtils.getVersionCode(Framework._C)}")
+        UrlParam("deviceModel", Device.DEVICE_NAME)
+        UrlParam("imei", Device.getIMEI())
+        UrlParam("mac", Device.getMacAddr())
+        UrlParam("osVersion", Device.getMacAddr())
+        HeadPassNullParam("userToken", AccountManager.token())
+        ResultType(object : TypeToken<T?>() {})
         Success {
             if (it == null)
                 "null response".failed()
             else if (it.code == SUCCESS_CODE)
-                it.data.success()
+                it.success()
             else
                 it.msg.failed()
         }
@@ -51,31 +68,124 @@ object NetManager {
         Failed { it.failed() }
     }
 
-    fun loadAppConfig(success: () -> Unit) {
-        success()
-//        createBase<AppConf>("$MAIN_URL/app/conf", {
-//            success()
-//        }){}
+
+    /**APIS **************/
+
+    fun loadAppConfDry() = loadAppConfig(null) {}
+
+    fun loadAppConfig(activity: Activity?, success: () -> Unit) {
+        createBase<RespAppConf>("$MAIN_URL/app/conf", {
+            GlobalData.storeAppConfig(this)
+            success()
+        }) {
+            activity?.ZToast(this)
+        }
     }
 
-    fun loadAppList(type: String = AppListType.ALL.str, filter: String = "", success: Array<RespAppInfo>.() -> Unit, failed: String.() -> Unit) {
-        createBase<Array<RespAppInfo>>("$MAIN_URL/app/list", success, failed)
+    fun loadAppList(type: String = AppListType.ALL.str, condition: String, keyword: String = "", index: Int = 0, success: RespAppList.() -> Unit, failed: String.() -> Unit) {
+        createBase<RespAppList>("$MAIN_URL/app/list", success, failed)
                 .Method(RequestHelper.Method.GET)
-                .UrlParam("type", type)
-                .apply { if(filter.isEmpty()) UrlParam("filter", filter) }
+                .UrlPassNullParam("adstype", type)
+                .UrlParam("condition", condition)
+                .UrlPassNullParam("keyword", keyword)
+                .UrlParam("number", "20")
+                .UrlParam("start", "${1 + index * 20}")
                 .get(Framework._C, Framework._H)
-
     }
+
+    fun loadAssociateApps(pkg: String, success: RespAppList.() -> Unit, failed: String.() -> Unit) {
+        createBase<RespAppList>("$MAIN_URL/app/list", success, failed)
+                .Method(RequestHelper.Method.GET)
+                .UrlParam("associatedWord", pkg)
+                .UrlParam("condition", "associate")
+                .get(Framework._C, Framework._H)
+    }
+
+    fun loadCommentList(pkg: String, index: Int = 0, success: RespCommentList.() -> Unit, failed: String.() -> Unit) {
+        createBase<RespCommentList>("$MAIN_URL/app/comment", success, failed)
+                .Method(RequestHelper.Method.GET)
+                .UrlParam("packageName", pkg)
+                .UrlParam("number", "20")
+                .UrlParam("start", "${1 + index * 20}")
+                .get(Framework._C, Framework._H)
+    }
+
+    fun loadAppDetail(pkg: String, success: RespAppInfo.() -> Unit, failed: String.() -> Unit) {
+        createBase<RespAppInfo>("$MAIN_URL/app/detail", success, failed)
+                .Method(RequestHelper.Method.GET)
+                .UrlParam("packageName", pkg)
+                .get(Framework._C, Framework._H)
+    }
+
+    fun loadUserInfo(activity: Activity, userId: Int) {
+        createBase<RespUserInfo>("$MAIN_URL/user", {
+            AccountManager.userId = userInfo.userId
+            AccountManager.userName = userInfo.userName
+            AccountManager.userHeadIcon = userInfo.userImageUrl
+        }, activity::ZToast)
+                .Method(RequestHelper.Method.GET)
+                .UrlParam("userId", "$userId")
+                .get(Framework._C, Framework._H)
+    }
+
+    fun loadBanners(success: RespBanners.() -> Unit, failed: String.() -> Unit) {
+        createBase<RespBanners>("$MAIN_URL/app/banner", success, failed)
+                .Method(RequestHelper.Method.GET)
+                .get(Framework._C, Framework._H)
+    }
+
+    fun applyComment(commentTxt: String, point: Int, userId: Int, userName: String, success: BaseResp.() -> Unit, failed: String.() -> Unit) {
+        createBase<BaseResp>("$MAIN_URL/comment/apply", success, failed)
+                .Method(RequestHelper.Method.GET)
+                .UrlParam("commentTxt", commentTxt)
+                .UrlParam("point", "$point")
+                .UrlParam("userId", "$userId")
+                .UrlParam("userName", userName)
+                .get(Framework._C, Framework._H)
+    }
+
+    fun RequestHelper<*>.UrlPassNullParam(key: String, value: String) = this.apply { if (value.isNotBlank()) UrlParam(key, value) }
+    fun RequestHelper<*>.HeadPassNullParam(key: String, value: String) = this.apply { if (value.isNotBlank()) HeaderParam(key, value) }
 }
 
 enum class AppListType(val str: String) {
-    ALL("all"),
-    HOT_APP("hot_app"),
-    HOT_GAME("hot_game"),
-    CHART_APP("chart_app"),
-    CHART_GAME("chart_game")
+    ALL(""),
+    APP("app"),
+    GAME("game")
 }
 
-data class BaseResp<Data>(var code: Int, var msg: String, var data: Data) : Serializable
-data class RespAppConf(var conf: String)
-data class RespAppInfo(var pkg: String)
+enum class AppCondition(val str: String) {
+    HOT("hot"),
+    TOP("top"),
+    SEARCH("search"),
+    ASSOCIATE("associate")
+}
+
+open class BaseResp(var code: Int = 0, var msg: String = "") : Serializable
+data class RespAppConf(val configs: RespAppConfEntity) : BaseResp(), Serializable
+data class RespAppList(val appNodes: RespAppListEntity) : BaseResp(), Serializable
+data class RespAppInfo(val appInfo: RespAppInfoEntity) : BaseResp(), Serializable
+data class RespUserInfo(val userInfo: RespUserInfoEntity) : BaseResp(), Serializable
+data class RespCommentList(val comments: RespCommentListEntity) : BaseResp(), Serializable
+data class RespBanners(val banners: Array<RespBannersEntity>) : BaseResp(), Serializable
+
+data class RespAppConfEntity(val appClass: RespConfClz, val gameClass: RespConfClz, val timeStamp: Long)
+data class RespConfClz(val `class`: Array<RespAppClass>)
+data class RespAppClass(val id: Int, val name: String, val subclass: Array<RespClassSec>)
+data class RespClassSec(val id: Int, val name: String)
+
+data class RespAppListEntity(val node: Array<RespAppListInfo>, val number: Int, val start: Int)
+data class RespAppListInfo(val appDesc: String, val appName: String, val downloadCount: Int, val iconUrl: String,
+                           val packageName: String, val size: Int, val sn: Int)
+
+data class RespAppInfoEntity(val adType: String, val appName: String, val commentCount: Int, val desContent: String,
+                             val downloadUrl: String, val iconUrl: String, val imgUrls: Array<String>,
+                             val packageName: String, val point: Int, val size: Int, val tips: String, val updateLog: String)
+
+data class RespUserInfoEntity(val userId: Int, val userImageUrl: String, val userName: String)
+
+data class RespCommentListEntity(val node: Array<RespComment>, val number: Int, val start: Int, val total: Int)
+data class RespComment(val authorName: String, val content: String, val date: Long, val thumbsup: Int)
+
+data class RespBannersEntity(val banner: RespBanner)
+data class RespBanner(val image: String, val link: String, val sn: Int)

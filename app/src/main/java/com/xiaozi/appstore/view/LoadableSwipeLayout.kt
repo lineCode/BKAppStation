@@ -63,7 +63,10 @@ class LoadableSwipeLayout(ctx: Context, attrs: AttributeSet) : SwipeRefreshLayou
     fun getChildAdapter(): RecyclerView.Adapter<*>? = mRecyclerView?.adapter
 
     private var mLimPoi = 0
-    fun <T> onSwipe(dataList: MutableList<T>, refresh: ((Array<out T>) -> Unit) -> Unit,
+    fun <T> onSwipe(dataList: MutableList<T>, refresh: () -> Unit, load: Int.() -> Unit) =
+            onSwipeComplex(dataList, { refresh() }) { offset, _ -> offset.load() }
+
+    fun <T> onSwipeComplex(dataList: MutableList<T>, refresh: ((Array<out T>) -> Unit) -> Unit,
                     load: (offset: Int, (Array<out T>) -> Unit) -> Unit) {
         Handler(Looper.getMainLooper()).postDelayed({
             if (mRecyclerView == null) {

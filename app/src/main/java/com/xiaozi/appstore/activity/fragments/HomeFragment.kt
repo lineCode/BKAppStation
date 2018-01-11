@@ -29,7 +29,9 @@ class HomeFragment : BaseFragment() {
     lateinit var mTvTabGame: TextView
     lateinit var mRPV: RollPagerView
     lateinit var mRV: RecyclerView
-    lateinit var mDataloader: INetAppsPresenter
+    lateinit var mAppLoader: INetAppsPresenter
+    lateinit var mGameLoader: INetAppsPresenter
+    lateinit var mWaiter: AsyncWaiter
     val mData: MutableList<DataManager.AppInfo> = mutableListOf()
 
     override fun initView(inflater: LayoutInflater) = inflater.inflate(R.layout.f_home, null).safetySelf {
@@ -46,12 +48,19 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun initDataLoader() {
-        mDataloader = AppListDataPresenterImpl(AsyncWaiter(activity)) {
+        mAppLoader = AppListDataPresenterImpl(mWaiter, AppListType.APP.str, AppCondition.HOT.str) {
             mData.safety {
                 clear()
                 addAll(this@AppListDataPresenterImpl)
-                mAdapter.notifyDataSetChanged()
             }
+            mAdapter.notifyDataSetChanged()
+        }
+        mGameLoader = AppListDataPresenterImpl(mWaiter, AppListType.GAME.str, AppCondition.HOT.str) {
+            mData.safety {
+                clear()
+                addAll(this@AppListDataPresenterImpl)
+            }
+            mAdapter.notifyDataSetChanged()
         }
     }
 
@@ -77,12 +86,14 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun checkTab(index: Int) {
+        if (mWaiter.isWaiting)
+            return
         mTvTabApp.setCompoundDrawables(null, null, null, if (index == 0) mDrawableTab else mDrawableTabWhite)
         mTvTabGame.setCompoundDrawables(null, null, null, if (index == 1) mDrawableTab else mDrawableTabWhite)
         if (index == 0) {
-            mDataloader.load(AppListType.HOT_APP.str)
+            mAppLoader.load()
         } else if (index == 1) {
-            mDataloader.load(AppListType.HOT_GAME.str)
+            mGameLoader.load()
         }
     }
 

@@ -6,32 +6,41 @@ import com.xiaozi.appstore.view.AsyncWaiter
 /**
  * Created by fish on 18-1-7.
  */
-class AppListDataPresenterImpl(private val waiter: AsyncWaiter, private val onLoaded: Array<DataManager.AppInfo>.() -> Unit) : INetAppsPresenter {
-    var isLoading = false
-    override fun load(type: String, filter: String) {
-        if (isLoading) return
-        waiter.show(false)
-        NetManager.loadAppList(type, filter, {
-            DataManager.AppInfoDM.importApps(this)
+open class AppListDataPresenterImpl(private val waiter: AsyncWaiter, private val type: String, private val condition: String, private val keyword: String = "", private val onLoaded: Array<DataManager.AppInfo>.() -> Unit) : INetAppsPresenter {
+    var isFirstLoad = true
+    override fun load(showWaiter: Boolean, index: Int) {
+        if (waiter.showing()) return
+        if (showWaiter || isFirstLoad)
+            waiter.show(false)
+        else
+            waiter.showHidden()
+        isFirstLoad = false
+        NetManager.loadAppList(type, condition, keyword, index, {
+            if (index == 0)
+                DataManager.AppInfoDM.importApps(this.appNodes.node)
+            else
+                DataManager.AppInfoDM.appendApps(this.appNodes.node)
             DataManager.AppInfoDM.getAppInfos().onLoaded()
-            isLoading = false
             waiter.hide(200)
         }) {
             waiter.activity.ZToast(this)
-            isLoading = false
             waiter.hide(200)
         }
     }
 }
 
-class CategoryPresenterImpl(private val waiter: AsyncWaiter, private val onLoaded: Array<DataManager>.() -> Unit)
+class CommentListPresenterImpl(private val waiter: AsyncWaiter, private val pkg: String, private val onLoaded: Array<DataManager.AppInfo>.() -> Unit) : INetAppsPresenter {
+    override fun load(showWaiter: Boolean, index: Int) {
+
+    }
+
+}
+
+
 
 object PresenterImpls {
     val AppInfoCachedPresenterImpl = object : ICachedDataPresenter<DataManager.AppInfo> {
         override fun get(pkg: String) = DataManager.AppInfoDM.getAppInfo(pkg)
-    }
-    val AppUpdateCachedPresenterImpl = object : ICachedDataPresenter<DataManager.UploadInfo> {
-        override fun get(pkg: String) = DataManager.AppInfoDM.getAppUploadInfo(pkg)
     }
 }
 

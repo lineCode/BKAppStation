@@ -1,15 +1,17 @@
 package com.xiaozi.appstore.activity
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.ZToast
 import com.xiaozi.appstore.manager.DataManager
 import com.xiaozi.appstore.manager.PresenterImpls
-import com.xiaozi.appstore.safety
+import com.xiaozi.appstore.plugin.ImageLoaderHelper
 import com.xiaozi.appstore.safetyNullable
+import kotlinx.android.synthetic.main.a_app.*
+import kotlinx.android.synthetic.main.i_applist.*
 
 /**
  * Created by fish on 18-1-9.
@@ -18,7 +20,6 @@ class AppActivity : BaseBarActivity() {
     override fun title() = "应用市场"
     override fun layoutID() = R.layout.a_app
     lateinit var mData: DataManager.AppInfo
-    lateinit var mUpload: DataManager.UploadInfo
 
     companion object {
         val KEY_PACKAGE = "package"
@@ -32,6 +33,7 @@ class AppActivity : BaseBarActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initData()
+        initView()
     }
 
     private fun initData() {
@@ -41,13 +43,23 @@ class AppActivity : BaseBarActivity() {
                 return
             }
             mData = PresenterImpls.AppInfoCachedPresenterImpl.get(this)!!
-            mUpload = PresenterImpls.AppUpdateCachedPresenterImpl.get(this)!!
         }
-        if (!::mData.isInitialized || !::mUpload.isInitialized) {
+        if (!::mData.isInitialized) {
             exit()
             return
         }
     }
+
+    private fun initView() {
+        tv_iapp_name.text = mData.name
+        tv_iapp_content.text = mData.tip
+        tv_iapp_pos.visibility = View.GONE
+        tv_app_chat.text = ""
+        tv_app_info.text = mData.content
+        tv_app_info.text = ""
+        ImageLoaderHelper.loadImageWithCache(mData.icon, img_iapp_icon)
+    }
+
 
     private fun exit() {
         ZToast("应用信息错误")

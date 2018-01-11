@@ -60,6 +60,5 @@ object ImageLoaderHelper {
         } catch (ex: Exception) {
             img.context.ZToast("保存图片失败")
         }
-        val b = { println() }
     }
 }

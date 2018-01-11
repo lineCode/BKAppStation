@@ -40,24 +40,30 @@
             android:id="@+id/tv_fapp_tab_category"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:drawableBottom="@drawable/icon_linebar"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
+            android:layout_weight="1"
+            android:drawableBottom="@drawable/icon_linebar"
             android:gravity="center"
             android:text="分类"
             android:textColor="@color/text_dark"
             android:textSize="@dimen/title_text" />
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_fapp_chart"
+    <com.xiaozi.appstore.view.LoadableSwipeLayout
+        android:id="@+id/sp_fapp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_fapp_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.xiaozi.appstore.view.LoadableSwipeLayout>
+
     <LinearLayout
         android:id="@+id/ll_fapp_category"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-    </LinearLayout>
+        android:orientation="vertical"></LinearLayout>
 </LinearLayout>

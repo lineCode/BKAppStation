@@ -8,6 +8,9 @@ import com.google.gson.Gson
  */
 val _DEBUG = true
 
+val _CLIENT_ID = "BK_APP_STORE"
+val _KEY = "DA23JH1238"
+
 val _GSON = Gson()
 
 

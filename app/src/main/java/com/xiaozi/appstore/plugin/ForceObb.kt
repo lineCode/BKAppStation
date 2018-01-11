@@ -12,7 +12,7 @@ class ForceObb<T>  {
     fun addObserver(o: TypedOB<T>, useCache: Boolean = false) {
         mObs.addElement(o)
         if (useCache && mCache != null) {
-            o?.update(this@ForceObb, mCache)
+            o.update(this@ForceObb, mCache)
         }
     }
 

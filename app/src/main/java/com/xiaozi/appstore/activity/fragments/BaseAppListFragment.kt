@@ -15,6 +15,7 @@ import com.xiaozi.appstore.manager.*
 import com.xiaozi.appstore.safety
 import com.xiaozi.appstore.safetySelf
 import com.xiaozi.appstore.view.AsyncWaiter
+import com.xiaozi.appstore.view.LoadableSwipeLayout
 import com.xiaozi.appstore.view.TypedAppListVH
 
 /**
@@ -28,6 +29,7 @@ sealed class BaseAppListFragment : BaseFragment() {
     lateinit var mType: AppListType
     lateinit var mListLoader: INetAppsPresenter
     lateinit var mWaiter: AsyncWaiter
+    lateinit var mSwiper: LoadableSwipeLayout
     lateinit var mAdapter: RecyclerView.Adapter<TypedAppListVH>
     val mData: MutableList<DataManager.AppInfo> = mutableListOf()
     val mDrawableTab by lazy { resources.getDrawable(R.drawable.icon_linebar).apply { setBounds(0, 0, minimumWidth, minimumHeight) } }
@@ -37,21 +39,22 @@ sealed class BaseAppListFragment : BaseFragment() {
 
     override fun initView(inflater: LayoutInflater) = inflater.inflate(R.layout.f_app, null).safetySelf {
         mType = when (this@BaseAppListFragment) {
-            is AppFragment -> AppListType.CHART_APP
-            is GameFragment -> AppListType.CHART_GAME
+            is AppFragment -> AppListType.APP
+            is GameFragment -> AppListType.GAME
         }
         mWaiter = AsyncWaiter(activity)
         mTvChart = findViewById(R.id.tv_fapp_tab_chart)
         mTvCategory = findViewById(R.id.tv_fapp_tab_category)
         mRvList = findViewById(R.id.rv_fapp_chart)
         mLLCategory = findViewById(R.id.ll_fapp_category)
+        mSwiper = findViewById(R.id.sp_fapp)
         initRv()
         initLoader()
         initEffects()
     }
 
     fun initLoader() {
-        mListLoader = AppListDataPresenterImpl(mWaiter) {
+        mListLoader = AppListDataPresenterImpl(mWaiter, mType.str, AppCondition.TOP.str) {
             mData.safety {
                 clear()
                 addAll(this@AppListDataPresenterImpl)
@@ -74,6 +77,7 @@ sealed class BaseAppListFragment : BaseFragment() {
             layoutManager = LinearLayoutManager(activity)
             adapter = mAdapter
         }
+        mSwiper.onSwipe(mData, { mListLoader.load() }) { mListLoader.load(index = this) }
     }
 
     private fun initEffects() {
@@ -85,7 +89,8 @@ sealed class BaseAppListFragment : BaseFragment() {
         mTvChart.setCompoundDrawables(null, null, null, if (index == 0) mDrawableTab else mDrawableTabWhite)
         mTvCategory.setCompoundDrawables(null, null, null, if (index == 1) mDrawableTab else mDrawableTabWhite)
         if (index == 0) {
-            mListLoader.load(mType.str)
+            if (mData.isEmpty())
+                mListLoader.load()
         } else if (index == 1) {
         }
     }

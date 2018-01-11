@@ -39,16 +39,25 @@ object Dialogs {
 class AsyncWaiter(val activity: Activity) {
     var showTime = 0L
     var dialog: Dialog? = null
+    var isWaiting = false
     fun show(cancelable: Boolean) {
         if (dialog?.isShowing == true) return
         dialog = Dialogs.createWaiter(activity, cancelable).safetySelf(Dialog::show)
         showTime = System.currentTimeMillis()
+        isWaiting = true
+    }
+
+    fun showHidden(){
+        isWaiting = true
     }
 
     fun hide(minDelay: Long) {
+        isWaiting = false
         if (dialog?.isShowing == true && !isActivityDead(activity)) {
             Call(limitL(minDelay, System.currentTimeMillis() - showTime))
-            { dialog.safety(Dialog::cancel) }
+            {
+                dialog.safety(Dialog::cancel)
+            }
         }
     }
 
@@ -56,9 +65,12 @@ class AsyncWaiter(val activity: Activity) {
 
     fun hide() {
         if (dialog?.isShowing == true && !isActivityDead(activity)) {
+            isWaiting = false
             dialog.safety(Dialog::cancel)
         }
     }
+
+    fun showing() = isWaiting
 }
 
 class CommonDialog(val ctx: Context) {

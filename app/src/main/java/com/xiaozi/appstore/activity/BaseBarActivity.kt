@@ -20,9 +20,13 @@ abstract class BaseBarActivity : Activity(){
         img_base_bar_back.setOnClickListener { onBackPressed() }
     }
 
-    abstract open fun title(): String
+    abstract fun title(): String
 
-    abstract open fun layoutID(): Int
+    abstract fun layoutID(): Int
+
+    fun changeTitle(title: String) {
+        tv_base_bar_title.text = title
+    }
 
     fun hideBack() {
         img_base_bar_back.visibility = View.GONE
