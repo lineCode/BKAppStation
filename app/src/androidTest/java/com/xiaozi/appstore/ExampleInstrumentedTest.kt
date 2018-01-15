@@ -17,8 +17,12 @@ import org.junit.Assert.*
 class ExampleInstrumentedTest {
     @Test
     fun useAppContext() {
-        // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
         assertEquals("com.xiaozi.appstore", appContext.packageName)
+    }
+
+    @Test
+    fun TEST_NetManager() {
+        assertEquals(1+1, 2)
     }
 }

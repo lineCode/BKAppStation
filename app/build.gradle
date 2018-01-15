@@ -10,8 +10,8 @@ android {
         applicationId "com.xiaozi.appstore"
         minSdkVersion 17
         targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        versionCode 1000
+        versionName "V 1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         resValue "string", "version_name", getVersionName()
     }
@@ -38,4 +38,9 @@ dependencies {
     implementation project(':uicore')
     implementation 'com.jude:rollviewpager:+'
     implementation 'com.umeng.analytics:analytics:latest.integration'
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:1.4.0'
+
+    //kotlin test
+    androidTestCompile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    androidTestCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
 }

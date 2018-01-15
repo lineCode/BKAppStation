@@ -37,6 +37,12 @@
             android:name=".activity.AppListActivity"
             android:screenOrientation="portrait" />
 
+        <activity android:name=".activity.AboutActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".activity.FeedbackActivity"
+            android:screenOrientation="portrait"/>
+
         <receiver android:name=".receiver.AppInstallRcv">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_ADDED"></action>

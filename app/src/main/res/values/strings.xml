@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">AppStore</string>
+    <string name="app_name">贝壳应用市场</string>
+
+    <string name="app_about"></string>
 </resources>

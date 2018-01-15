@@ -145,6 +145,36 @@ object NetManager {
                 .get(Framework._C, Framework._H)
     }
 
+    fun applyFeedback(content: String, success: BaseResp.()->Unit, failed: String.() -> Unit) {
+        createBase<BaseResp>("$MAIN_URL/feedback", success, failed)
+                .Method(RequestHelper.Method.GET)
+                .UrlParam("advise", content)
+                .UrlParam("email", "")
+                .UrlParam("qq", "")
+                .UrlParam("userId", "")
+                .get(Framework._C, Framework._H)
+    }
+
+    fun applyThumbsup(appId: Int, commentId: Int, userId: Int, success: BaseResp.()->Unit, failed: String.() -> Unit) {
+        createBase<BaseResp>("$MAIN_URL/thumb/apply", success, failed)
+                .Method(RequestHelper.Method.GET)
+                .UrlParam("appId", "$appId")
+                .UrlParam("beThumbsup", "1")
+                .UrlParam("commentId", "$commentId")
+                .UrlParam("userId", "${AccountManager.userId}")
+                .get(Framework._C, Framework._H)
+    }
+
+    fun login(openId: String, unionId: String, userName: String, imgUrl: String, success: RespLoginInfo.()-> Unit, failed: String.() -> Unit) {
+        createBase<RespLoginInfo>("$MAIN_URL/user/login", success, failed)
+                .Method(RequestHelper.Method.GET)
+                .UrlParam("openId", openId)
+                .UrlParam("unionId", unionId)
+                .UrlParam("userName", userName)
+                .UrlParam("imgUrl", imgUrl)
+                .get(Framework._C, Framework._H)
+    }
+
     fun RequestHelper<*>.UrlPassNullParam(key: String, value: String) = this.apply { if (value.isNotBlank()) UrlParam(key, value) }
     fun RequestHelper<*>.HeadPassNullParam(key: String, value: String) = this.apply { if (value.isNotBlank()) HeaderParam(key, value) }
 }
@@ -169,6 +199,7 @@ data class RespAppInfo(val appInfo: RespAppInfoEntity) : BaseResp(), Serializabl
 data class RespUserInfo(val userInfo: RespUserInfoEntity) : BaseResp(), Serializable
 data class RespCommentList(val comments: RespCommentListEntity) : BaseResp(), Serializable
 data class RespBanners(val banners: Array<RespBannersEntity>) : BaseResp(), Serializable
+data class RespLoginInfo(val userId: String, val userToken: String) : BaseResp(), Serializable
 
 data class RespAppConfEntity(val appClass: RespConfClz, val gameClass: RespConfClz, val timeStamp: Long)
 data class RespConfClz(val `class`: Array<RespAppClass>)
