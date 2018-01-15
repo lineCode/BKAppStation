@@ -1,5 +1,6 @@
 package com.xiaozi.appstore.manager
 
+import android.app.Activity
 import com.xiaozi.appstore.ZToast
 import com.xiaozi.appstore.view.AsyncWaiter
 
@@ -23,20 +24,45 @@ open class AppListDataPresenterImpl(private val waiter: AsyncWaiter, private val
             DataManager.AppInfoDM.getAppInfos().onLoaded()
             waiter.hide(200)
         }) {
-            waiter.activity.ZToast(this)
+            waiter.activity::ZToast
+            arrayOf<DataManager.AppInfo>().onLoaded()
             waiter.hide(200)
         }
     }
 }
 
-class CommentListPresenterImpl(private val waiter: AsyncWaiter, private val pkg: String, private val onLoaded: Array<DataManager.AppInfo>.() -> Unit) : INetAppsPresenter {
+open class CommentListPresenterImpl(private val waiter: AsyncWaiter, private val appId: Int, private val onLoaded: Array<DataManager.Comment>.(isAppend: Boolean) -> Unit) : INetAppsPresenter {
     override fun load(showWaiter: Boolean, index: Int) {
+        if (waiter.isWaiting) return
+        if (showWaiter)
+            waiter.show(false)
+        else
+            waiter.showHidden()
+        NetManager.loadCommentList(appId, index, {
+            DataManager.Transor.CommentTransor(this).onLoaded(index != 0)
+            waiter.hide(200)
+        }) {
+            waiter.activity::ZToast
+            arrayOf<DataManager.Comment>().onLoaded(index != 0)
+            waiter.hide(200)
+        }
 
     }
 
 }
 
-
+open class AppDetailPresenterImpl(private val mWaiter: AsyncWaiter, private val appId: Int, private val onLoaded: (data: DataManager.AppDetail) -> Unit) : IDataPresenter {
+    override fun load() {
+        mWaiter.show()
+        NetManager.loadAppDetail(appId, {
+            mWaiter.hide(200)
+            onLoaded(DataManager.Transor.AppDetailTransor(this))
+        }) {
+            mWaiter.hide(200)
+            mWaiter.activity::ZToast
+        }
+    }
+}
 
 object PresenterImpls {
     val AppInfoCachedPresenterImpl = object : ICachedDataPresenter<DataManager.AppInfo> {

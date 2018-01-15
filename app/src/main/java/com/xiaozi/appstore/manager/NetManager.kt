@@ -101,19 +101,19 @@ object NetManager {
                 .get(Framework._C, Framework._H)
     }
 
-    fun loadCommentList(pkg: String, index: Int = 0, success: RespCommentList.() -> Unit, failed: String.() -> Unit) {
+    fun loadCommentList(appId: Int, index: Int = 0, success: RespCommentList.() -> Unit, failed: String.() -> Unit) {
         createBase<RespCommentList>("$MAIN_URL/app/comment", success, failed)
                 .Method(RequestHelper.Method.GET)
-                .UrlParam("packageName", pkg)
+                .UrlParam("appId", "$appId")
                 .UrlParam("number", "20")
                 .UrlParam("start", "${1 + index * 20}")
                 .get(Framework._C, Framework._H)
     }
 
-    fun loadAppDetail(pkg: String, success: RespAppInfo.() -> Unit, failed: String.() -> Unit) {
+    fun loadAppDetail(appId: Int, success: RespAppInfo.() -> Unit, failed: String.() -> Unit) {
         createBase<RespAppInfo>("$MAIN_URL/app/detail", success, failed)
                 .Method(RequestHelper.Method.GET)
-                .UrlParam("packageName", pkg)
+                .UrlParam("appId", "$appId")
                 .get(Framework._C, Framework._H)
     }
 
@@ -134,9 +134,10 @@ object NetManager {
                 .get(Framework._C, Framework._H)
     }
 
-    fun applyComment(commentTxt: String, point: Int, userId: Int, userName: String, success: BaseResp.() -> Unit, failed: String.() -> Unit) {
+    fun applyComment(appId: Int, commentTxt: String, point: Int, userId: Int, userName: String, success: BaseResp.() -> Unit, failed: String.() -> Unit) {
         createBase<BaseResp>("$MAIN_URL/comment/apply", success, failed)
                 .Method(RequestHelper.Method.GET)
+                .UrlParam("appId", "$appId")
                 .UrlParam("commentTxt", commentTxt)
                 .UrlParam("point", "$point")
                 .UrlParam("userId", "$userId")
@@ -176,16 +177,16 @@ data class RespClassSec(val id: Int, val name: String)
 
 data class RespAppListEntity(val node: Array<RespAppListInfo>, val number: Int, val start: Int)
 data class RespAppListInfo(val appDesc: String, val appName: String, val downloadCount: Int, val iconUrl: String,
-                           val packageName: String, val size: Int, val sn: Int)
+                           val packageName: String, val size: Int, val sn: Int, val appId: Int, val downloadUrl: String)
 
 data class RespAppInfoEntity(val adType: String, val appName: String, val commentCount: Int, val desContent: String,
-                             val downloadUrl: String, val iconUrl: String, val imgUrls: Array<String>,
+                             val appId: Int, val downloadUrl: String, val iconUrl: String, val imgUrls: Array<String>,
                              val packageName: String, val point: Int, val size: Int, val tips: String, val updateLog: String)
 
 data class RespUserInfoEntity(val userId: Int, val userImageUrl: String, val userName: String)
 
 data class RespCommentListEntity(val node: Array<RespComment>, val number: Int, val start: Int, val total: Int)
-data class RespComment(val authorName: String, val content: String, val date: Long, val thumbsup: Int)
+data class RespComment(val authorName: String,val thumbsupSign: Int, val content: String, val date: Long, val thumbsupCount: Int, val commentId: Int)
 
 data class RespBannersEntity(val banner: RespBanner)
 data class RespBanner(val image: String, val link: String, val sn: Int)

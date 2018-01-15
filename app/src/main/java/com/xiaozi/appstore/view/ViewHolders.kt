@@ -1,5 +1,9 @@
 package com.xiaozi.appstore.view
 
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Rect
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.fish.downloader.view.DownloadBar
 import com.xiaozi.appstore.R
+import com.xiaozi.appstore.dp2px
 import com.xiaozi.appstore.manager.DataManager
 import com.xiaozi.appstore.onClick
 import com.xiaozi.appstore.plugin.ImageLoaderHelper
@@ -52,7 +57,7 @@ class TypedAppListVH(val v: View) : RecyclerView.ViewHolder(v) {
             mTvPos.text = "$poi"
         } else
             mTvPos.visibility = View.GONE
-        mTvCon.text = app.content
+        mTvCon.text = app.tip
         ImageLoaderHelper.loadImageWithCache(app.icon, mImgIcon)
     }
 
@@ -80,4 +85,51 @@ class CategoryVH(val v: View) : RecyclerView.ViewHolder(v) {
             }
     }
 }
+
+class CommentVH(val v: View) : RecyclerView.ViewHolder(v) {
+    constructor(parent: ViewGroup?) : this(LayoutInflater.from(parent?.context).inflate(R.layout.i_comment, parent, false))
+
+    val imgIcon = v.findViewById<ImageView>(R.id.img_icomment_userhead)
+    val tvName = v.findViewById<TextView>(R.id.tv_icomment_username)
+    val tvAgree = v.findViewById<TextView>(R.id.tv_icomment_agree)
+    val tvDate = v.findViewById<TextView>(R.id.tv_icomment_date)
+    val tvContent = v.findViewById<TextView>(R.id.tv_icomment_content)
+    val mDrawableAgree = v.context.resources.getDrawable(R.drawable.icon_agreed).apply { setBounds(0, 0, minimumWidth, minimumHeight) }
+    val mDrawableUnAgree = v.context.resources.getDrawable(R.drawable.icon_unagreed).apply { setBounds(0, 0, minimumWidth, minimumHeight) }
+    fun load(data: DataManager.Comment, tvAction: TextView.() -> Unit) {
+        ImageLoaderHelper.loadImageWithCache(data.headIcon, imgIcon)
+        tvName.text = data.name
+        tvDate.text = data.time
+        tvContent.text = data.content
+        tvAgree.safety {
+            text = "${data.count}"
+            setCompoundDrawables(null, null, if (data.isAgreed == 1) mDrawableAgree else mDrawableUnAgree, null)
+            if (data.isAgreed == 0) setOnClickListener { this.tvAction() }
+        }
+    }
+}
+
+class ImageVH(v: ImageView) : RecyclerView.ViewHolder(v) {
+    val img = v
+    fun load(imgUrl: String) {
+        ImageLoaderHelper.loadImageWithCache(imgUrl, img)
+    }
+}
+
+
+class RecyclerDividerDecor(private val ctx: Context, private val dividerSize: Int) : RecyclerView.ItemDecoration() {
+    val mDividerSize = ctx.dp2px(dividerSize)
+    override fun getItemOffsets(outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?) {
+        if (parent?.layoutManager is LinearLayoutManager) {
+
+            if ((parent.layoutManager as LinearLayoutManager).orientation == LinearLayoutManager.HORIZONTAL) {
+                outRect?.set(mDividerSize, mDividerSize, mDividerSize, 0)
+            } else {
+                outRect?.set(0, 0, 0, mDividerSize)
+            }
+        }
+    }
+}
+
+
 

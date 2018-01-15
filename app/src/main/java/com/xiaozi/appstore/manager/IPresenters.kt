@@ -10,3 +10,7 @@ interface INetAppsPresenter {
 interface ICachedDataPresenter<out T> {
     fun get(tag: String): T?
 }
+
+interface IDataPresenter {
+    fun load()
+}

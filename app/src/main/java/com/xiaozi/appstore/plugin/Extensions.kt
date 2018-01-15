@@ -11,10 +11,12 @@ import com.xiaozi.appstore.component.Framework
 fun Call(delay: Long = 0, success: () -> Unit) = Framework._H.postDelayed(success, delay)
 
 fun Context.ZToast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+fun Context.dp2px(dpValue: Int) = (dpValue * resources.displayMetrics.density + 0.5f).toInt()
+
 
 fun <T : View> View.bind(id: Int) = lazy { findViewById<T>(id) }
 
-fun View.onClick(clk: () -> Unit) = setOnClickListener { clk }
+fun View.onClick(clk: () -> Unit) = setOnClickListener { clk() }
 
 inline fun <T, R> T?.safety(action: T.() -> R): R? = try {
     this?.action()

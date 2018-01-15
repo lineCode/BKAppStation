@@ -40,7 +40,7 @@ class AsyncWaiter(val activity: Activity) {
     var showTime = 0L
     var dialog: Dialog? = null
     var isWaiting = false
-    fun show(cancelable: Boolean) {
+    fun show(cancelable: Boolean = false) {
         if (dialog?.isShowing == true) return
         dialog = Dialogs.createWaiter(activity, cancelable).safetySelf(Dialog::show)
         showTime = System.currentTimeMillis()
