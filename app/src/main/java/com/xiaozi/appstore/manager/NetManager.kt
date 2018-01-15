@@ -74,6 +74,7 @@ object NetManager {
     fun loadAppConfDry() = loadAppConfig(null) {}
 
     fun loadAppConfig(activity: Activity?, success: () -> Unit) {
+        success()
         createBase<RespAppConf>("$MAIN_URL/app/conf", {
             GlobalData.storeAppConfig(this)
             success()

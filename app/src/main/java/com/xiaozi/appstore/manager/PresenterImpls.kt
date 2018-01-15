@@ -64,6 +64,15 @@ open class AppDetailPresenterImpl(private val mWaiter: AsyncWaiter, private val 
     }
 }
 
+class CategoryPresenterImpl(private val type: AppListType, private val onLoaded: List<DataManager.Category>.() -> Unit) : IDataPresenter {
+    override fun load() = when (type) {
+        AppListType.APP -> DataManager.CategoryDM.mAppCategory.onLoaded()
+        AppListType.GAME -> DataManager.CategoryDM.mGameCategory.onLoaded()
+        else -> {
+        }
+    }
+}
+
 object PresenterImpls {
     val AppInfoCachedPresenterImpl = object : ICachedDataPresenter<DataManager.AppInfo> {
         override fun get(pkg: String) = DataManager.AppInfoDM.getAppInfo(pkg)

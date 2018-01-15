@@ -32,8 +32,8 @@ class DataManager {
 
 
     object CategoryDM {
-        lateinit var mAppCategory: Category
-        lateinit var mGameCategory: Category
+        lateinit var mAppCategory: MutableList<Category>
+        lateinit var mGameCategory: MutableList<Category>
         private fun trans(data: RespConfClz) = data.`class`.map {
             Category(it.name, "type icon", it.id, it.subclass.map { SecCategory(it.name, it.id) })
         }

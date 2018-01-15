@@ -13,6 +13,7 @@
         android:hint="请详细输入您想反馈的问题"
         android:padding="16dp"
         android:textColor="@color/text_dark"
+        android:background="@android:color/transparent"
         android:textSize="@dimen/common_text" />
 
     <View

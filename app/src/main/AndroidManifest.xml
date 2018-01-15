@@ -43,6 +43,13 @@
         <activity android:name=".activity.FeedbackActivity"
             android:screenOrientation="portrait"/>
 
+        <activity android:name=".activity.LoginActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".wxapi.WXEntryActivity"
+            android:screenOrientation="portrait"
+            android:exported="true"/>
+
         <receiver android:name=".receiver.AppInstallRcv">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_ADDED"></action>

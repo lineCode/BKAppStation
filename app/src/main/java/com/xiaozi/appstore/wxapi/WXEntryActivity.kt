@@ -13,6 +13,8 @@ import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler
 import com.tencent.mm.opensdk.openapi.WXAPIFactory
 import com.xiaozi.appstore.ZToast
 import com.xiaozi.appstore.component.Framework
+import com.xiaozi.appstore.manager.AccountManager
+import com.xiaozi.appstore.manager.NetManager
 import com.xiaozi.appstore.plugin.LogFilePlugin
 import com.xiaozi.appstore.wxapi.WXHelper.Companion.APP_ID
 import com.xiaozi.appstore.wxapi.WXHelper.Companion.APP_SECRET
@@ -85,8 +87,14 @@ class WXEntryActivity : IWXAPIEventHandler, Activity() {
     }
 
     private fun loadWXUserInfo(access: WXAccessResp) {
-        RequestHelper<WXUserInfo?>().Success {
-
+        RequestHelper<WXUserInfo>().Success {
+            NetManager.login(it.openid, it.unionid, it.nickname, it.headimgurl, {
+                AccountManager.apply {
+                    storeToken(userToken)
+                    userHeadIcon = ""
+                    userName = ""
+                }
+            }) {}
         }.Url(URL_WX_USERINFO)
                 .Method(RequestHelper.Method.GET)
                 .Result(WXUserInfo::class.java)

@@ -19,6 +19,7 @@
     </FrameLayout>
 
     <LinearLayout
+        android:id="@+id/ll_fmine_login"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:gravity="center_vertical"
@@ -90,7 +91,7 @@
         android:background="@color/line" />
 
     <RelativeLayout
-        android:id="@+id/fl_fmine_download"
+        android:id="@+id/rl_fmine_download"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:gravity="center_vertical">
