@@ -73,6 +73,12 @@ class CategoryPresenterImpl(private val type: AppListType, private val onLoaded:
     }
 }
 
+class SearchPresenterImpl(private val onLoaded: Array<String>.() -> Unit) : IDataPresenter {
+    override fun load() {
+        NetManager.loadHotWords{ names.onLoaded() }
+    }
+}
+
 object PresenterImpls {
     val AppInfoCachedPresenterImpl = object : ICachedDataPresenter<DataManager.AppInfo> {
         override fun get(pkg: String) = DataManager.AppInfoDM.getAppInfo(pkg)

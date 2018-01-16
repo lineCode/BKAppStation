@@ -135,6 +135,12 @@ object NetManager {
                 .get(Framework._C, Framework._H)
     }
 
+    fun loadHotWords(success: RespHots.() -> Unit) {
+        createBase<RespHots>("$MAIN_URL/hots", success, {})
+                .Method(RequestHelper.Method.GET)
+                .get(Framework._C, Framework._H)
+    }
+
     fun applyComment(appId: Int, commentTxt: String, point: Int, userId: Int, userName: String, success: BaseResp.() -> Unit, failed: String.() -> Unit) {
         createBase<BaseResp>("$MAIN_URL/comment/apply", success, failed)
                 .Method(RequestHelper.Method.GET)
@@ -146,7 +152,7 @@ object NetManager {
                 .get(Framework._C, Framework._H)
     }
 
-    fun applyFeedback(content: String, success: BaseResp.()->Unit, failed: String.() -> Unit) {
+    fun applyFeedback(content: String, success: BaseResp.() -> Unit, failed: String.() -> Unit) {
         createBase<BaseResp>("$MAIN_URL/feedback", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("advise", content)
@@ -156,7 +162,7 @@ object NetManager {
                 .get(Framework._C, Framework._H)
     }
 
-    fun applyThumbsup(appId: Int, commentId: Int, userId: Int, success: BaseResp.()->Unit, failed: String.() -> Unit) {
+    fun applyThumbsup(appId: Int, commentId: Int, userId: Int, success: BaseResp.() -> Unit, failed: String.() -> Unit) {
         createBase<BaseResp>("$MAIN_URL/thumb/apply", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("appId", "$appId")
@@ -166,7 +172,7 @@ object NetManager {
                 .get(Framework._C, Framework._H)
     }
 
-    fun login(openId: String, unionId: String, userName: String, imgUrl: String, success: RespLoginInfo.()-> Unit, failed: String.() -> Unit) {
+    fun login(openId: String, unionId: String, userName: String, imgUrl: String, success: RespLoginInfo.() -> Unit, failed: String.() -> Unit) {
         createBase<RespLoginInfo>("$MAIN_URL/user/login", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("openId", openId)
@@ -201,6 +207,7 @@ data class RespUserInfo(val userInfo: RespUserInfoEntity) : BaseResp(), Serializ
 data class RespCommentList(val comments: RespCommentListEntity) : BaseResp(), Serializable
 data class RespBanners(val banners: Array<RespBannersEntity>) : BaseResp(), Serializable
 data class RespLoginInfo(val userId: String, val userToken: String) : BaseResp(), Serializable
+data class RespHots(val names: Array<String>) : BaseResp(), Serializable
 
 data class RespAppConfEntity(val appClass: RespConfClz, val gameClass: RespConfClz, val timeStamp: Long)
 data class RespConfClz(val `class`: Array<RespAppClass>)
@@ -218,7 +225,7 @@ data class RespAppInfoEntity(val adType: String, val appName: String, val commen
 data class RespUserInfoEntity(val userId: Int, val userImageUrl: String, val userName: String)
 
 data class RespCommentListEntity(val node: Array<RespComment>, val number: Int, val start: Int, val total: Int)
-data class RespComment(val authorName: String,val thumbsupSign: Int, val content: String, val date: Long, val thumbsupCount: Int, val commentId: Int)
+data class RespComment(val authorName: String, val thumbsupSign: Int, val content: String, val date: Long, val thumbsupCount: Int, val commentId: Int)
 
 data class RespBannersEntity(val banner: RespBanner)
 data class RespBanner(val image: String, val link: String, val sn: Int)

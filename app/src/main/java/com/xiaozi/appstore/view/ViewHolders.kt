@@ -12,11 +12,18 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.fish.downloader.view.DownloadBar
 import com.xiaozi.appstore.R
+import com.xiaozi.appstore.activity.AppListActivity
+import com.xiaozi.appstore.component.Framework
+import com.xiaozi.appstore.component.GlobalData
 import com.xiaozi.appstore.dp2px
+import com.xiaozi.appstore.manager.AppCondition
+import com.xiaozi.appstore.manager.AppListType
 import com.xiaozi.appstore.manager.DataManager
+import com.xiaozi.appstore.manager.DownloadInfoManager
 import com.xiaozi.appstore.onClick
 import com.xiaozi.appstore.plugin.ImageLoaderHelper
 import com.xiaozi.appstore.safety
+import java.io.File
 
 /**
  * Created by fish on 18-1-5.
@@ -113,6 +120,48 @@ class ImageVH(v: ImageView) : RecyclerView.ViewHolder(v) {
     val img = v
     fun load(imgUrl: String) {
         ImageLoaderHelper.loadImageWithCache(imgUrl, img)
+    }
+}
+
+class DownloadingVH(private val v: View) : RecyclerView.ViewHolder(v) {
+    constructor(parent: ViewGroup?) : this(LayoutInflater.from(parent?.context).inflate(R.layout.i_downloading, parent, false))
+
+    private val mTvName = v.findViewById<TextView>(R.id.tv_idl_name)
+    private val mTvContent = v.findViewById<TextView>(R.id.tv_idl_content)
+    val mDownloader = v.findViewById<DownloadBar>(R.id.download_idl)
+    fun load(data: DownloadInfoManager.DownloadInfo) {
+        mTvName.text = data.name
+        if (data.size == data.ptr) {
+            if (!File(data.path).exists()) {
+                mTvContent.text = "文件已删除"
+                mDownloader.text("已删除")
+                return
+            }
+            mTvContent.text = "已完成"
+            mDownloader.apply {
+                if (GlobalData.isAppInstalled(data.tag)) {
+                    text("打开")
+                    setOnClickListener { Framework.App.openOtherApp(data.tag) }
+                } else {
+                    text("安装")
+                    setOnClickListener { File(data.path).safety(Framework.App::installApp) }
+                }
+            }
+        } else {
+            mTvContent.text = "${Framework.Trans.Size(data.ptr)}/${Framework.Trans.Size(data.size)} 0B/s"
+            mDownloader.text("暂停")
+            mDownloader.setOnClickListener { }
+        }
+    }
+
+    fun content(str: String) {
+        mTvContent.text = str
+    }
+}
+
+class SearchVH(private val v: TextView) : RecyclerView.ViewHolder(v) {
+    fun load(searchWord: String) {
+        AppListActivity.open(v.context, "搜索结果", AppListType.ALL.str, AppCondition.SEARCH.str, searchWord)
     }
 }
 

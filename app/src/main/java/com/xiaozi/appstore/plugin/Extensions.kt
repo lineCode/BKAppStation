@@ -39,3 +39,12 @@ inline fun <reified T> T?.safetySelf(action: T.() -> Any?): T? = try {
     ex.printStackTrace()
     this
 }
+
+fun <T> Collection<T?>.toNotNullMutableList(): MutableList<T> = ArrayList<T>(this.filter { it != null })
+
+fun <T> Iterable<T>.forkList(predicate: T.() -> Boolean, result: (resultTrue: List<T>, resultFalse: List<T>) -> Unit) {
+    val tList = mutableListOf<T>()
+    val fList = mutableListOf<T>()
+    this.forEach { if (it.predicate()) tList.add(it) else fList.add(it) }
+    result(tList, fList)
+}

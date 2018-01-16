@@ -2,6 +2,10 @@ package com.xiaozi.appstore.manager
 
 import android.content.Context
 import com.xiaozi.appstore.component.Framework
+import com.xiaozi.appstore.plugin._GSON
+import com.xiaozi.appstore.safety
+import com.xiaozi.appstore.toNotNullMutableList
+import java.io.Serializable
 
 /**
  * Created by fish on 17-7-4.
@@ -21,8 +25,7 @@ sealed class PreferenceManager(module: Module) {
                 is Long -> putLong(key, value)
                 is Float -> putFloat(key, value)
                 is String -> putString(key, value)
-                else -> {
-                }
+                else -> putString(key, _GSON.toJson(value))
             }
         }.apply()
     }
@@ -48,6 +51,7 @@ sealed class PreferenceManager(module: Module) {
         Account,
         App,
         Config,
+        Download,
     }
 }
 
@@ -63,6 +67,19 @@ object AccountManager {
     fun token() = AccountSPMgr.getStringValue(KEY_TOKEN)
 }
 
+object DownloadInfoManager {
+    val KEY_DOWNLOADS = "downloads"
+    val downloadInfos = DownloadSPMgr.getSP().all.map { _GSON.safety { fromJson(it.value as String, DownloadInfo::class.java) } }.toNotNullMutableList()
+
+    fun storeInfo(info: DownloadInfo) {
+        DownloadSPMgr.putValue(info.tag, info)
+        downloadInfos.add(info)
+    }
+
+    data class DownloadInfo(val url: String, val path: String, val name: String, val tag: String, val size: Int, var ptr: Int)
+}
+
 object AccountSPMgr : PreferenceManager(Module.Account)
 object AppSPMgr : PreferenceManager(Module.App)
 object ConfSPMgr : PreferenceManager(Module.Config)
+object DownloadSPMgr : PreferenceManager(Module.Download)

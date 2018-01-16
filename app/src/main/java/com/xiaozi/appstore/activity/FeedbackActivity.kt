@@ -18,10 +18,11 @@ class FeedbackActivity : BaseBarActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         et_feedback.text.toString().safety {
-            if (this.isEmpty()) {
-                ZToast("请输入反馈内容")
-            }
             tv_feedback_apply.setOnClickListener {
+                if (this.isEmpty()) {
+                    ZToast("请输入反馈内容")
+                    return@setOnClickListener
+                }
                 NetManager.applyFeedback(this, { ZToast("反馈上报成功") }, this@FeedbackActivity::ZToast)
             }
         }
