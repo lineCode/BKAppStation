@@ -75,7 +75,7 @@ object NetManager {
 
     fun loadAppConfig(activity: Activity?, success: () -> Unit) {
         success()
-        createBase<RespAppConf>("$MAIN_URL/app/conf", {
+        createBase<RespAppConf>("$MAIN_URL/cconfig", {
             GlobalData.storeAppConfig(this)
             success()
         }) {
@@ -97,13 +97,13 @@ object NetManager {
     fun loadAssociateApps(pkg: String, success: RespAppList.() -> Unit, failed: String.() -> Unit) {
         createBase<RespAppList>("$MAIN_URL/app/list", success, failed)
                 .Method(RequestHelper.Method.GET)
-                .UrlParam("associatedWord", pkg)
+                .UrlParam("associatedApp", pkg)
                 .UrlParam("condition", "associate")
                 .get(Framework._C, Framework._H)
     }
 
     fun loadCommentList(appId: Int, index: Int = 0, success: RespCommentList.() -> Unit, failed: String.() -> Unit) {
-        createBase<RespCommentList>("$MAIN_URL/app/comment", success, failed)
+        createBase<RespCommentList>("$MAIN_URL/comment/list", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("appId", "$appId")
                 .UrlParam("number", "20")
@@ -112,14 +112,14 @@ object NetManager {
     }
 
     fun loadAppDetail(appId: Int, success: RespAppInfo.() -> Unit, failed: String.() -> Unit) {
-        createBase<RespAppInfo>("$MAIN_URL/app/detail", success, failed)
+        createBase<RespAppInfo>("$MAIN_URL/app/info", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("appId", "$appId")
                 .get(Framework._C, Framework._H)
     }
 
     fun loadUserInfo(activity: Activity, userId: Int) {
-        createBase<RespUserInfo>("$MAIN_URL/user", {
+        createBase<RespUserInfo>("$MAIN_URL/user/getinfo", {
             AccountManager.userId = userInfo.userId
             AccountManager.userName = userInfo.userName
             AccountManager.userHeadIcon = userInfo.userImageUrl
@@ -130,19 +130,19 @@ object NetManager {
     }
 
     fun loadBanners(success: RespBanners.() -> Unit, failed: String.() -> Unit) {
-        createBase<RespBanners>("$MAIN_URL/app/banner", success, failed)
+        createBase<RespBanners>("$MAIN_URL/ad", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .get(Framework._C, Framework._H)
     }
 
     fun loadHotWords(success: RespHots.() -> Unit) {
-        createBase<RespHots>("$MAIN_URL/hots", success, {})
+        createBase<RespHots>("$MAIN_URL/topsearchkw", success, {})
                 .Method(RequestHelper.Method.GET)
                 .get(Framework._C, Framework._H)
     }
 
     fun applyComment(appId: Int, commentTxt: String, point: Int, userId: Int, userName: String, success: BaseResp.() -> Unit, failed: String.() -> Unit) {
-        createBase<BaseResp>("$MAIN_URL/comment/apply", success, failed)
+        createBase<BaseResp>("$MAIN_URL/comment/add", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("appId", "$appId")
                 .UrlParam("commentTxt", commentTxt)
@@ -163,7 +163,7 @@ object NetManager {
     }
 
     fun applyThumbsup(appId: Int, commentId: Int, userId: Int, success: BaseResp.() -> Unit, failed: String.() -> Unit) {
-        createBase<BaseResp>("$MAIN_URL/thumb/apply", success, failed)
+        createBase<BaseResp>("$MAIN_URL/comment/thumbup", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("appId", "$appId")
                 .UrlParam("beThumbsup", "1")
@@ -178,7 +178,7 @@ object NetManager {
                 .UrlParam("openId", openId)
                 .UrlParam("unionId", unionId)
                 .UrlParam("userName", userName)
-                .UrlParam("imgUrl", imgUrl)
+                .UrlParam("userImageUrl", imgUrl)
                 .get(Framework._C, Framework._H)
     }
 

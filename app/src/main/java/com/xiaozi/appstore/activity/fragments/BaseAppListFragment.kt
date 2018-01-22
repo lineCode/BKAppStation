@@ -1,16 +1,19 @@
 package com.xiaozi.appstore.activity.fragments
 
+import android.content.Intent
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import cc.fish.coreui.BaseFragment
 import com.xiaozi.appstore.App
 import com.xiaozi.appstore.R
+import com.xiaozi.appstore.activity.SearchActivity
 import com.xiaozi.appstore.manager.*
 import com.xiaozi.appstore.safety
 import com.xiaozi.appstore.safetySelf
@@ -27,6 +30,7 @@ sealed class BaseAppListFragment : BaseFragment() {
     lateinit var mTvCategory: TextView
     lateinit var mRvList: RecyclerView
     lateinit var mType: AppListType
+    lateinit var mFlSearch: FrameLayout
     lateinit var mListLoader: INetAppsPresenter
     lateinit var mCategoryLoader: IDataPresenter
     lateinit var mWaiter: AsyncWaiter
@@ -39,7 +43,6 @@ sealed class BaseAppListFragment : BaseFragment() {
     val mDrawableTabWhite by lazy { resources.getDrawable(R.drawable.icon_linebar_white).apply { setBounds(0, 0, minimumWidth, minimumHeight) } }
     val mDefaultItemLP = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
 
-
     override fun initView(inflater: LayoutInflater) = inflater.inflate(R.layout.f_app, null).safetySelf {
         mType = when (this@BaseAppListFragment) {
             is AppFragment -> AppListType.APP
@@ -50,6 +53,7 @@ sealed class BaseAppListFragment : BaseFragment() {
         mTvCategory = findViewById(R.id.tv_fapp_tab_category)
         mRvList = findViewById(R.id.rv_fapp_chart)
         mSwiper = findViewById(R.id.sp_fapp)
+        mFlSearch = findViewById(R.id.fl_fapp_search)
         initRv()
         initLoader()
         initEffects()
@@ -101,6 +105,7 @@ sealed class BaseAppListFragment : BaseFragment() {
     private fun initEffects() {
         mTvChart.setOnClickListener { checkTab(0) }
         mTvCategory.setOnClickListener { checkTab(1) }
+        mFlSearch.setOnClickListener { activity.startActivity(Intent(activity, SearchActivity::class.java)) }
     }
 
     private fun checkTab(index: Int) {

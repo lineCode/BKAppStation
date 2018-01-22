@@ -1,5 +1,6 @@
 package com.xiaozi.appstore
 
+import com.google.gson.Gson
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -14,4 +15,13 @@ class ExampleUnitTest {
     fun addition_isCorrect() {
         assertEquals(4, 2 + 2)
     }
+
+    @Test
+    fun gsonTest() {
+        val a = Gson().fromJson("{}", AAA::class.java)
+        assertEquals(a.a, 0)
+        assertEquals(a, null)
+        println(a)
+    }
+    data class AAA(val a: Int, val b: String)
 }

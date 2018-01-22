@@ -74,8 +74,26 @@ class CategoryPresenterImpl(private val type: AppListType, private val onLoaded:
 }
 
 class SearchPresenterImpl(private val onLoaded: Array<String>.() -> Unit) : IDataPresenter {
+    var isLoading = false
     override fun load() {
-        NetManager.loadHotWords{ names.onLoaded() }
+        if (isLoading) return
+        else isLoading = true
+        NetManager.loadHotWords {
+            names.onLoaded()
+            isLoading = false
+        }
+    }
+}
+
+class BannerPresenterImpl(private val onLoaded: List<DataManager.Banner>.() -> Unit) : IDataPresenter {
+    var isLoading = false
+    override fun load() {
+        if (isLoading) return
+        isLoading = true
+        NetManager.loadBanners({
+            DataManager.Transor.BannerTransor(this)
+            isLoading = false
+        }) { isLoading = false }
     }
 }
 

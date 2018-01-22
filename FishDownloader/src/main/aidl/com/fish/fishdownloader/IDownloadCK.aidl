@@ -14,5 +14,5 @@ interface IDownloadCK {
     void onComplete(String tag, String filePath);
     void onFailed(String tag, String msg);
     void onCanceled(String tag);
-
+    void onPause(String tag, String filePath, int ptr, int size);
 }

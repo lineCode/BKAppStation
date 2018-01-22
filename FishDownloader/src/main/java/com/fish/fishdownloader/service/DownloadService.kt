@@ -1,6 +1,7 @@
 package com.fish.downloader.service
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Environment
 import android.os.IBinder
@@ -8,6 +9,9 @@ import android.util.Log
 import com.fish.downloader.framework.ThreadPool
 import com.fish.fishdownloader.IDownloadCK
 import com.fish.fishdownloader.IDownloader
+import com.google.gson.Gson
+import org.json.JSONObject
+import org.json.JSONTokener
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -23,9 +27,17 @@ class DownloadService : Service() {
     companion object {
         val DOWNLOAD_DIR = Environment.getExternalStoragePublicDirectory("ad/download/")
         val TAG = "FISH DOWNLOAD SERVICE"
+        val GSON = Gson()
     }
 
     val mDownloaderBinder: IBinder = object : IDownloader.Stub() {
+
+        override fun hasTag(tag: String) = mDownloadMapper.containsKey(tag)
+
+        @Synchronized override fun pauseByTag(tag: String?) {
+            mDownloadMapper[tag]?.pauseSignal = true
+        }
+
         override fun basicTypes(anInt: Int, aLong: Long, aBoolean: Boolean, aFloat: Float, aDouble: Double, aString: String?, aCK: IBinder?) {
         }
 
@@ -35,8 +47,16 @@ class DownloadService : Service() {
 
         override fun startDownload(url: String, tag: String, fileName: String, fileSize: Long) {
             Log.e(TAG, "start download")
-            mDownloadMapper.put(tag, Downloader.createDownloadInfo(url, tag, fileName, fileSize))
-            ThreadPool.addTask(Downloader().get(mDownloadMapper.get(tag) ?: return, mDownloadCKSender))
+            var pausePtr = 0
+            takePauseInfo(tag).run {
+                if (ptr != 0) {
+                    if (File(path).run { exists() && length() >= ptr }) {
+                        pausePtr = ptr
+                    }
+                }
+                mDownloadMapper.put(tag, Downloader.createDownloadInfo(url, tag, fileName, fileSize, pausePtr))
+                ThreadPool.addTask(Downloader().get(mDownloadMapper.get(tag) ?: return, mDownloadCKSender))
+            }
         }
 
         override fun cancelDownloadByTag(tag: String?) {
@@ -60,6 +80,13 @@ class DownloadService : Service() {
     }
 
     val mDownloadCKSender = object : IDownloadCK.Stub() {
+        override fun onPause(tag: String, filePath: String, ptr: Int, size: Int) {
+            if (mDownloadMapper.containsKey(tag)) {
+                savePauseInfo(DownloadPausedInfo(tag, mDownloadMapper[tag]?.filePath ?: "", filePath, ptr, size))
+                mCKs.map { it.onPause(tag, filePath, ptr, size) }
+            }
+        }
+
         override fun basicTypes(anInt: Int, aLong: Long, aBoolean: Boolean, aFloat: Float, aDouble: Double, aString: String?) {
         }
 
@@ -104,18 +131,21 @@ class DownloadService : Service() {
         return mDownloaderBinder
     }
 
+    private fun savePauseInfo(info: DownloadPausedInfo) = getSharedPreferences("pause-list", Context.MODE_PRIVATE).edit().putString(info.tag, GSON.toJson(info)).apply()
+    private fun takePauseInfo(tag: String) = GSON.fromJson(getSharedPreferences("pause-list", Context.MODE_PRIVATE).getString(tag, "{}"), DownloadPausedInfo::class.java)
+
 }
 
 
-data class DownloadInfo(val tag: String, val url: String, val fileName: String, var filePath: String, var fileSize: Long, var offset: Long, var cancelSignal: Boolean) : Serializable
-
+data class DownloadInfo(val tag: String, val url: String, val fileName: String, var filePath: String, var fileSize: Long, var offset: Long, var cancelSignal: Boolean, var pauseSignal: Boolean) : Serializable
+data class DownloadPausedInfo(val tag: String, val url: String, val path: String, val ptr: Int, val size: Int) : Serializable
 
 class Downloader {
     companion object {
         private val BUF_SIZE = 2 * 1024
         val TAG = "fish downloader"
-        fun createDownloadInfo(url: String, tag: String, fileName: String, fileSize: Long)
-                = DownloadInfo(tag, url, fileName, "", fileSize, 0, false)
+        fun createDownloadInfo(url: String, tag: String, fileName: String, fileSize: Long, ptr: Int)
+                = DownloadInfo(tag, url, fileName, "", fileSize, ptr.toLong(), false, false)
     }
 
     private fun createFile(info: DownloadInfo) = File(DownloadService.DOWNLOAD_DIR, "${info.fileName}-${System.currentTimeMillis()}.apk").apply {
@@ -128,16 +158,19 @@ class Downloader {
     fun get(info: DownloadInfo, ck: IDownloadCK) = Runnable {
         try {
             val connection = URL(info.url).openConnection() as HttpURLConnection
+            if (info.offset > 0) {
+                connection.addRequestProperty("Range", "bytes=${limit(info.offset.toInt(), 1024)}-")
+            }
             Log.e(TAG, "url connected!")
-            if (connection.responseCode == 200) {
+            if (connection.responseCode == 200 || connection.responseCode == 206) {
                 Log.e(TAG, "code:${connection.responseCode}")
                 if (connection.contentLength != 0) info.fileSize = connection.contentLength.toLong()
                 Log.e(TAG, "lenth:${info.fileSize}")
                 val f = createFile(info)
                 info.filePath = f.absolutePath
-                val fos = FileOutputStream(f)
+                val fos = FileOutputStream(f, true)
                 val netIS = connection.inputStream
-                var downloadPtr = 0
+                var downloadPtr = limit(info.offset.toInt(), 1024)
                 var readCnt = 0
                 val buf = ByteArray(BUF_SIZE)
                 do {
@@ -149,7 +182,7 @@ class Downloader {
                     Log.e(TAG, "dptr:$downloadPtr, readCnt:$readCnt, BUF SIZE: $BUF_SIZE")
                     downloadPtr += readCnt
                     ck.onProgress(info.tag, downloadPtr * 1.0 / info.fileSize)
-                } while (readCnt > 0 && !info.cancelSignal)
+                } while (readCnt > 0 && !info.cancelSignal && info.pauseSignal)
                 Log.e(TAG, "exit looper")
                 try {
                     fos.close()
@@ -161,7 +194,11 @@ class Downloader {
                 if (info.cancelSignal) {
                     ck.onCanceled(info.tag)
                     f.delete()
-                } else ck.onComplete(info.tag, info.filePath)
+                } else if (info.pauseSignal) {
+                    ck.onPause(info.tag, info.filePath, downloadPtr, info.fileSize.toInt())
+                } else {
+                    ck.onComplete(info.tag, info.filePath)
+                }
             } else {
                 ck.onFailed(info.tag, "REQUEST ERROR:${connection.responseCode}")
             }
@@ -170,4 +207,6 @@ class Downloader {
             ck.onFailed(info.tag, "CONNECTION FAILED")
         }
     }
+
+    fun limit(origin: Int, limits: Int) = if (origin <= limits) 0 else origin - limits
 }

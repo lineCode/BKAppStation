@@ -1,16 +1,20 @@
 package com.xiaozi.appstore.activity.fragments
 
+import android.content.Intent
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.DividerItemDecoration.VERTICAL
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import cc.fish.coreui.BaseFragment
 import com.jude.rollviewpager.RollPagerView
 import com.jude.rollviewpager.adapter.StaticPagerAdapter
 import com.xiaozi.appstore.R
+import com.xiaozi.appstore.activity.SearchActivity
+import com.xiaozi.appstore.activity.WebActivity
 import com.xiaozi.appstore.manager.*
 import com.xiaozi.appstore.plugin.ImageLoaderHelper
 import com.xiaozi.appstore.safety
@@ -29,8 +33,10 @@ class HomeFragment : BaseFragment() {
     lateinit var mTvTabGame: TextView
     lateinit var mRPV: RollPagerView
     lateinit var mRV: RecyclerView
+    lateinit var mFLSearch: FrameLayout
     lateinit var mAppLoader: INetAppsPresenter
     lateinit var mGameLoader: INetAppsPresenter
+    lateinit var mBannerLoader: IDataPresenter
     lateinit var mWaiter: AsyncWaiter
     val mData: MutableList<DataManager.AppInfo> = mutableListOf()
 
@@ -38,12 +44,12 @@ class HomeFragment : BaseFragment() {
         mTvTabApp = findViewById(R.id.tv_fhome_tab_app)
         mTvTabGame = findViewById(R.id.tv_fhome_tab_game)
         mRPV = findViewById(R.id.rp_fhome_top)
+        mFLSearch = findViewById(R.id.fl_fmain_search)
         mRV = findViewById(R.id.rv_fhome)
         mRV.addItemDecoration(DividerItemDecoration(activity, VERTICAL))
         mRV.adapter = mAdapter
         initDataLoader()
         checkTab(0)
-        freshRPV(arrayOf<DataManager.Banner>())
         initEffects()
     }
 
@@ -62,9 +68,11 @@ class HomeFragment : BaseFragment() {
             }
             mAdapter.notifyDataSetChanged()
         }
+        mBannerLoader = BannerPresenterImpl(this::freshRPV)
+        mBannerLoader.load()
     }
 
-    private fun freshRPV(banner: Array<DataManager.Banner>) {
+    private fun freshRPV(banner: List<DataManager.Banner>) {
         mRPV.apply {
             setPlayDelay(3000)
             setAnimationDurtion(300)
@@ -73,6 +81,7 @@ class HomeFragment : BaseFragment() {
                     ImageLoaderHelper.loadImageWithCache(banner[position].img, this)
                     scaleType = ImageView.ScaleType.CENTER_CROP
                     layoutParams = mDefaultItemLP
+                    setOnClickListener { WebActivity.start(activity, banner[position].link) }
                 }
 
                 override fun getCount() = banner.size
@@ -83,6 +92,7 @@ class HomeFragment : BaseFragment() {
     private fun initEffects() {
         mTvTabApp.setOnClickListener { checkTab(0) }
         mTvTabGame.setOnClickListener { checkTab(1) }
+        mFLSearch.setOnClickListener { activity.startActivity(Intent(activity, SearchActivity::class.java)) }
     }
 
     private fun checkTab(index: Int) {

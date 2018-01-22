@@ -16,5 +16,7 @@ interface IDownloader {
     void cancelAll();
     void registerCB(IBinder ck);
     void unregisterCB(IBinder ck);
+    boolean hasTag(String tag);
+    void pauseByTag(String tag);
 
 }
