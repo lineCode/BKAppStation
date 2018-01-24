@@ -16,8 +16,8 @@ class WXHelper {
         val EXTRA_SHARE_SUCCESS = "SHARE_SUCCESS"
         val BUNDLE_SHARE = "BUNDLE_SHARE"
         var isLoggingIn = false
-        val APP_ID = ""
-        val APP_SECRET = ""
+        val APP_ID = "wx1f714ed004c09b23"
+        val APP_SECRET = "9816401d6f518c6e11758e0478f1dd6d"
 
         val SHARE_TO_SESSION = SendMessageToWX.Req.WXSceneSession
         val SHARE_TO_TIME_LINE = SendMessageToWX.Req.WXSceneTimeline

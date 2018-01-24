@@ -54,6 +54,14 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".activity.SearchActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity.DownloadMgrActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".wxapi.WXEntryActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
@@ -71,6 +79,9 @@
         <meta-data
             android:name="YZAD_APP_ID"
             android:value="19dbe35a06d95393ff5e4260b2039d15" />
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="5a655b16a40fa3257600008b" />
         <meta-data
             android:name="UMENG_CHANNEL"
             android:value="DEVELOP" />

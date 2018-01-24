@@ -115,7 +115,12 @@ class Device() {
         @SuppressLint("MissingPermission", "HardwareIds")
         fun getAndroidID(): String {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                Build.getSerial()
+                try{
+                    Build.getSerial()
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    Build.SERIAL
+                }
             } else {
                 Build.SERIAL
             }

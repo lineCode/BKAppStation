@@ -30,6 +30,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginLeft="16dp"
+            android:src="@drawable/icon_unlogin_img"
             android:scaleType="fitXY" />
 
         <TextView
@@ -38,6 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:textColor="@color/text_dark"
+            android:text="未登录"
             android:textSize="@dimen/tab_text" />
 
         <View
@@ -78,6 +80,7 @@
             android:textSize="@dimen/common_text" />
 
         <ImageView
+            android:id="@+id/img_fmine_wifi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

@@ -23,5 +23,27 @@ class ExampleUnitTest {
         assertEquals(a, null)
         println(a)
     }
+
+    @Test
+    fun checkChild() {
+        if (null.equals(null))
+        print(getSubStrPositions("#哈哈##哈哈##哈哈#", "#哈哈#"))
+    }
+
+    private fun getSubStrPositions(originStr: String, sub: String): List<Int>? {
+        if (!originStr.contains(sub)) return null
+        val result = mutableListOf<Int>()
+        var ptr = 0
+        println(originStr.split(sub))
+        originStr.split(sub).map {
+            ptr += it.length
+            result.add(ptr)
+            ptr += sub.length
+        }
+        result.removeAt(result.size - 1)
+        return result
+    }
+
+
     data class AAA(val a: Int, val b: String)
 }

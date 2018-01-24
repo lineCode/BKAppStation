@@ -44,7 +44,7 @@ class DataManager {
                 = data.comments.node.map { Comment("need head icon", 0, it.authorName, Framework.Date.toYMD(it.date), it.content, it.thumbsupCount, it.thumbsupSign, it.commentId) }.toTypedArray()
 
         fun BannerTransor(data: RespBanners)
-                = data.banners.map { Banner(it.banner.image, it.banner.link) }
+                = data.banners.banner.map { Banner(it.image, it.link) }
 
         fun AppDetailTransor(resp: RespAppInfo) = resp.appInfo.run {
             AppDetail(appId, appName, packageName, iconUrl, Framework.Trans.Size(size), updateLog, tips, desContent, downloadUrl, commentCount, imgUrls)

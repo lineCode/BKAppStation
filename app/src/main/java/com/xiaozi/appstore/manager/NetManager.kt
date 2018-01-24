@@ -21,14 +21,14 @@ import java.io.Serializable
 object NetManager {
 
     val SUCCESS_CODE = 0
-    private val _TEST_URL = ""
+    private val _TEST_URL = "http://192.168.1.100:18079/v1"
     private val _PRODUCT_URL = ""
     private val MAIN_URL = if (_DEBUG) _TEST_URL else _PRODUCT_URL
 
     inline fun <reified T> fastCall(url: String, crossinline success: T.() -> Unit = {}, crossinline failed: String.() -> Unit = {}) = createOri<T>(url, success, failed).get(Framework._C, Framework._H)
-    inline fun <reified T : BaseResp> fastCallBaseResp(url: String, crossinline success: T.() -> Unit = {}, crossinline failed: String.() -> Unit = {}) = createBase(url, success, failed).get(Framework._C, Framework._H)
+    inline fun <reified T> fastCallBaseResp(url: String, crossinline success: T.() -> Unit = {}, crossinline failed: String.() -> Unit = {}) = createBase(url, success, failed).get(Framework._C, Framework._H)
 
-    inline fun <reified T : BaseResp> createBase(url: String, crossinline success: T.() -> Unit, crossinline failed: String.() -> Unit) = RequestHelper<T?>().apply {
+    inline fun <reified T> createBase(url: String, crossinline success: T.() -> Unit, crossinline failed: String.() -> Unit) = RequestHelper<BaseResp<T>?>().apply {
         Url(url)
         Method(RequestHelper.Method.GET)
         System.currentTimeMillis().apply {
@@ -42,12 +42,12 @@ object NetManager {
         UrlParam("mac", Device.getMacAddr())
         UrlParam("osVersion", Device.getMacAddr())
         HeadPassNullParam("userToken", AccountManager.token())
-        ResultType(object : TypeToken<T?>() {})
+        ResultType(object : TypeToken<BaseResp<T>>() {})
         Success {
             if (it == null)
                 "null response".failed()
             else if (it.code == SUCCESS_CODE)
-                it.success()
+                it.data.success()
             else
                 it.msg.failed()
         }
@@ -80,7 +80,7 @@ object NetManager {
             success()
         }) {
             activity?.ZToast(this)
-        }
+        }.ResultType(object : TypeToken<BaseResp<RespAppConf>>(){}).get(Framework._C, Framework._H)
     }
 
     fun loadAppList(type: String = AppListType.ALL.str, condition: String, keyword: String = "", index: Int = 0, success: RespAppList.() -> Unit, failed: String.() -> Unit) {
@@ -91,7 +91,7 @@ object NetManager {
                 .UrlPassNullParam("keyword", keyword)
                 .UrlParam("number", "20")
                 .UrlParam("start", "${1 + index * 20}")
-                .get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespAppList>>(){}).get(Framework._C, Framework._H)
     }
 
     fun loadAssociateApps(pkg: String, success: RespAppList.() -> Unit, failed: String.() -> Unit) {
@@ -99,7 +99,7 @@ object NetManager {
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("associatedApp", pkg)
                 .UrlParam("condition", "associate")
-                .get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespAppList>>(){}).get(Framework._C, Framework._H)
     }
 
     fun loadCommentList(appId: Int, index: Int = 0, success: RespCommentList.() -> Unit, failed: String.() -> Unit) {
@@ -108,68 +108,65 @@ object NetManager {
                 .UrlParam("appId", "$appId")
                 .UrlParam("number", "20")
                 .UrlParam("start", "${1 + index * 20}")
-                .get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespCommentList>>(){}).get(Framework._C, Framework._H)
     }
 
     fun loadAppDetail(appId: Int, success: RespAppInfo.() -> Unit, failed: String.() -> Unit) {
         createBase<RespAppInfo>("$MAIN_URL/app/info", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("appId", "$appId")
-                .get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespAppInfo>>(){}).get(Framework._C, Framework._H)
     }
 
     fun loadUserInfo(activity: Activity, userId: Int) {
         createBase<RespUserInfo>("$MAIN_URL/user/getinfo", {
-            AccountManager.userId = userInfo.userId
-            AccountManager.userName = userInfo.userName
-            AccountManager.userHeadIcon = userInfo.userImageUrl
         }, activity::ZToast)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("userId", "$userId")
-                .get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespUserInfo>>(){}).get(Framework._C, Framework._H)
     }
 
     fun loadBanners(success: RespBanners.() -> Unit, failed: String.() -> Unit) {
         createBase<RespBanners>("$MAIN_URL/ad", success, failed)
                 .Method(RequestHelper.Method.GET)
-                .get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespBanners>>(){}).get(Framework._C, Framework._H)
     }
 
     fun loadHotWords(success: RespHots.() -> Unit) {
         createBase<RespHots>("$MAIN_URL/topsearchkw", success, {})
                 .Method(RequestHelper.Method.GET)
-                .get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespHots>>(){}).get(Framework._C, Framework._H)
     }
 
-    fun applyComment(appId: Int, commentTxt: String, point: Int, userId: Int, userName: String, success: BaseResp.() -> Unit, failed: String.() -> Unit) {
-        createBase<BaseResp>("$MAIN_URL/comment/add", success, failed)
+    fun applyComment(appId: Int, commentTxt: String, point: Int, userId: Int, userName: String, success: Any?.() -> Unit, failed: String.() -> Unit) {
+        createBase<Any?>("$MAIN_URL/comment/add", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("appId", "$appId")
                 .UrlParam("commentTxt", commentTxt)
                 .UrlParam("point", "$point")
                 .UrlParam("userId", "$userId")
                 .UrlParam("userName", userName)
-                .get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<Any?>>(){}).get(Framework._C, Framework._H)
     }
 
-    fun applyFeedback(content: String, success: BaseResp.() -> Unit, failed: String.() -> Unit) {
-        createBase<BaseResp>("$MAIN_URL/feedback", success, failed)
+    fun applyFeedback(content: String, success: Any?.() -> Unit, failed: String.() -> Unit) {
+        createBase<Any?>("$MAIN_URL/feedback", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("advise", content)
                 .UrlParam("email", "")
                 .UrlParam("qq", "")
                 .UrlParam("userId", "")
-                .get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<Any?>>(){}).get(Framework._C, Framework._H)
     }
 
-    fun applyThumbsup(appId: Int, commentId: Int, userId: Int, success: BaseResp.() -> Unit, failed: String.() -> Unit) {
-        createBase<BaseResp>("$MAIN_URL/comment/thumbup", success, failed)
+    fun applyThumbsup(appId: Int, commentId: Int, userId: Int, success: Any?.() -> Unit, failed: String.() -> Unit) {
+        createBase<Any?>("$MAIN_URL/comment/thumbup", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("appId", "$appId")
                 .UrlParam("beThumbsup", "1")
                 .UrlParam("commentId", "$commentId")
-                .UrlParam("userId", "${AccountManager.userId}")
-                .get(Framework._C, Framework._H)
+                .UrlParam("userId", "$userId")
+                .ResultType(object : TypeToken<BaseResp<Any?>>(){}).get(Framework._C, Framework._H)
     }
 
     fun login(openId: String, unionId: String, userName: String, imgUrl: String, success: RespLoginInfo.() -> Unit, failed: String.() -> Unit) {
@@ -179,7 +176,7 @@ object NetManager {
                 .UrlParam("unionId", unionId)
                 .UrlParam("userName", userName)
                 .UrlParam("userImageUrl", imgUrl)
-                .get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespLoginInfo>>(){}).get(Framework._C, Framework._H)
     }
 
     fun RequestHelper<*>.UrlPassNullParam(key: String, value: String) = this.apply { if (value.isNotBlank()) UrlParam(key, value) }
@@ -199,15 +196,15 @@ enum class AppCondition(val str: String) {
     ASSOCIATE("associate")
 }
 
-open class BaseResp(var code: Int = 0, var msg: String = "") : Serializable
-data class RespAppConf(val configs: RespAppConfEntity) : BaseResp(), Serializable
-data class RespAppList(val appNodes: RespAppListEntity) : BaseResp(), Serializable
-data class RespAppInfo(val appInfo: RespAppInfoEntity) : BaseResp(), Serializable
-data class RespUserInfo(val userInfo: RespUserInfoEntity) : BaseResp(), Serializable
-data class RespCommentList(val comments: RespCommentListEntity) : BaseResp(), Serializable
-data class RespBanners(val banners: Array<RespBannersEntity>) : BaseResp(), Serializable
-data class RespLoginInfo(val userId: String, val userToken: String) : BaseResp(), Serializable
-data class RespHots(val names: Array<String>) : BaseResp(), Serializable
+open class BaseResp<T>(var code: Int = 0, var msg: String = "", var data: T) : Serializable
+data class RespAppConf(val configs: RespAppConfEntity) : Serializable
+data class RespAppList(val appNodes: RespAppListEntity) : Serializable
+data class RespAppInfo(val appInfo: RespAppInfoEntity) : Serializable
+data class RespUserInfo(val userInfo: RespUserInfoEntity) : Serializable
+data class RespCommentList(val comments: RespCommentListEntity) : Serializable
+data class RespBanners(val banners: RespBannersEntity) : Serializable
+data class RespLoginInfo(val userId: String, val userToken: String) : Serializable
+data class RespHots(val names: Array<String>) : Serializable
 
 data class RespAppConfEntity(val appClass: RespConfClz, val gameClass: RespConfClz, val timeStamp: Long)
 data class RespConfClz(val `class`: Array<RespAppClass>)
@@ -227,5 +224,5 @@ data class RespUserInfoEntity(val userId: Int, val userImageUrl: String, val use
 data class RespCommentListEntity(val node: Array<RespComment>, val number: Int, val start: Int, val total: Int)
 data class RespComment(val authorName: String, val thumbsupSign: Int, val content: String, val date: Long, val thumbsupCount: Int, val commentId: Int)
 
-data class RespBannersEntity(val banner: RespBanner)
+data class RespBannersEntity(val banner: Array<RespBanner>)
 data class RespBanner(val image: String, val link: String, val sn: Int)

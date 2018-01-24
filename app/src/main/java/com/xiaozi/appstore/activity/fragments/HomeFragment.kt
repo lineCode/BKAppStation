@@ -3,6 +3,7 @@ package com.xiaozi.appstore.activity.fragments
 import android.content.Intent
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.DividerItemDecoration.VERTICAL
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -46,6 +47,7 @@ class HomeFragment : BaseFragment() {
         mRPV = findViewById(R.id.rp_fhome_top)
         mFLSearch = findViewById(R.id.fl_fmain_search)
         mRV = findViewById(R.id.rv_fhome)
+        mRV.layoutManager = LinearLayoutManager(activity)
         mRV.addItemDecoration(DividerItemDecoration(activity, VERTICAL))
         mRV.adapter = mAdapter
         initDataLoader()
@@ -54,6 +56,7 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun initDataLoader() {
+        mWaiter = AsyncWaiter(activity)
         mAppLoader = AppListDataPresenterImpl(mWaiter, AppListType.APP.str, AppCondition.HOT.str) {
             mData.safety {
                 clear()

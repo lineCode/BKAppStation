@@ -7,12 +7,13 @@ import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
-import android.webkit.DownloadListener
-import android.webkit.WebSettings
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.view.View
+import android.webkit.*
+import com.google.gson.Gson
 import com.umeng.analytics.MobclickAgent
 import com.xiaozi.appstore.R
+import com.xiaozi.appstore.ZToast
+import com.xiaozi.appstore.component.Device
 import com.xiaozi.appstore.component.Framework
 import kotlinx.android.synthetic.main.a_web.*
 
@@ -96,6 +97,7 @@ object WebViewKit : DownloadListener {
                 return true
             }
         }
+        mWeb?.addJavascriptInterface(JSInterface(activity, mWeb), "bridge")
         mWeb?.setDownloadListener(this)
     }
 
@@ -109,5 +111,29 @@ object WebViewKit : DownloadListener {
             action = Intent.ACTION_VIEW
             data = Uri.parse(url)
         })
+    }
+    class JSInterface(val activity: Activity, val web: WebView?) {
+
+        @JavascriptInterface
+        fun back(isForce: Boolean) {
+            Framework._H.post {
+                if (web?.canGoBack() ?: return@post)
+                    web.goBack()
+                else if (isForce)
+                    activity.finish()
+            }
+        }
+
+        @JavascriptInterface
+        fun close() {
+            Framework._H.post { activity.finish() }
+        }
+
+        @JavascriptInterface
+        fun toast(msg: String) = activity.ZToast(msg)
+
+        @JavascriptInterface
+        fun getImei() = Device.getIMEI()
+
     }
 }

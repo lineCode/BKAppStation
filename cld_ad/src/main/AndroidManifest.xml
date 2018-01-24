@@ -7,9 +7,8 @@
     <application
         android:allowBackup="true"
         android:supportsRtl="true">
-        <meta-data android:name="UMENG_CHANNEL" android:value="DEVELOP"/>
 
-        <activity android:name=".ad.view.AdWebView" android:screenOrientation="portrait" android:launchMode="singleTask "/>
+        <activity android:name=".ad.view.AdWebView" android:screenOrientation="portrait" android:launchMode="singleTask"/>
         <service android:name=".common.service.DownloadService"/>
         <!--<receiver android:name=".common.service.DownloadReceiver">-->
             <!--<intent-filter>-->

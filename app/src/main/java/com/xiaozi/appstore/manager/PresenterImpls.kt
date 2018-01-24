@@ -91,10 +91,19 @@ class BannerPresenterImpl(private val onLoaded: List<DataManager.Banner>.() -> U
         if (isLoading) return
         isLoading = true
         NetManager.loadBanners({
-            DataManager.Transor.BannerTransor(this)
+            DataManager.Transor.BannerTransor(this).onLoaded()
             isLoading = false
         }) { isLoading = false }
     }
+}
+
+class UserInfoPresenterImpl(private val activity: Activity, private val onLoaded: () -> Unit) : IDataPresenter {
+    override fun load() {
+        if (AccountManager.userHeadIcon.isEmpty() || AccountManager.userName.isEmpty()) {
+            NetManager.loadUserInfo(activity, AccountManager.uid())
+        }
+    }
+
 }
 
 object PresenterImpls {

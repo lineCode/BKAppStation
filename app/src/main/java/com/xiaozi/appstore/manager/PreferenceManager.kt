@@ -56,15 +56,25 @@ sealed class PreferenceManager(module: Module) {
 }
 
 object AccountManager {
-    val KEY_TOKEN = "TOKEN"
+    private val KEY_TOKEN = "TOKEN"
+    private val KEY_UID = "UID"
 
     var userName = ""
     var userHeadIcon = ""
-    var userId = 0
 
-    fun storeToken(token: String) = AccountSPMgr.putValue(KEY_TOKEN, token)
+    fun storeToken(token: String, id: Int)  {
+        AccountSPMgr.putValue(KEY_TOKEN, token)
+        AccountSPMgr.putValue(KEY_UID, id)
+    }
     fun isLoggedIn() = AccountSPMgr.haveKey(KEY_TOKEN)
     fun token() = AccountSPMgr.getStringValue(KEY_TOKEN)
+    fun uid() = AccountSPMgr.getIntValue(KEY_UID)
+    fun logout() {
+        AccountSPMgr.putValue(KEY_TOKEN, null)
+        AccountSPMgr.putValue(KEY_UID, null)
+        userName = ""
+        userHeadIcon = ""
+    }
 }
 
 object DownloadInfoManager {
@@ -77,6 +87,10 @@ object DownloadInfoManager {
     }
 
     data class DownloadInfo(val url: String, val path: String, val name: String, val tag: String, val size: Int, var ptr: Int)
+}
+
+object ConfManager {
+    val KEY_ONLYWIFI = "only_wifi"
 }
 
 object AccountSPMgr : PreferenceManager(Module.Account)
