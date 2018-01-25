@@ -16,9 +16,10 @@ class App : Application() {
         Framework.mContext = applicationContext
         CldAd.init(applicationContext)
         initEnv()
+
     }
 
     private fun initEnv() {
-        packageManager.getInstalledPackages(PackageManager.MATCH_UNINSTALLED_PACKAGES).filter { it != null }.map { it.packageName }.run(GlobalData::initInstalledApp)
+        Framework.Package.installed()
     }
 }

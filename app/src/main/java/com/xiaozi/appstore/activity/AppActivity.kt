@@ -5,18 +5,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.ZToast
-import com.xiaozi.appstore.manager.AppDetailPresenterImpl
-import com.xiaozi.appstore.manager.DataManager
-import com.xiaozi.appstore.manager.IDataPresenter
-import com.xiaozi.appstore.manager.PresenterImpls
+import com.xiaozi.appstore.manager.*
 import com.xiaozi.appstore.plugin.ImageLoaderHelper
 import com.xiaozi.appstore.safetyNullable
 import com.xiaozi.appstore.view.AsyncWaiter
+import com.xiaozi.appstore.view.HomeVH
 import com.xiaozi.appstore.view.ImageVH
 import com.xiaozi.appstore.view.RecyclerDividerDecor
 import kotlinx.android.synthetic.main.a_app.*
@@ -29,9 +28,12 @@ class AppActivity : BaseBarActivity() {
     override fun title() = "应用市场"
     override fun layoutID() = R.layout.a_app
     lateinit var mData: DataManager.AppDetail
+    var mAdData: MutableList<DataManager.AppInfo> = mutableListOf()
     lateinit var mLoader: IDataPresenter
+    lateinit var mAdsLoader: IDataPresenter
     lateinit var mWaiter: AsyncWaiter
     lateinit var mAdapter: RecyclerView.Adapter<ImageVH>
+    lateinit var mAdAdapter: RecyclerView.Adapter<HomeVH>
 
     companion object {
         val KEY_APPID = "appID"
@@ -45,11 +47,14 @@ class AppActivity : BaseBarActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initLoader()
+        mLoader.load()
+        mAdsLoader.load()
     }
 
     private fun initLoader() {
         mWaiter = AsyncWaiter(this)
         mLoader = AppDetailPresenterImpl(mWaiter, getAppId()) { mData = it; initView() }
+        mAdsLoader = AppAdListPresenterImpl(mWaiter, getAppId()) { mAdData.addAll(it); mAdAdapter.notifyDataSetChanged() }
     }
 
     private fun getAppId() = intent.getIntExtra(KEY_APPID, -1).apply {
@@ -65,9 +70,8 @@ class AppActivity : BaseBarActivity() {
         tv_app_info.text = mData.content
         tv_app_update_info.text = mData.updateLog
         ImageLoaderHelper.loadImageWithCache(mData.icon, img_iapp_icon)
-        tv_app_chat.run {
-            text = "${mData.commentCnt}"
-        }
+        tv_app_chat.text = "${mData.commentCnt}"
+        rl_app_comment.setOnClickListener { CommentListActivity.open(this, mData.appId) }
         initRV()
     }
 
@@ -82,11 +86,35 @@ class AppActivity : BaseBarActivity() {
                 holder.load(mData.imgs[position])
             }
         }
+        mAdAdapter = object : RecyclerView.Adapter<HomeVH>() {
+            override fun getItemCount() = mAdData.size
+
+            override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = HomeVH(parent)
+
+            override fun onBindViewHolder(holder: HomeVH?, position: Int) {
+                holder?.load(mAdData[position])
+            }
+
+            override fun onViewRecycled(holder: HomeVH?) {
+                super.onViewRecycled(holder)
+                if (holder == null) return
+                try {
+                    holder.release(mAdData[holder.adapterPosition].pkg)
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                }
+            }
+        }
         rv_app.run {
             layoutManager = LinearLayoutManager(this@AppActivity)
             adapter = mAdapter
 //            addItemDecoration(RecyclerDividerDecor(this@AppActivity, 4))
             mAdapter.notifyDataSetChanged()
+        }
+        rv_app_adv.run {
+            layoutManager = LinearLayoutManager(this@AppActivity)
+            adapter = mAdAdapter
+            mAdAdapter.notifyDataSetChanged()
         }
     }
 

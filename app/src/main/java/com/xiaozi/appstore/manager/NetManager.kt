@@ -44,7 +44,7 @@ object NetManager {
         HeadPassNullParam("userToken", AccountManager.token())
         ResultType(object : TypeToken<BaseResp<T>>() {})
         Success {
-            if (it == null)
+            if (it?.data == null)
                 "null response".failed()
             else if (it.code == SUCCESS_CODE)
                 it.data.success()
@@ -94,10 +94,10 @@ object NetManager {
                 .ResultType(object : TypeToken<BaseResp<RespAppList>>(){}).get(Framework._C, Framework._H)
     }
 
-    fun loadAssociateApps(pkg: String, success: RespAppList.() -> Unit, failed: String.() -> Unit) {
+    fun loadAssociateApps(appId: String, success: RespAppList.() -> Unit, failed: String.() -> Unit) {
         createBase<RespAppList>("$MAIN_URL/app/list", success, failed)
                 .Method(RequestHelper.Method.GET)
-                .UrlParam("associatedApp", pkg)
+                .UrlParam("associatedAppId", appId)
                 .UrlParam("condition", "associate")
                 .ResultType(object : TypeToken<BaseResp<RespAppList>>(){}).get(Framework._C, Framework._H)
     }
@@ -185,8 +185,8 @@ object NetManager {
 
 enum class AppListType(val str: String) {
     ALL(""),
-    APP("app"),
-    GAME("game")
+    APP("0"),
+    GAME("1")
 }
 
 enum class AppCondition(val str: String) {
@@ -199,11 +199,11 @@ enum class AppCondition(val str: String) {
 open class BaseResp<T>(var code: Int = 0, var msg: String = "", var data: T) : Serializable
 data class RespAppConf(val configs: RespAppConfEntity) : Serializable
 data class RespAppList(val appNodes: RespAppListEntity) : Serializable
-data class RespAppInfo(val appInfo: RespAppInfoEntity) : Serializable
+data class RespAppInfo(val appinfo: RespAppInfoEntity) : Serializable
 data class RespUserInfo(val userInfo: RespUserInfoEntity) : Serializable
 data class RespCommentList(val comments: RespCommentListEntity) : Serializable
 data class RespBanners(val banners: RespBannersEntity) : Serializable
-data class RespLoginInfo(val userId: String, val userToken: String) : Serializable
+data class RespLoginInfo(val userId: Int, val userToken: String) : Serializable
 data class RespHots(val names: Array<String>) : Serializable
 
 data class RespAppConfEntity(val appClass: RespConfClz, val gameClass: RespConfClz, val timeStamp: Long)
@@ -215,7 +215,7 @@ data class RespAppListEntity(val node: Array<RespAppListInfo>, val number: Int, 
 data class RespAppListInfo(val appDesc: String, val appName: String, val downloadCount: Int, val iconUrl: String,
                            val packageName: String, val size: Int, val sn: Int, val appId: Int, val downloadUrl: String)
 
-data class RespAppInfoEntity(val adType: String, val appName: String, val commentCount: Int, val desContent: String,
+data class RespAppInfoEntity(val adType: String, val appName: String, val commentCount: Int, val appDesc: String,
                              val appId: Int, val downloadUrl: String, val iconUrl: String, val imgUrls: Array<String>,
                              val packageName: String, val point: Int, val size: Int, val tips: String, val updateLog: String)
 

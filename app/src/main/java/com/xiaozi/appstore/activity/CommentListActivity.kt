@@ -24,8 +24,8 @@ class CommentListActivity : BaseBarActivity() {
 
     companion object {
         val KEY_APPID = "APPID"
-        fun open(ctx: Context, pkg: String) {
-            ctx.startActivity(Intent(ctx, CommentListActivity::class.java).apply { putExtra(KEY_APPID, pkg) })
+        fun open(ctx: Context, appID: Int) {
+            ctx.startActivity(Intent(ctx, CommentListActivity::class.java).apply { putExtra(KEY_APPID, appID) })
         }
     }
 

@@ -102,7 +102,7 @@ class DownloadService : Service() {
         }
 
         override fun onFailed(tag: String?, msg: String?) {
-            Log.e(TAG, "failed:$msg")
+            Log.e(TAG, "tag: $tag, failed: $msg")
             mCKs.map { it.onFailed(tag, msg) }
             mDownloadMapper.remove(tag)
         }

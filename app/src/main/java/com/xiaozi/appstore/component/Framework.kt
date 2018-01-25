@@ -35,9 +35,29 @@ class Framework {
     }
 
     object Package {
-        fun loadInstalledPackages(): Array<String> =
-                mContext!!.packageManager.getInstalledPackages(PackageManager.MATCH_UNINSTALLED_PACKAGES)
-                        .filter { it != null }.map { it.packageName }.toTypedArray()
+        private val installedPkgs = mutableSetOf<String>()
+        @Synchronized fun installed(force: Boolean = false): List<String> {
+            if (force || installedPkgs.isEmpty()) {
+                installedPkgs.clear()
+                installedPkgs.addAll(mContext!!.packageManager.getInstalledPackages(PackageManager.MATCH_UNINSTALLED_PACKAGES)
+                        .filter { it != null }.map { it.packageName })
+            }
+            return installedPkgs.toList()
+        }
+        fun addInstalled(pkg: String) {
+            if (installedPkgs.isEmpty()) {
+                installed()
+            }
+            installedPkgs.add(pkg)
+        }
+        fun removeInstalled(pkg: String) {
+            if (installedPkgs.isEmpty()) {
+                installed()
+            }
+            installedPkgs.remove(pkg)
+        }
+        fun isInstalled(pkg: String) = pkg in installedPkgs
+
     }
 
     object Date {

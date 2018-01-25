@@ -3,14 +3,19 @@ package com.xiaozi.appstore
 import android.content.Context
 import android.view.View
 import android.widget.Toast
+import com.fish.downloader.view.DownloadBar
 import com.xiaozi.appstore.component.Framework
+import com.xiaozi.appstore.manager.DownloadTagsManager
 
 /**
  * Created by fish on 18-1-2.
  */
 fun Call(delay: Long = 0, success: () -> Unit) = Framework._H.postDelayed(success, delay)
 
-fun Context.ZToast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+fun Context.ZToast(msg: String) {
+    Framework._H.post { Toast.makeText(this, msg, Toast.LENGTH_LONG).show() }
+}
+
 fun Context.dp2px(dpValue: Int) = (dpValue * resources.displayMetrics.density + 0.5f).toInt()
 
 
@@ -47,4 +52,32 @@ fun <T> Iterable<T>.forkList(predicate: T.() -> Boolean, result: (resultTrue: Li
     val fList = mutableListOf<T>()
     this.forEach { if (it.predicate()) tList.add(it) else fList.add(it) }
     result(tList, fList)
+}
+
+fun <T> Collection<T>.containsBy(data: Any, predicate: T.() -> Any?): Boolean = this.filter { data == predicate }.map { it != null }.isNotEmpty()
+
+
+fun DownloadBar.initDownload(pkg: String, appName: String, url: String, fileSize: Long) {
+    if (DownloadTagsManager.mTagsMap.containsKey(pkg)) {
+        mTag = pkg
+        text(DownloadTagsManager.mTagsMap[pkg]?.text ?: "下载")
+        return
+    }
+    DownloadTagsManager.store(pkg, url, appName, fileSize)
+    initInfo(pkg, appName, fileSize, url)
+    init { type, data ->
+        when (type) {
+            DownloadBar.CK_TYPE.COMPLETE -> {
+            }
+            DownloadBar.CK_TYPE.FAILED -> {
+                context.ZToast(data ?: "下载失败")
+
+            }
+            DownloadBar.CK_TYPE.CANCELED -> {
+            }
+        }
+    }
+    setOnClickListener {
+        download()
+    }
 }

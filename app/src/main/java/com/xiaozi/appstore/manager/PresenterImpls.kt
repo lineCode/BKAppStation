@@ -64,6 +64,13 @@ open class AppDetailPresenterImpl(private val mWaiter: AsyncWaiter, private val 
     }
 }
 
+class AppAdListPresenterImpl(private val mWaiter: AsyncWaiter, private val appId: Int, private val onLoaded: (data: List<DataManager.AppInfo>) -> Unit) : IDataPresenter {
+    override fun load() {
+        NetManager.loadAssociateApps("$appId", { onLoaded(appNodes.node.map { DataManager.AppInfoDM.trans(it) }) }, mWaiter.activity::ZToast)
+    }
+
+}
+
 class CategoryPresenterImpl(private val type: AppListType, private val onLoaded: List<DataManager.Category>.() -> Unit) : IDataPresenter {
     override fun load() = when (type) {
         AppListType.APP -> DataManager.CategoryDM.mAppCategory.onLoaded()

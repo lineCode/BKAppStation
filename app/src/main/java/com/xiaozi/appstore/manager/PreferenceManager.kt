@@ -62,10 +62,11 @@ object AccountManager {
     var userName = ""
     var userHeadIcon = ""
 
-    fun storeToken(token: String, id: Int)  {
+    fun storeToken(token: String, id: Int) {
         AccountSPMgr.putValue(KEY_TOKEN, token)
         AccountSPMgr.putValue(KEY_UID, id)
     }
+
     fun isLoggedIn() = AccountSPMgr.haveKey(KEY_TOKEN)
     fun token() = AccountSPMgr.getStringValue(KEY_TOKEN)
     fun uid() = AccountSPMgr.getIntValue(KEY_UID)
@@ -79,11 +80,26 @@ object AccountManager {
 
 object DownloadInfoManager {
     val KEY_DOWNLOADS = "downloads"
-    val downloadInfos = DownloadSPMgr.getSP().all.map { _GSON.safety { fromJson(it.value as String, DownloadInfo::class.java) } }.toNotNullMutableList()
+    val downloadInfos: MutableList<DownloadInfo>
+
+    init {
+        downloadInfos = DownloadSPMgr.getSP().all.map { _GSON.safety { fromJson(it.value as String, DownloadInfo::class.java) } }.toNotNullMutableList()
+    }
+
+    fun getInfoByTag(tag: String): DownloadInfo? = try {
+        downloadInfos.filter { it.tag == tag }[0]
+    } catch (ex: Exception) {
+        null
+    }
 
     fun storeInfo(info: DownloadInfo) {
         DownloadSPMgr.putValue(info.tag, info)
         downloadInfos.add(info)
+    }
+
+    fun removeInfo(tag: String) {
+        DownloadSPMgr.putValue(tag, null)
+        downloadInfos.remove(getInfoByTag(tag))
     }
 
     data class DownloadInfo(val url: String, val path: String, val name: String, val tag: String, val size: Int, var ptr: Int)

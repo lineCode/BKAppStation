@@ -32,6 +32,7 @@
 
 
             <RelativeLayout
+                android:id="@+id/rl_app_comment"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_marginLeft="16dp"
@@ -43,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/icon_app_score"
                     android:drawablePadding="16dp"
-                    android:text="评分"
+                    android:text="评论"
                     android:textColor="@color/text_dark"
                     android:textSize="@dimen/title_text" />
 

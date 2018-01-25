@@ -2,6 +2,7 @@ package com.xiaozi.appstore;
 
 import org.junit.Test;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -49,6 +50,11 @@ public class JavaTest {
             }
         }
         return result;
+    }
+
+    @Test
+    public void testUrlEncode() {
+        System.out.println(URLEncoder.encode("~"));
     }
 
     interface IFilter<T> {

@@ -46,7 +46,7 @@ class WXEntryActivity : IWXAPIEventHandler, Activity() {
         LogFilePlugin.RLog("WX RESP", "${resp?.type}")
         when (resp?.type) {
             ConstantsAPI.COMMAND_SENDAUTH -> {
-                when (resp?.errCode) {
+                when (resp.errCode) {
                     BaseResp.ErrCode.ERR_OK -> loadAccess((resp as? SendAuth.Resp)?.code)   //success
                     BaseResp.ErrCode.ERR_USER_CANCEL -> ZToast("用户取消")
                     BaseResp.ErrCode.ERR_AUTH_DENIED -> ZToast("认证被拒绝")
@@ -90,7 +90,7 @@ class WXEntryActivity : IWXAPIEventHandler, Activity() {
         RequestHelper<WXUserInfo>().Success {
             NetManager.login(it.openid, it.unionid, it.nickname, it.headimgurl, {
                 AccountManager.apply {
-                    storeToken(userToken)
+                    storeToken(userToken, userId)
                     userHeadIcon = ""
                     userName = ""
                 }

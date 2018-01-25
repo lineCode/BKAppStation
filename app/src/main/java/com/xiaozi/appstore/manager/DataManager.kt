@@ -26,7 +26,7 @@ class DataManager {
         fun getAppInfo(pkg: String) = RamStorage.appInfoMap[pkg]
 
         fun trans(data: RespAppListInfo) = data.run {
-            AppInfo(appId, packageName, appName, iconUrl, downloadCount, Framework.Trans.Size(size), appDesc, downloadUrl)
+            AppInfo(appId, packageName, appName, iconUrl, downloadCount, Framework.Trans.Size(size), size, appDesc, downloadUrl)
         }
     }
 
@@ -46,8 +46,8 @@ class DataManager {
         fun BannerTransor(data: RespBanners)
                 = data.banners.banner.map { Banner(it.image, it.link) }
 
-        fun AppDetailTransor(resp: RespAppInfo) = resp.appInfo.run {
-            AppDetail(appId, appName, packageName, iconUrl, Framework.Trans.Size(size), updateLog, tips, desContent, downloadUrl, commentCount, imgUrls)
+        fun AppDetailTransor(resp: RespAppInfo) = resp.appinfo.run {
+            AppDetail(appId, appName, packageName, iconUrl, Framework.Trans.Size(size), updateLog, tips, appDesc, downloadUrl, commentCount, arrayOf<String>())
         }
     }
 
@@ -57,7 +57,7 @@ class DataManager {
 
     data class Category(val name: String, val icon: String, val classId: Int, val tabs: List<SecCategory>)
     data class SecCategory(val name: String, val classId: Int)
-    data class AppInfo(val appId: Int, val pkg: String, val name: String, val icon: String, val installCnt: Int, val size: String, val tip: String, val dlUrl: String)
+    data class AppInfo(val appId: Int, val pkg: String, val name: String, val icon: String, val installCnt: Int, val size: String, val sizeInt: Int, val tip: String, val dlUrl: String)
     data class Comment(val headIcon: String, val score: Int, val name: String, val time: String, val content: String, val count: Int, val isAgreed: Int, val id: Int)
 
 }

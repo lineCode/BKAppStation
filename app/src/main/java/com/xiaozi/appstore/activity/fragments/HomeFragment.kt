@@ -5,6 +5,7 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.DividerItemDecoration.VERTICAL
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -67,7 +68,7 @@ class HomeFragment : BaseFragment() {
         mGameLoader = AppListDataPresenterImpl(mWaiter, AppListType.GAME.str, AppCondition.HOT.str) {
             mData.safety {
                 clear()
-                addAll(this@AppListDataPresenterImpl)
+                addAll(this@AppListDataPresenterImpl.filter { it.appId == 3 })
             }
             mAdapter.notifyDataSetChanged()
         }
@@ -119,5 +120,15 @@ class HomeFragment : BaseFragment() {
             holder?.load(mData[position])
         }
 
+        override fun onViewRecycled(holder: HomeVH?) {
+            super.onViewRecycled(holder)
+            if (holder == null) return
+            Log.e("VH", "recycled: poi[${holder.adapterPosition}]")
+            try {
+                holder.release(mData[holder.adapterPosition].pkg)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+            }
+        }
     }
 }

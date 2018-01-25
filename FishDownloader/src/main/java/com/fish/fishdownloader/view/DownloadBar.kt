@@ -56,8 +56,10 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
         override fun basicTypes(anInt: Int, aLong: Long, aBoolean: Boolean, aFloat: Float, aDouble: Double, aString: String?) {}
 
         override fun onPause(tag2: String?, filePath: String?, ptr: Int, size: Int) {
-            if (tag.equals(mTag)) {
-                onceReDownload()
+            if (tag2.equals(mTag)) {
+                setOnClickListener {
+                    onceReDownload()
+                }
             }
         }
 
@@ -78,6 +80,9 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
         override fun onFailed(tag2: String?, msg: String?) {
             if (tag2.equals(mTag)) {
                 mTvPG.stopTextProg(mConf.compileTextColor)
+                mHandler.post {
+                    mTvPG.text = mConf.failedText
+                }
                 if (this@DownloadBar::mDlck.isInitialized)
                     mDlck(CK_TYPE.FAILED, msg)
             }
@@ -86,9 +91,11 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
         override fun onCanceled(tag2: String?) {
             if (tag2.equals(mTag)) {
                 mTvPG.setTextColor(mConf.compileTextColor)
-                onceReDownload()
                 if (this@DownloadBar::mDlck.isInitialized)
                     mDlck(CK_TYPE.CANCELED, "")
+                setOnClickListener {
+                    onceReDownload()
+                }
             }
         }
     }
@@ -120,6 +127,15 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
         context.bindService(Intent(context, DownloadService::class.java), mConnection, Service.BIND_AUTO_CREATE)
     }
 
+    fun restore() {
+        disconnectService()
+        mTag = ""
+        mUrl = ""
+        mFileName = ""
+        mSize = 0
+        initView()
+    }
+
     fun init(ck: (type: CK_TYPE, data: String?) -> Unit) {
         if (!this::mDlck.isInitialized)
             mDlck = ck
@@ -133,6 +149,8 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
         mUrl = url
     }
 
+    fun text() = mTvPG.text.toString()
+
     private fun initView() {
         mTvPG.text = mConf.initText
         mTvPG.setTextColor(mConf.textColor)
@@ -142,16 +160,20 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
         Log.e("attach to win", "att")
     }
 
-    fun text(str: String) {
-        mTvPG.text = str
+    fun restoreUI() {
+        initView()
     }
 
-    private fun onceReDownload() = setOnClickListener {
+    fun text(str: String) {
+        mHandler.post { mTvPG.text = str }
+    }
+
+    fun onceReDownload() = setOnClickListener {
         download()
         setOnClickListener {}
     }
 
-    private fun download() = try {
+    fun download() = try {
         mServiceBinder?.startDownload(mUrl, mTag, mFileName, mSize)
         chgDownloadUI()
     } catch (ex: Exception) {
@@ -159,9 +181,11 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
     }
 
     private fun chgDownloadUI() {
-        mFlPG.layoutParams = mFlPG.layoutParams.apply { width = 0 }
-        mTvPG.setTextColor(mConf.downloadingTextColor)
-        if (mConf.downloadingBGRes == null) mFlPG.setBackgroundColor(mConf.downloadingBGColor) else mFlPG.setBackgroundResource(mConf.downloadingBGRes ?: return)
+        mHandler.post {
+            mFlPG.layoutParams = mFlPG.layoutParams.apply { width = 0 }
+            mTvPG.setTextColor(mConf.downloadingTextColor)
+            if (mConf.downloadingBGRes == null) mFlPG.setBackgroundColor(mConf.downloadingBGColor) else mFlPG.setBackgroundResource(mConf.downloadingBGRes ?: return@post)
+        }
     }
 
     private fun complete(filePath: String?) {
@@ -178,7 +202,11 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
     }
 
     fun disconnectService() {
-        context.unbindService(mConnection ?: return)
+        try {
+            context.unbindService(mConnection ?: return)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
     }
 
     fun cancelByTag(tag: String) {
@@ -192,8 +220,9 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
     enum class CK_TYPE { COMPLETE, CANCELED, FAILED }
 
     data class DownloadBarConfigure(var initText: String = "下载",
-                                    var downloadingText: String = "下载",
+                                    var downloadingText: String = "下载中",
                                     var completeText: String = "完成",
+                                    var failedText: String = "下载失败",
                                     var textColor: Int = TEXT_COLOR,
                                     var downloadingTextColor: Int = TEXT_COLOR,
                                     var compileTextColor: Int = TEXT_COLOR,
@@ -209,7 +238,7 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
                                     var pogressCK: (parentView: View, progressBar: FrameLayout, pg: Double, colorChangableTV: ColorChangedTextView) -> Unit = { view, img, pg, ctv ->
                                         {
                                             img.layoutParams = img.layoutParams.apply { this@apply.width = (view.width * pg).toInt() }
-                                            ctv.setTextProg(String.format(downloadingText), (view.width * pg).toInt())
+                                            ctv.setTextProg(downloadingText, (view.width * pg).toInt())
 
                                         }()
                                     },

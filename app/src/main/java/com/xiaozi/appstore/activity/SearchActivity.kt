@@ -6,6 +6,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import android.widget.TextView
+import com.xiaozi.appstore.R
 import com.xiaozi.appstore.dp2px
 import com.xiaozi.appstore.manager.SearchPresenterImpl
 import com.xiaozi.appstore.view.SearchVH
@@ -25,6 +26,7 @@ class SearchActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.a_search)
         initRV()
         mLoader.load()
     }
