@@ -68,8 +68,6 @@ class DownloadService : Service() {
         }
 
         override fun registerCB(ck: IBinder?) {
-            Log.e(TAG, "reg")
-            Log.e(TAG, "CKS LEN:${mCKs.size}")
             mCKs.add(IDownloadCK.Stub.asInterface(ck))
             Log.e(TAG, "CKS LEN:${mCKs.size}")
         }
@@ -157,12 +155,13 @@ class Downloader {
 
     fun get(info: DownloadInfo, ck: IDownloadCK) = Runnable {
         try {
+            Log.e(TAG, "START ${info.url}")
             val connection = URL(info.url).openConnection() as HttpURLConnection
             if (info.offset > 0) {
                 connection.addRequestProperty("Range", "bytes=${limit(info.offset.toInt(), 1024)}-")
             }
             Log.e(TAG, "url connected!")
-            if (connection.responseCode == 200 || connection.responseCode == 206) {
+            if (connection.responseCode == 200 || connection.responseCode == 206 || connection.responseCode == 302) {
                 Log.e(TAG, "code:${connection.responseCode}")
                 if (connection.contentLength != 0) info.fileSize = connection.contentLength.toLong()
                 Log.e(TAG, "lenth:${info.fileSize}")
@@ -182,7 +181,8 @@ class Downloader {
                     Log.e(TAG, "dptr:$downloadPtr, readCnt:$readCnt, BUF SIZE: $BUF_SIZE")
                     downloadPtr += readCnt
                     ck.onProgress(info.tag, downloadPtr * 1.0 / info.fileSize)
-                } while (readCnt > 0 && !info.cancelSignal && info.pauseSignal)
+                    Log.e(TAG, "cancelSig: ${info.cancelSignal}, pauseSignal: ${info.pauseSignal}")
+                } while (readCnt > 0 && !info.cancelSignal && !info.pauseSignal)
                 Log.e(TAG, "exit looper")
                 try {
                     fos.close()

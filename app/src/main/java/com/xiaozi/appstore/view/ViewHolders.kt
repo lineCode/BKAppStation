@@ -43,7 +43,6 @@ class HomeVH(val v: View) : RecyclerView.ViewHolder(v) {
 
     fun release(tag: String) {
         DownloadTagsManager.mTagsMap[tag]?.text = mDL.text()
-
     }
 
     fun itemClk(ck: () -> Unit) {
@@ -215,6 +214,12 @@ object DownloadBarImplement {
                 }
             } else {
                 initDownload(app.pkg, app.name, app.dlUrl, app.sizeInt.toLong())
+                init { type, data ->  when(type) {
+                    DownloadBar.CK_TYPE.CANCELED -> {}
+                    DownloadBar.CK_TYPE.FAILED -> {}
+                    DownloadBar.CK_TYPE.COMPLETE -> {}
+                }}
+                setOnClickListener { onceReDownload() }
             }
         }
     }

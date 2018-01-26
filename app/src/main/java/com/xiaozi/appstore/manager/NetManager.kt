@@ -40,7 +40,7 @@ object NetManager {
         UrlParam("deviceModel", Device.DEVICE_NAME)
         UrlParam("imei", Device.getIMEI())
         UrlParam("mac", Device.getMacAddr())
-        UrlParam("osVersion", Device.getMacAddr())
+        UrlParam("osVersion", Device.OS_VERSION)
         HeadPassNullParam("userToken", AccountManager.token())
         ResultType(object : TypeToken<BaseResp<T>>() {})
         Success {
@@ -86,7 +86,7 @@ object NetManager {
     fun loadAppList(type: String = AppListType.ALL.str, condition: String, keyword: String = "", index: Int = 0, success: RespAppList.() -> Unit, failed: String.() -> Unit) {
         createBase<RespAppList>("$MAIN_URL/app/list", success, failed)
                 .Method(RequestHelper.Method.GET)
-                .UrlPassNullParam("adstype", type)
+                .UrlPassNullParam("adsType", type)
                 .UrlParam("condition", condition)
                 .UrlPassNullParam("keyword", keyword)
                 .UrlParam("number", "20")
@@ -204,7 +204,7 @@ data class RespUserInfo(val userInfo: RespUserInfoEntity) : Serializable
 data class RespCommentList(val comments: RespCommentListEntity) : Serializable
 data class RespBanners(val banners: RespBannersEntity) : Serializable
 data class RespLoginInfo(val userId: Int, val userToken: String) : Serializable
-data class RespHots(val names: Array<String>) : Serializable
+data class RespHots(val hotSearchWd: Array<String>) : Serializable
 
 data class RespAppConfEntity(val appClass: RespConfClz, val gameClass: RespConfClz, val timeStamp: Long)
 data class RespConfClz(val `class`: Array<RespAppClass>)

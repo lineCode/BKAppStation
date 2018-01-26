@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
 import com.fish.downloader.extensions.bid
 import com.fish.downloader.service.DownloadService
 import com.fish.fishdownloader.IDownloadCK
@@ -28,22 +29,23 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
     companion object {
         val DOWNLOADING_COLOR: Int = 0xfffde179.toInt()
         val COMPLETE_COLOR: Int = 0xfffff1ba.toInt()
-        val TEXT_COLOR: Int = 0xff1a96fc.toInt()
+        val INIT_BG_COLOR: Int = 0xfffff1ba.toInt()
+        val TEXT_COLOR: Int = 0xffff8a02.toInt()
     }
 
     init {
         View.inflate(context, R.layout.v_download_bar, this)
     }
 
-    val mTvPG by bid<ColorChangedTextView>(R.id.tv_dlbar_pg)
+    val mTvPG by bid<TextView>(R.id.tv_dlbar_pg)
     val mFlPG by bid<FrameLayout>(R.id.fl_dlbar_progress)
     val mBG by bid<FrameLayout>(R.id.fl_dlbar_bg)
     val mMask by bid<ImageView>(R.id.img_dlbar_mask)
 
     lateinit var mDlck: (type: CK_TYPE, data: String?) -> Unit
-    lateinit var mTag: String
-    lateinit var mUrl: String
-    lateinit var mFileName: String
+    var mTag: String = ""
+    var mUrl: String = ""
+    var mFileName: String = ""
     var mSize: Long = 0
 
     var mConf = DownloadBarConfigure { initView() }
@@ -70,7 +72,6 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
 
         override fun onComplete(tag2: String?, filePath: String?) {
             if (tag2.equals(mTag)) {
-                mTvPG.stopTextProg(mConf.compileTextColor)
                 complete(filePath)
                 if (this@DownloadBar::mDlck.isInitialized)
                     mDlck(CK_TYPE.COMPLETE, filePath)
@@ -79,7 +80,6 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
 
         override fun onFailed(tag2: String?, msg: String?) {
             if (tag2.equals(mTag)) {
-                mTvPG.stopTextProg(mConf.compileTextColor)
                 mHandler.post {
                     mTvPG.text = mConf.failedText
                 }
@@ -90,7 +90,6 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
 
         override fun onCanceled(tag2: String?) {
             if (tag2.equals(mTag)) {
-                mTvPG.setTextColor(mConf.compileTextColor)
                 if (this@DownloadBar::mDlck.isInitialized)
                     mDlck(CK_TYPE.CANCELED, "")
                 setOnClickListener {
@@ -129,6 +128,7 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
 
     fun restore() {
         disconnectService()
+        Log.e("dl bar", "restore status of tag:$mTag, url: $mUrl")
         mTag = ""
         mUrl = ""
         mFileName = ""
@@ -147,6 +147,7 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
         mFileName = fileName
         mSize = fileSize
         mUrl = url
+        Log.e("dl bar", "init, tag:$mTag, url:$mUrl")
     }
 
     fun text() = mTvPG.text.toString()
@@ -157,7 +158,6 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
         mMask.setBackgroundResource(mConf.maskRes)
         if (mConf.baseBGRes == null) mBG.setBackgroundColor(mConf.baseBGColor) else mBG.setBackgroundResource(mConf.baseBGRes ?: return)
         if (mConf.initBGRes == null) mFlPG.setBackgroundColor(mConf.initBGColor) else mFlPG.setBackgroundResource(mConf.initBGRes ?: return)
-        Log.e("attach to win", "att")
     }
 
     fun restoreUI() {
@@ -165,7 +165,9 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
     }
 
     fun text(str: String) {
-        mHandler.post { mTvPG.text = str }
+        mHandler.post {
+            mTvPG.text = str
+        }
     }
 
     fun onceReDownload() = setOnClickListener {
@@ -226,19 +228,20 @@ class DownloadBar(ctx: Context, attrs: AttributeSet?) : FrameLayout(ctx, attrs) 
                                     var textColor: Int = TEXT_COLOR,
                                     var downloadingTextColor: Int = TEXT_COLOR,
                                     var compileTextColor: Int = TEXT_COLOR,
-                                    var initBGColor: Int = DOWNLOADING_COLOR,
+                                    var initBGColor: Int = INIT_BG_COLOR,
                                     var initBGRes: Int? = null,
-                                    var downloadingBGColor: Int = DownloadBar.DOWNLOADING_COLOR,
-                                    var completeBGColor: Int = DownloadBar.COMPLETE_COLOR,
+                                    var downloadingBGColor: Int = DOWNLOADING_COLOR,
+                                    var completeBGColor: Int = COMPLETE_COLOR,
                                     var downloadingBGRes: Int? = null,
                                     var completeBGRes: Int? = null,
-                                    var baseBGColor: Int = 0xfffff1ba.toInt(),
+                                    var baseBGColor: Int = INIT_BG_COLOR,
                                     var baseBGRes: Int? = null,
                                     var maskRes: Int = R.drawable.i_download_top,
-                                    var pogressCK: (parentView: View, progressBar: FrameLayout, pg: Double, colorChangableTV: ColorChangedTextView) -> Unit = { view, img, pg, ctv ->
+                                    var pogressCK: (parentView: View, progressBar: FrameLayout, pg: Double, colorChangableTV: TextView) -> Unit = { view, img, pg, ctv ->
                                         {
+                                            if (downloadingBGRes == null) img.setBackgroundColor(downloadingBGColor) else img.setBackgroundResource(downloadingBGRes)
                                             img.layoutParams = img.layoutParams.apply { this@apply.width = (view.width * pg).toInt() }
-                                            ctv.setTextProg(downloadingText, (view.width * pg).toInt())
+                                            ctv.text = downloadingText
 
                                         }()
                                     },

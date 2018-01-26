@@ -15,7 +15,7 @@ import android.widget.TextView
 class ColorChangedTextView(ctx: Context, attr: AttributeSet) : TextView(ctx, attr) {
 
     val mBound = Rect()
-    var mProgressChangedColor: Int = 0xffffffff.toInt()
+    var mProgressChangedColor: Int = 0xffff8a02.toInt()
     val mPaint: Paint by lazy {
         Paint().apply {
             isAntiAlias = true

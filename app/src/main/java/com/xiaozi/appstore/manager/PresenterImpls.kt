@@ -86,7 +86,7 @@ class SearchPresenterImpl(private val onLoaded: Array<String>.() -> Unit) : IDat
         if (isLoading) return
         else isLoading = true
         NetManager.loadHotWords {
-            names.onLoaded()
+            hotSearchWd.onLoaded()
             isLoading = false
         }
     }

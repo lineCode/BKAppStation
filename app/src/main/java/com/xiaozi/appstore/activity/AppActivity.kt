@@ -48,13 +48,12 @@ class AppActivity : BaseBarActivity() {
         super.onCreate(savedInstanceState)
         initLoader()
         mLoader.load()
-        mAdsLoader.load()
     }
 
     private fun initLoader() {
         mWaiter = AsyncWaiter(this)
         mLoader = AppDetailPresenterImpl(mWaiter, getAppId()) { mData = it; initView() }
-        mAdsLoader = AppAdListPresenterImpl(mWaiter, getAppId()) { mAdData.addAll(it); mAdAdapter.notifyDataSetChanged() }
+        mAdsLoader = AppAdListPresenterImpl(mWaiter, getAppId()) { mAdData.addAll(it) }
     }
 
     private fun getAppId() = intent.getIntExtra(KEY_APPID, -1).apply {
@@ -116,6 +115,7 @@ class AppActivity : BaseBarActivity() {
             adapter = mAdAdapter
             mAdAdapter.notifyDataSetChanged()
         }
+        mAdsLoader.load()
     }
 
 
