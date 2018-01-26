@@ -76,8 +76,7 @@ class AppActivity : BaseBarActivity() {
 
     private fun initRV() {
         mAdapter = object : RecyclerView.Adapter<ImageVH>() {
-            val imgView = ImageView(this@AppActivity)
-            override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = ImageVH(imgView)
+            override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = ImageVH(ImageView(this@AppActivity))
 
             override fun getItemCount() = mData.imgs.size
 
@@ -105,10 +104,9 @@ class AppActivity : BaseBarActivity() {
             }
         }
         rv_app.run {
-            layoutManager = LinearLayoutManager(this@AppActivity)
+            layoutManager = LinearLayoutManager(this@AppActivity, LinearLayoutManager.HORIZONTAL,false)
             adapter = mAdapter
-//            addItemDecoration(RecyclerDividerDecor(this@AppActivity, 4))
-            mAdapter.notifyDataSetChanged()
+            addItemDecoration(RecyclerDividerDecor(this@AppActivity, 4))
         }
         rv_app_adv.run {
             layoutManager = LinearLayoutManager(this@AppActivity)

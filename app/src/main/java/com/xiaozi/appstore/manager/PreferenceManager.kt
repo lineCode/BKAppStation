@@ -40,7 +40,7 @@ sealed class PreferenceManager(module: Module) {
         }
     }
 
-    fun getBooleanValue(key: String) = getSP().getBoolean(key, false)
+    fun getBooleanValue(key: String, default: Boolean = false) = getSP().getBoolean(key, default)
     fun getIntValue(key: String, defaultValue: Int) = getSP().getInt(key, defaultValue)
     fun getIntValue(key: String) = getIntValue(key, -1)
     fun getStringValue(key: String) = getSP().getString(key, "")
@@ -107,6 +107,8 @@ object DownloadInfoManager {
 
 object ConfManager {
     val KEY_ONLYWIFI = "only_wifi"
+    fun isOnlyWifi() = ConfSPMgr.getBooleanValue(KEY_ONLYWIFI, true)
+    fun setOnlyWifi(value: Boolean) = ConfSPMgr.putValue(KEY_ONLYWIFI, value)
 }
 
 object AccountSPMgr : PreferenceManager(Module.Account)

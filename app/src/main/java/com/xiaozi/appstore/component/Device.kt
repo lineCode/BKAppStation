@@ -34,6 +34,20 @@ class Device() {
             }
         }
 
+        fun isUsingWifi(ctx: Context): Boolean {
+            val netType = try {
+                val netInfo = (ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager)?.activeNetworkInfo
+                if (netInfo == null || !netInfo.isAvailable) {
+                    NET_STATUS_NO
+                } else {
+                    if (netInfo.type == NET_STATUS_WIFI) NET_STATUS_WIFI else NET_STATUS_NOT_WIFI
+                }
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                NET_STATUS_UNKNOWN
+            }
+            return netType == NET_STATUS_WIFI
+        }
         fun CheckNetStatForToast(activity: Activity) {
             val netType = try {
                 val netInfo = (activity.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager)?.activeNetworkInfo

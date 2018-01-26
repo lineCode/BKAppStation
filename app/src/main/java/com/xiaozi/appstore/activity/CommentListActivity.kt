@@ -9,8 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.ZToast
+import com.xiaozi.appstore.manager.AccountManager
 import com.xiaozi.appstore.manager.CommentListPresenterImpl
 import com.xiaozi.appstore.manager.DataManager
+import com.xiaozi.appstore.manager.NetManager
 import com.xiaozi.appstore.view.AsyncWaiter
 import com.xiaozi.appstore.view.CommentVH
 import kotlinx.android.synthetic.main.a_comment_list.*
@@ -47,7 +49,7 @@ class CommentListActivity : BaseBarActivity() {
     private fun initRV() {
         mAdapter = object : RecyclerView.Adapter<CommentVH>() {
             override fun onBindViewHolder(holder: CommentVH, position: Int) {
-                holder.load(mData[position]){}
+                holder.load(mData[position]) {}
             }
 
             override fun getItemCount() = mData.size
@@ -85,8 +87,23 @@ class CommentListActivity : BaseBarActivity() {
     }
 
     private fun initEffects() {
-        tv_comment_write.setOnClickListener { fl_comment_page.visibility = View.VISIBLE }
-        tv_comment_apply.setOnClickListener { fl_comment_page.visibility = View.GONE }
-        tv_comment_cancel.setOnClickListener { fl_comment_page.visibility = View.GONE }
+        tv_comment_write.setOnClickListener {
+            fl_comment_page.visibility = View.VISIBLE
+            et_comment.requestFocus()
+
+        }
+        tv_comment_apply.setOnClickListener {
+            if (et_comment.text.isEmpty()) {
+                ZToast("请输入评论内容")
+            } else {
+                fl_comment_page.visibility = View.GONE
+                NetManager.applyComment(mAppId, et_comment.text.toString(), 0, AccountManager.uid(), AccountManager.userName, {
+                    ZToast("评论提交成功")
+                }) { this@CommentListActivity::ZToast }
+            }
+        }
+        tv_comment_cancel.setOnClickListener {
+            fl_comment_page.visibility = View.GONE
+        }
     }
 }

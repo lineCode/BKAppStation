@@ -47,7 +47,7 @@ class DataManager {
                 = data.banners.banner.map { Banner(it.image, it.link) }
 
         fun AppDetailTransor(resp: RespAppInfo) = resp.appinfo.run {
-            AppDetail(appId, appName, packageName, iconUrl, Framework.Trans.Size(size), updateLog, tips, appDesc, downloadUrl, commentCount, arrayOf<String>())
+            AppDetail(appId, appName, packageName, iconUrl, Framework.Trans.Size(size), updateLog, tips, appDesc, downloadUrl, commentCount, imageUrls)
         }
     }
 

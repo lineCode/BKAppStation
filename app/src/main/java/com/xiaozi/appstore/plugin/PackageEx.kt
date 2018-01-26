@@ -2,6 +2,9 @@ package com.xiaozi.appstore.plugin
 
 import android.util.Log
 import com.google.gson.Gson
+import com.xiaozi.appstore.component.Device
+import com.xiaozi.appstore.component.Framework
+import com.xiaozi.appstore.manager.ConfManager
 
 /**
  * Created by fish on 18-1-2.
@@ -23,3 +26,5 @@ fun ZLogW(tag: String = "FrameZLog", msg: String) = msg.apply { if (_LOG_W) Log.
 fun ZLogE(tag: String = "FrameZLog", msg: String) = msg.apply { if (_LOG_E) Log.e(tag, msg) }
 
 inline fun <T, R> within(t: T, r: T.() -> R) = t.run(r)
+
+fun netSupportByWifi() = !ConfManager.isOnlyWifi() || Device.isUsingWifi(Framework._C)

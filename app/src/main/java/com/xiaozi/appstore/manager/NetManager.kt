@@ -216,7 +216,7 @@ data class RespAppListInfo(val appDesc: String, val appName: String, val downloa
                            val packageName: String, val size: Int, val sn: Int, val appId: Int, val downloadUrl: String)
 
 data class RespAppInfoEntity(val adType: String, val appName: String, val commentCount: Int, val appDesc: String,
-                             val appId: Int, val downloadUrl: String, val iconUrl: String, val imgUrls: Array<String>,
+                             val appId: Int, val downloadUrl: String, val iconUrl: String, val imageUrls: Array<String>,
                              val packageName: String, val point: Int, val size: Int, val tips: String, val updateLog: String)
 
 data class RespUserInfoEntity(val userId: Int, val userImageUrl: String, val userName: String)

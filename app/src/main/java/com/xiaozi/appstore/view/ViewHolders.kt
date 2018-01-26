@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.fish.downloader.view.DownloadBar
+import com.nostra13.universalimageloader.core.ImageLoader
 import com.xiaozi.appstore.*
 import com.xiaozi.appstore.activity.AppActivity
 import com.xiaozi.appstore.activity.AppListActivity
@@ -120,7 +121,7 @@ class CommentVH(val v: View) : RecyclerView.ViewHolder(v) {
 class ImageVH(v: ImageView) : RecyclerView.ViewHolder(v) {
     val img = v
     fun load(imgUrl: String) {
-        ImageLoaderHelper.loadImageWithCache(imgUrl, img)
+        ImageLoader.getInstance().displayImage(imgUrl, img)
     }
 }
 
