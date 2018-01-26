@@ -59,7 +59,7 @@ class CommentListActivity : BaseBarActivity() {
         }
         rv_comment_list.layoutManager = LinearLayoutManager(this)
         rv_comment_list.adapter = mAdapter
-        swipe_comment_list.onSwipe(mData, { mLoader.load() }) { mLoader.load(false, this) }
+        swipe_comment_list.onSwipe({ mLoader.load() }) { mLoader.load(false, this) }
     }
 
     private fun initData() {

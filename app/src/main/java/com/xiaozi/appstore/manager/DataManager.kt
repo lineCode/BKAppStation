@@ -32,10 +32,17 @@ class DataManager {
 
 
     object CategoryDM {
-        lateinit var mAppCategory: MutableList<Category>
-        lateinit var mGameCategory: MutableList<Category>
+        var mAppCategory: MutableList<Category> = mutableListOf()
+        var mGameCategory: MutableList<Category> = mutableListOf()
         private fun trans(data: RespConfClz) = data.`class`.map {
-            Category(it.name, "type icon", it.id, it.subclass.map { SecCategory(it.name, it.id) })
+            Category(it.name, it.imgUrl, it.id, it.subclass.map { SecCategory(it.name, it.id) })
+        }
+
+        fun init(conf: RespAppConf) {
+            mAppCategory.clear()
+            mGameCategory.clear()
+            mAppCategory.addAll(trans(conf.configs.appClass))
+            mGameCategory.addAll(trans(conf.configs.gameClass))
         }
     }
 

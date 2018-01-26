@@ -208,7 +208,7 @@ data class RespHots(val hotSearchWd: Array<String>) : Serializable
 
 data class RespAppConfEntity(val appClass: RespConfClz, val gameClass: RespConfClz, val timeStamp: Long)
 data class RespConfClz(val `class`: Array<RespAppClass>)
-data class RespAppClass(val id: Int, val name: String, val subclass: Array<RespClassSec>)
+data class RespAppClass(val id: Int, val name: String, val imgUrl: String, val subclass: Array<RespClassSec>)
 data class RespClassSec(val id: Int, val name: String)
 
 data class RespAppListEntity(val node: Array<RespAppListInfo>, val number: Int, val start: Int)

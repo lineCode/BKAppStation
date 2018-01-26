@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.View
 import android.view.ViewGroup
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.manager.AppListDataPresenterImpl
@@ -52,7 +53,7 @@ class AppListActivity : BaseBarActivity() {
     }
 
     private fun initRV() {
-        swipe_applist.onSwipe(mData, { mLoader.load() }) { mLoader.load(index = this) }
+        swipe_applist.onSwipe({ mLoader.load() }) { mLoader.load(false, this) }
         mAdapter = object : RecyclerView.Adapter<TypedAppListVH>() {
             override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = TypedAppListVH(parent)
 
@@ -77,6 +78,7 @@ class AppListActivity : BaseBarActivity() {
                 mData.safety {
                     clear()
                     addAll(this@AppListDataPresenterImpl)
+                    img_applist_none.visibility = if (mData.isEmpty()) View.VISIBLE else View.GONE
                 }
                 mAdapter.notifyDataSetChanged()
             }

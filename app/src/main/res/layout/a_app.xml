@@ -7,29 +7,31 @@
 
     <include layout="@layout/i_applist" />
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/cutter"
-        android:paddingBottom="4dp"
-        android:paddingLeft="16dp"
-        android:paddingTop="4dp">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_app"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </FrameLayout>
-
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/cutter"
+                android:paddingBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingTop="4dp">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_app"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:overScrollMode="never"/>
+            </FrameLayout>
 
             <RelativeLayout
                 android:id="@+id/rl_app_comment"
@@ -85,11 +87,13 @@
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
                 android:textColor="@color/text_dark" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_margin="16dp"
-                android:background="@color/line"/>
+                android:background="@color/line" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -99,6 +103,7 @@
                 android:text="应用简介"
                 android:textColor="@color/text_dark"
                 android:textSize="@dimen/title_text" />
+
             <TextView
                 android:id="@+id/tv_app_info"
                 android:layout_width="match_parent"
@@ -107,11 +112,13 @@
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp"
                 android:textColor="@color/text_dark" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_margin="16dp"
-                android:background="@color/line"/>
+                android:background="@color/line" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -121,16 +128,18 @@
                 android:text="相关应用推荐"
                 android:textColor="@color/text_dark"
                 android:textSize="@dimen/title_text" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="16dp"
                 android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp">
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp">
+
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/rv_app_adv"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
             </RelativeLayout>
         </LinearLayout>
     </ScrollView>

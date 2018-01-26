@@ -13,6 +13,7 @@ import android.widget.TextView
 import cc.fish.coreui.BaseFragment
 import com.xiaozi.appstore.App
 import com.xiaozi.appstore.R
+import com.xiaozi.appstore.activity.AppListActivity
 import com.xiaozi.appstore.activity.SearchActivity
 import com.xiaozi.appstore.manager.*
 import com.xiaozi.appstore.safety
@@ -89,7 +90,9 @@ sealed class BaseAppListFragment : BaseFragment() {
             override fun getItemCount() = mCategoryData.size
 
             override fun onBindViewHolder(holder: CategoryVH, position: Int) {
-                holder.load(mCategoryData[position]) {}
+                holder.load(mCategoryData[position]) {
+                    AppListActivity.open(activity, name, mType.str, "class", "${mCategoryData[position].name}-$name")
+                }
             }
 
             override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = CategoryVH(parent)
@@ -99,7 +102,7 @@ sealed class BaseAppListFragment : BaseFragment() {
             layoutManager = LinearLayoutManager(activity)
             adapter = mAdapter
         }
-        mSwiper.onSwipe(mData, { mListLoader.load() }) { mListLoader.load(index = this) }
+        mSwiper.onSwipe({ mListLoader.load() }) { mListLoader.load(index = this) }
     }
 
     private fun initEffects() {

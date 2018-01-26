@@ -15,8 +15,7 @@
             android:id="@+id/img_icate_icon"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_centerHorizontal="true"
-            android:background="#00ff00" />
+            android:layout_centerHorizontal="true" />
 
         <TextView
             android:id="@+id/tv_icate_name"

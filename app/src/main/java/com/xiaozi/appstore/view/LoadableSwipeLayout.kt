@@ -9,6 +9,8 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE
 import android.util.AttributeSet
 import android.util.Log
+import com.xiaozi.appstore.Call
+import com.xiaozi.appstore.component.Framework
 import com.xiaozi.appstore.plugin.ForceObb
 import com.xiaozi.appstore.plugin.TypedOB
 import java.util.*
@@ -63,11 +65,26 @@ class LoadableSwipeLayout(ctx: Context, attrs: AttributeSet) : SwipeRefreshLayou
     fun getChildAdapter(): RecyclerView.Adapter<*>? = mRecyclerView?.adapter
 
     private var mLimPoi = 0
-    fun <T> onSwipe(dataList: MutableList<T>, refresh: () -> Unit, load: Int.() -> Unit) =
-            onSwipeComplex(dataList, { refresh() }) { offset, _ -> offset.load() }
+    fun onSwipe(refresh: () -> Unit, load: Int.() -> Unit) {
+        Call(200) {
+            if (mRecyclerView == null)
+                return@Call
+            setOnRefreshListener {
+                refresh()
+                Log.e("refresh", "ok")
+                mAdapterOBB.notifyObs()
+                mLimPoi = 0
+                isRefreshing = false
+            }
+            (++mLimPoi).load()
+            Log.e("load", "ok")
+            mAdapterOBB.notifyObs()
+            isLoading = false
+        }
+    }
 
-    fun <T> onSwipeComplex(dataList: MutableList<T>, refresh: ((Array<out T>) -> Unit) -> Unit,
-                    load: (offset: Int, (Array<out T>) -> Unit) -> Unit) {
+    fun <T> onSwipeComplex(dataList: MutableList<T>, refresh: (Array<out T>.() -> Unit) -> Unit,
+                           load: (offset: Int, (Array<out T>) -> Unit) -> Unit) {
         Handler(Looper.getMainLooper()).postDelayed({
             if (mRecyclerView == null) {
                 Log.e("swipe", "null!!!!!")
@@ -78,7 +95,7 @@ class LoadableSwipeLayout(ctx: Context, attrs: AttributeSet) : SwipeRefreshLayou
                     Log.e("refresh", "ok")
                     dataList.apply {
                         clear()
-                        addAll(it)
+                        addAll(this@refresh)
                         mAdapterOBB.notifyObs()
                         mLimPoi = 0
                         isRefreshing = false

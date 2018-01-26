@@ -71,6 +71,7 @@ class AppActivity : BaseBarActivity() {
         ImageLoaderHelper.loadImageWithCache(mData.icon, img_iapp_icon)
         tv_app_chat.text = "${mData.commentCnt}"
         rl_app_comment.setOnClickListener { CommentListActivity.open(this, mData.appId) }
+        changeTitle(mData.name)
         initRV()
     }
 

@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/common_bg">
     <ImageView
+        android:id="@+id/img_applist_none"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/nodata_list"
@@ -16,6 +17,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_applist"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:overScrollMode="never"/>
     </com.xiaozi.appstore.view.LoadableSwipeLayout>
 </FrameLayout>

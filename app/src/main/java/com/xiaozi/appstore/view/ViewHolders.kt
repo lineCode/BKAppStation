@@ -63,15 +63,13 @@ class TypedAppListVH(val v: View) : RecyclerView.ViewHolder(v) {
     fun load(app: DataManager.AppInfo, poi: Int) {
         mTvName.text = app.name
         if (poi > 0) {
+            mTvPos.visibility = View.VISIBLE
             mTvPos.text = "$poi"
         } else
             mTvPos.visibility = View.GONE
         mTvCon.text = app.tip
         ImageLoaderHelper.loadImageWithCache(app.icon, mImgIcon)
-    }
-
-    fun itemClk(ck: () -> Unit) {
-        v.onClick(ck)
+        v.setOnClickListener { AppActivity.open(v.context, app.appId) }
     }
 }
 
@@ -163,7 +161,10 @@ class DownloadingVH(private val v: View) : RecyclerView.ViewHolder(v) {
 
 class SearchVH(private val v: TextView) : RecyclerView.ViewHolder(v) {
     fun load(searchWord: String) {
-        AppListActivity.open(v.context, "搜索结果", AppListType.ALL.str, AppCondition.SEARCH.str, searchWord)
+        v.text = searchWord
+        v.setOnClickListener {
+            AppListActivity.open(v.context, "搜索结果", AppListType.ALL.str, AppCondition.SEARCH.str, searchWord)
+        }
     }
 }
 
