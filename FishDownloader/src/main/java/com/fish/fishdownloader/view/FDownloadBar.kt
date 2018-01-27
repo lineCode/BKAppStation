@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
 import com.fish.downloader.extensions.bid
 import com.fish.fishdownloader.IFDownloadAction
 import com.fish.fishdownloader.IFDownloadCallbacks
@@ -50,29 +51,41 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
         }
 
         override fun onProgress(pg: Double) {
-            progressUI(pg)
-            mOnProgress(pg)
+            post {
+                progressUI(pg)
+                mOnProgress(pg)
+            }
         }
 
         override fun onComplete(filePath: String) {
-            mOnComplete(filePath)
-            installApp(ctx, filePath)
-            mStatus = DownloadStatus.COMPLETE
+            post {
+                progressUI(0.0)
+                mOnComplete(filePath)
+                installApp(ctx, filePath)
+                mStatus = DownloadStatus.COMPLETE
+            }
         }
 
         override fun onFailed(msg: String) {
-            mOnFailed(msg)
-            mStatus = DownloadStatus.FAILED
+            post {
+                mOnFailed(msg)
+                mStatus = DownloadStatus.FAILED
+                ZToast(msg)
+            }
         }
 
         override fun onCanceled(msg: String) {
-            mOnCanceled(msg)
-            mStatus = DownloadStatus.IDLE
+            post {
+                mOnCanceled(msg)
+                mStatus = DownloadStatus.IDLE
+            }
         }
 
         override fun onPause(msg: String) {
-            mOnPause(msg)
-            mStatus = DownloadStatus.PAUSE
+            post {
+                mOnPause(msg)
+                mStatus = DownloadStatus.PAUSE
+            }
         }
     }
     var mOnProgress: (Double) -> Unit = {}
@@ -90,7 +103,9 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
     }
 
     fun putInfo(name: String, url: String, size: Int) {
-        mServiceStub.initInfo(mTag, name, url, size)
+        postDelayed({
+            mServiceStub.initInfo(mTag, name, url, size)
+        }, 30)
     }
 
     fun release() {
@@ -106,23 +121,26 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
     private fun cleanView() {
         mActionTv.text = "下载"
         progressUI(0.0)
+        flushUI()
     }
 
     private fun initStatusBySP(tag: String) {
-        if (hasInfo(ctx, tag)) {
-            takeInfo(ctx, tag)!!.run {
-                if (ptr != size)
-                    mStatus = DownloadStatus.PAUSE
-                else if (File(filePath).exists())
-                    mStatus = DownloadStatus.COMPLETE
-                else {
-                    deleteInfo(ctx, tag)
-                    mStatus = DownloadStatus.IDLE
+        postDelayed({
+            if (mServiceStub.hasTag(tag)) {
+                takeInfo(ctx, tag)?.run {
+                    if (ptr != size)
+                        mStatus = DownloadStatus.PAUSE
+                    else if (File(filePath).exists())
+                        mStatus = DownloadStatus.COMPLETE
+                    else {
+                        deleteInfo(ctx, tag)
+                        mStatus = DownloadStatus.IDLE
+                    }
                 }
+            } else {
+                mStatus = DownloadStatus.IDLE
             }
-        } else {
-            mStatus = DownloadStatus.IDLE
-        }
+        }, 35)
     }
 
     private fun initConnect() {
@@ -143,7 +161,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
 
     /****Inner funcs****/
     private fun progressUI(pg: Double) {
-        mProgress.layoutParams = mProgress.layoutParams.apply { this@apply.width = (mProgress.width * pg).toInt() }
+        mProgress.layoutParams = mProgress.layoutParams.apply { this@apply.width = (this@FDownloadBar.width * pg).toInt() }
     }
 
     private fun download() {
@@ -182,6 +200,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
                 DownloadStatus.PAUSE -> {
                     text = "继续"
                     onceClick(this@FDownloadBar::download)
+                    progressUI(takeInfo(ctx, mTag)?.run { 1.0 * ptr / size } ?: return@run)
                 }
                 DownloadStatus.FAILED -> {
                     text = "失败"
@@ -193,8 +212,8 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
                     } else {
                         text = "安装"
                         onceClick {
-                            installApp(ctx, mTag)
                             mStatus = DownloadStatus.COMPLETE
+                            installApp(ctx, takeInfo(ctx, mTag)?.filePath?:return@onceClick)
                         }
                     }
                 }
@@ -213,11 +232,19 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
         INSTALL_CHK,
     }
 
+    var onceClkFlag = false
     private fun onceClick(ck: () -> Unit) {
+        onceClkFlag = true
         setOnClickListener {
+            onceClkFlag = false
             ck()
-            setOnClickListener {}
+            if (!onceClkFlag)
+                setOnClickListener {}
         }
+    }
+
+    fun ZToast(msg: String) {
+        Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
     }
 
     @Synchronized

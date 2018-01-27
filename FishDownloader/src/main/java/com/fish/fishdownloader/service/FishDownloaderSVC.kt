@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Environment
 import android.os.IBinder
 import android.util.Log
+import com.fish.downloader.framework.ThreadPool
 import com.fish.fishdownloader.IFDownloadAction
 import com.fish.fishdownloader.IFDownloadCallbacks
 import com.fish.fishdownloader.service.FishDownloaderData.mCKS
@@ -46,17 +47,16 @@ class FishDownloaderSVC : Service() {
 
         override fun startDownload(tag: String) {
             takeInfo(this@FishDownloaderSVC, tag)?.run {
-                if (ptr == size ) {
+                if (ptr == size) {
                     if (File(filePath).exists()) {
                         FishDownloaderData.mCKS[tag]?.onComplete(filePath)
                         return
-                    }
-                    else
+                    } else
                         deleteInfo(this@FishDownloaderSVC, tag)
                 }
             }
             if (tag !in FishDownloaderData.mDownloadings) {
-                FishDownloader().get(this@FishDownloaderSVC, FishDownloaderData.mInfos[tag] ?: return)
+                ThreadPool.addTask(FishDownloader().get(this@FishDownloaderSVC, tag))
                 FishDownloaderData.mDownloadings.add(tag)
             }
         }
@@ -70,6 +70,7 @@ class FishDownloaderSVC : Service() {
         }
 
         override fun registerCK(tag: String, ck: IBinder) {
+            Log.e(TAG, "reg: $tag")
             mCKS[tag] = IFDownloadCallbacks.Stub.asInterface(ck)
         }
 
@@ -81,10 +82,12 @@ class FishDownloaderSVC : Service() {
             mCKS.clear()
         }
 
-        override fun hasTag(tag: String) = mInfos.containsKey(tag)
+        override fun hasTag(tag: String) = mInfos[tag]?.ptr ?: -1 > 0
 
         override fun pauseByTag(tag: String) {
+            Log.e(TAG, "PAUSE  $tag")
             mInfos[tag]?.pauseSignal = true
+            Log.e(TAG, "signal  ${mInfos[tag]?.pauseSignal ?: "none"}")
         }
     }
 
@@ -123,24 +126,27 @@ class FishDownloader {
         }
     }
 
-    fun get(ctx: Context, info: DownloadRecInfo) = Runnable {
+    fun get(ctx: Context, tag: String) = Runnable {
         try {
-            Log.e(TAG, "START ${info.downloadUrl}")
-            val connection = URL(info.downloadUrl).openConnection() as HttpURLConnection
-            if (info.ptr > 0) {
-                connection.addRequestProperty("Range", "bytes=${limit(info.ptr.toInt(), 1024)}-")
+            if (mInfos[tag] == null) return@Runnable
+            mInfos[tag]!!.pauseSignal = false
+            Log.e(TAG, "START ${mInfos[tag]!!.downloadUrl}")
+            val connection = URL(mInfos[tag]!!.downloadUrl).openConnection() as HttpURLConnection
+            if (mInfos[tag]!!.ptr > 0) {
+                connection.addRequestProperty("Range", "bytes=${limit(mInfos[tag]!!.ptr, 0)}-")
             }
             Log.e(TAG, "url connected!")
             if (connection.responseCode == 200 || connection.responseCode == 206 || connection.responseCode == 302) {
                 Log.e(TAG, "code:${connection.responseCode}")
-                if (connection.contentLength != 0) info.size = connection.contentLength
-                Log.e(TAG, "lenth:${info.size}")
-                val f = createFile(info)
+                if (connection.contentLength != 0) mInfos[tag]!!.size = connection.contentLength + limit(mInfos[tag]!!.ptr, 0)
+                Log.e(TAG, "lenth:${mInfos[tag]!!.size}")
+                val f = createFile(mInfos[tag]!!)
                 val fos = FileOutputStream(f, true)
                 val netIS = connection.inputStream
-                var downloadPtr = limit(info.ptr.toInt(), 1024)
+                var downloadPtr = limit(mInfos[tag]!!.ptr, 0)
                 var readCnt = 0
                 val buf = ByteArray(BUF_SIZE)
+                saveInfo(ctx, mInfos[tag]!!)
                 do {
                     readCnt = netIS.read(buf, 0, BUF_SIZE)
                     if (readCnt == -1)
@@ -149,10 +155,12 @@ class FishDownloader {
                     fos.flush()
                     Log.e(TAG, "dptr:$downloadPtr, readCnt:$readCnt, BUF SIZE: $BUF_SIZE")
                     downloadPtr += readCnt
-                    mCKS[info.tag]?.onProgress(downloadPtr * 1.0 / info.size)
-                    info.ptr = downloadPtr
-                    Log.e(TAG, "cancelSig: ${info.cancelSignal}, pauseSignal: ${info.pauseSignal}")
-                } while (readCnt > 0 && !info.cancelSignal && !info.pauseSignal)
+                    mCKS[tag]?.onProgress(downloadPtr * 1.0 / mInfos[tag]!!.size)
+                    mInfos[tag]?.ptr = downloadPtr
+//                    Log.e(TAG, "cancelSig: ${mInfos[tag]?.cancelSignal}, pauseSignal: ${mInfos[tag]?.pauseSignal}")
+                } while (readCnt > 0 && !(mInfos[tag]?.cancelSignal
+                                ?: return@Runnable) && !(mInfos[tag]?.pauseSignal
+                                ?: return@Runnable))
                 Log.e(TAG, "exit looper")
                 try {
                     fos.close()
@@ -161,35 +169,46 @@ class FishDownloader {
                 } catch (ioex: IOException) {
                     ioex.printStackTrace()
                 }
-                if (info.cancelSignal) {
-                    mCKS[info.tag]?.onCanceled(info.tag)
-                    deleteInfo(ctx, info.tag)
+                if (mInfos[tag]?.cancelSignal!!) {
+                    mCKS[tag]?.onCanceled(tag)
+                    deleteInfo(ctx, tag)
                     f.delete()
-                } else if (info.pauseSignal) {
-                    saveInfo(ctx, info)
-                    mCKS[info.tag]?.onPause(info.filePath)
+                    Log.e(TAG, "canceled: ${tag}")
+                } else if (mInfos[tag]!!.pauseSignal) {
+                    saveInfo(ctx, mInfos[tag]!!)
+                    mCKS[tag]?.onPause(mInfos[tag]!!.filePath)
+                    Log.e(TAG, "pause: ${tag}")
                 } else {
-                    mCKS[info.tag]?.onComplete(info.filePath)
+                    mCKS[tag]?.onComplete(mInfos[tag]!!.filePath)
+                    saveInfo(ctx, mInfos[tag]!!)
+                    Log.e(TAG, "completed: ${tag}")
                 }
             } else {
-                mCKS[info.tag]?.onFailed("REQUEST ERROR:${connection.responseCode}")
-                deleteInfo(ctx, info.tag)
+                mCKS[tag]?.onFailed("REQUEST ERROR:${connection.responseCode}")
+                Log.e(TAG, "failed: ${tag}")
+                deleteInfo(ctx, tag)
             }
         } catch (ioEX: IOException) {
             ioEX.printStackTrace()
-            mCKS[info.tag]?.onFailed("CONNECTION FAILED")
-            deleteInfo(ctx, info.tag)
+            mCKS[tag]?.onFailed("CONNECTION FAILED")
+            Log.e(TAG, "failed: ${tag}")
+            deleteInfo(ctx, tag)
         } finally {
-            FishDownloaderData.mDownloadings.remove(info.tag)
+            FishDownloaderData.mDownloadings.remove(tag)
         }
     }
 
     private fun limit(origin: Int, limits: Int) = if (origin <= limits) 0 else origin - limits
 }
 
-@Synchronized private fun deleteInfo(ctx: Context, tag: String) = ctx.getSharedPreferences("download_rec", Context.MODE_PRIVATE).edit().remove(tag).apply()
-@Synchronized private fun saveInfo(ctx: Context, info: DownloadRecInfo) = ctx.getSharedPreferences("download_rec", Context.MODE_PRIVATE).edit().putString(info.tag, FishDownloaderSVC.GSON.toJson(info)).apply()
-@Synchronized private fun takeInfo(ctx: Context, tag: String): DownloadRecInfo? {
+@Synchronized
+private fun deleteInfo(ctx: Context, tag: String) = ctx.getSharedPreferences("download_rec", Context.MODE_PRIVATE).edit().remove(tag).apply()
+
+@Synchronized
+private fun saveInfo(ctx: Context, info: DownloadRecInfo) = ctx.getSharedPreferences("download_rec", Context.MODE_PRIVATE).edit().putString(info.tag, FishDownloaderSVC.GSON.toJson(info)).apply()
+
+@Synchronized
+private fun takeInfo(ctx: Context, tag: String): DownloadRecInfo? {
     ctx.getSharedPreferences("download_rec", Context.MODE_PRIVATE).all.run {
         if (containsKey(tag))
             return FishDownloaderSVC.GSON.fromJson(this[tag] as? String
@@ -197,6 +216,8 @@ class FishDownloader {
         return null
     }
 }
-@Synchronized private fun hasInfo(ctx: Context, tag: String) = ctx.getSharedPreferences("download_rec", Context.MODE_PRIVATE).all.containsKey(tag)
+
+@Synchronized
+private fun hasInfo(ctx: Context, tag: String) = ctx.getSharedPreferences("download_rec", Context.MODE_PRIVATE).all.containsKey(tag)
 
 data class DownloadRecInfo(var tag: String, var name: String, var downloadUrl: String, var filePath: String, var ptr: Int, var size: Int, var cancelSignal: Boolean, var pauseSignal: Boolean)

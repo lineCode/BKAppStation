@@ -10,8 +10,6 @@ import com.fish.downloader.framework.ThreadPool
 import com.fish.fishdownloader.IDownloadCK
 import com.fish.fishdownloader.IDownloader
 import com.google.gson.Gson
-import org.json.JSONObject
-import org.json.JSONTokener
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
