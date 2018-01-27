@@ -98,7 +98,7 @@ class AppActivity : BaseBarActivity() {
                 super.onViewRecycled(holder)
                 if (holder == null) return
                 try {
-                    holder.release(mAdData[holder.adapterPosition].pkg)
+                    holder.release()
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                 }

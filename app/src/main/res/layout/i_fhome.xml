@@ -13,8 +13,7 @@
         <ImageView
             android:id="@+id/img_ifhome_icon"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#ff0000"/>
+            android:layout_height="match_parent"/>
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -54,7 +53,7 @@
 
     </LinearLayout>
 
-    <com.fish.downloader.view.DownloadBar
+    <com.fish.downloader.view.FDownloadBar
         android:id="@+id/dlbar_ifhome"
         android:layout_width="62dp"
         android:layout_height="26dp"

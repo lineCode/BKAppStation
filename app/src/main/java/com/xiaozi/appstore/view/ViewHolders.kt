@@ -1,7 +1,6 @@
 package com.xiaozi.appstore.view
 
 import android.content.Context
-import android.graphics.Canvas
 import android.graphics.Rect
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -11,12 +10,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.fish.downloader.view.DownloadBar
+import com.fish.fishdownloader.view.FDownloadBar
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.xiaozi.appstore.*
 import com.xiaozi.appstore.activity.AppActivity
 import com.xiaozi.appstore.activity.AppListActivity
 import com.xiaozi.appstore.component.Framework
-import com.xiaozi.appstore.component.GlobalData
 import com.xiaozi.appstore.manager.*
 import com.xiaozi.appstore.plugin.ImageLoaderHelper
 import java.io.File
@@ -31,7 +30,7 @@ class HomeVH(val v: View) : RecyclerView.ViewHolder(v) {
     val mTvInfo = v.findViewById<TextView>(R.id.tv_ifhome_info)
     val mTvTip = v.findViewById<TextView>(R.id.tv_ifhome_tip)
     val mImgIcon = v.findViewById<ImageView>(R.id.img_ifhome_icon)
-    val mDL = v.findViewById<DownloadBar>(R.id.dlbar_ifhome)
+    val mDL = v.findViewById<FDownloadBar>(R.id.dlbar_ifhome)
 
     fun load(app: DataManager.AppInfo) {
         mTvName.text = app.name
@@ -39,15 +38,14 @@ class HomeVH(val v: View) : RecyclerView.ViewHolder(v) {
         mTvInfo.text = "${app.installCnt}次安装/${app.size}"
         ImageLoaderHelper.loadImageWithCache(app.icon, mImgIcon)
         v.setOnClickListener { AppActivity.open(v.context, app.appId) }
-        DownloadBarImplement.initDownloadBar(mDL, app)
+        mDL.run {
+            bindTag(app.pkg)
+            putInfo(app.name, app.dlUrl, app.sizeInt)
+        }
     }
 
-    fun release(tag: String) {
-        DownloadTagsManager.mTagsMap[tag]?.text = mDL.text()
-    }
-
-    fun itemClk(ck: () -> Unit) {
-        v.setOnClickListener { ck() }
+    fun release() {
+        mDL.release()
     }
 }
 

@@ -5,8 +5,9 @@
     android:background="#fff1ba">
     <FrameLayout
         android:id="@+id/fl_dlbar_progress"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:background="#fde179"/>
     <ImageView
         android:id="@+id/img_dlbar_mask"
         android:layout_width="match_parent"
@@ -18,5 +19,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textSize="15dp"
+        android:textColor="#ff8a02"
         android:gravity="center"/>
 </FrameLayout>

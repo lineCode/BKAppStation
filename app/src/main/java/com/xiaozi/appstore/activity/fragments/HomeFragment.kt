@@ -114,7 +114,7 @@ class HomeFragment : BaseFragment() {
     val mAdapter = object : RecyclerView.Adapter<HomeVH>() {
         override fun getItemCount() = mData.size
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = HomeVH(parent).apply { setIsRecyclable(false) }
+        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = HomeVH(parent)
 
         override fun onBindViewHolder(holder: HomeVH?, position: Int) {
             holder?.load(mData[position])
@@ -124,7 +124,7 @@ class HomeFragment : BaseFragment() {
             super.onViewRecycled(holder)
             if (holder == null) return
             try {
-                holder.release(mData[holder.adapterPosition].pkg)
+                holder.release()
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }

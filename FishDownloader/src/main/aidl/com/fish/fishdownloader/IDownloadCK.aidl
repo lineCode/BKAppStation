@@ -9,7 +9,6 @@ interface IDownloadCK {
      * and return values in AIDL.
      */
     void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat, double aDouble, String aString);
-
     void onProgress(String tag, double pg);
     void onComplete(String tag, String filePath);
     void onFailed(String tag, String msg);

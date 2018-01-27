@@ -114,6 +114,7 @@ class DownloadService : Service() {
     }
 
     val mDownloadMapper = HashMap<String, DownloadInfo?>()
+    val mCKMap = mutableMapOf<String, IDownloadCK>()
     val mCKs = ArrayList<IDownloadCK>()
 
     override fun onCreate() {
