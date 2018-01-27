@@ -80,7 +80,4 @@ fun DownloadBar.initDownload(pkg: String, appName: String, url: String, fileSize
             }
         }
     }
-    setOnClickListener {
-        onceReDownload()
-    }
 }

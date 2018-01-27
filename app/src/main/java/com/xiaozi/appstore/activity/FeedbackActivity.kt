@@ -17,9 +17,9 @@ class FeedbackActivity : BaseBarActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        et_feedback.text.toString().safety {
-            tv_feedback_apply.setOnClickListener {
-                if (this.isEmpty()) {
+        tv_feedback_apply.setOnClickListener {
+            et_feedback.text.toString().safety {
+                if (this@safety.isEmpty()) {
                     ZToast("请输入反馈内容")
                     return@setOnClickListener
                 }

@@ -26,7 +26,7 @@ class DataManager {
         fun getAppInfo(pkg: String) = RamStorage.appInfoMap[pkg]
 
         fun trans(data: RespAppListInfo) = data.run {
-            AppInfo(appId, packageName, appName, iconUrl, downloadCount, Framework.Trans.Size(size), size, appDesc, downloadUrl)
+            AppInfo(appId, packageName, appName, iconUrl, downloadCount, Framework.Trans.Size(size), size, tips, downloadUrl)
         }
     }
 

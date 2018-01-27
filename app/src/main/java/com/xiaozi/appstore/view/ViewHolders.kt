@@ -186,7 +186,6 @@ class RecyclerDividerDecor(private val ctx: Context, private val dividerSize: In
 object DownloadBarImplement {
     fun initDownloadBar(dlBar: DownloadBar, app: DataManager.AppInfo) {
         dlBar.run {
-            restore()
             if (Framework.Package.installed().contains(app.pkg)) {
                 text("打开")
                 setOnClickListener { Framework.App.openOtherApp(app.pkg) }
@@ -219,7 +218,13 @@ object DownloadBarImplement {
                 init { type, data ->  when(type) {
                     DownloadBar.CK_TYPE.CANCELED -> {}
                     DownloadBar.CK_TYPE.FAILED -> {}
-                    DownloadBar.CK_TYPE.COMPLETE -> {}
+                    DownloadBar.CK_TYPE.COMPLETE -> {
+                        try {
+                            Framework.App.installApp(File(data!!))
+                        }catch (ex:Exception) {
+                            ex.printStackTrace()
+                        }
+                    }
                 }}
                 setOnClickListener { onceReDownload() }
             }
