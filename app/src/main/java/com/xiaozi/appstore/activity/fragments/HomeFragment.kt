@@ -130,4 +130,9 @@ class HomeFragment : BaseFragment() {
             }
         }
     }
+
+    override fun onActivityResume() {
+        super.onActivityResume()
+        mAdapter.notifyDataSetChanged()
+    }
 }

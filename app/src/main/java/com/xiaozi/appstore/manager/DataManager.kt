@@ -65,7 +65,7 @@ class DataManager {
     data class Category(val name: String, val icon: String, val classId: Int, val tabs: List<SecCategory>)
     data class SecCategory(val name: String, val classId: Int)
     data class AppInfo(val appId: Int, val pkg: String, val name: String, val icon: String, val installCnt: Int, val size: String, val sizeInt: Int, val tip: String, val dlUrl: String)
-    data class Comment(val headIcon: String, val score: Int, val name: String, val time: String, val content: String, val count: Int, val isAgreed: Int, val id: Int)
+    data class Comment(val headIcon: String, val score: Int, val name: String, val time: String, val content: String, var count: Int, var isAgreed: Int, val id: Int)
 
 }
 

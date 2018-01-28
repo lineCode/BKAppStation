@@ -6,10 +6,7 @@ import android.view.View
 import android.widget.*
 import cc.fish.coreui.BaseFragment
 import com.xiaozi.appstore.R
-import com.xiaozi.appstore.activity.AboutActivity
-import com.xiaozi.appstore.activity.DownloadMgrActivity
-import com.xiaozi.appstore.activity.FeedbackActivity
-import com.xiaozi.appstore.activity.SearchActivity
+import com.xiaozi.appstore.activity.*
 import com.xiaozi.appstore.manager.AccountManager
 import com.xiaozi.appstore.manager.ConfManager
 import com.xiaozi.appstore.manager.IDataPresenter
@@ -60,13 +57,12 @@ class MineFragment : BaseFragment() {
 
 
     override fun onSelected() {
-        mLoader.load()
         if (!AccountManager.isLoggedIn()) {
-            mLLLogin.setOnClickListener { WXHelper.login() }
+            mLLLogin.setOnClickListener { activity.startActivity(Intent(activity, LoginActivity::class.java)) }
             mUserAction.apply {
                 text = "登录"
                 setOnClickListener {
-                    WXHelper.login()
+                    activity.startActivity(Intent(activity, LoginActivity::class.java))
                 }
             }
         } else {
@@ -79,6 +75,11 @@ class MineFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    override fun onActivityResume() {
+        super.onActivityResume()
+        mLoader.load()
     }
 
 }

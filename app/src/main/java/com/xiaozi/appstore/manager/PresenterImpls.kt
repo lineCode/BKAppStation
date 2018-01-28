@@ -114,7 +114,6 @@ class UserInfoPresenterImpl(private val activity: Activity, private val onLoaded
         }
         onLoaded()
     }
-
 }
 
 object PresenterImpls {

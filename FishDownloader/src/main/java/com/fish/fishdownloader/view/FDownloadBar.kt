@@ -18,10 +18,7 @@ import com.fish.downloader.extensions.bid
 import com.fish.fishdownloader.IFDownloadAction
 import com.fish.fishdownloader.IFDownloadCallbacks
 import com.fish.fishdownloader.R
-import com.fish.fishdownloader.service.DownloadRecInfo
-import com.fish.fishdownloader.service.FishDownloaderSVC
-import com.fish.fishdownloader.service.deleteInfo
-import com.fish.fishdownloader.service.takeInfo
+import com.fish.fishdownloader.service.*
 import com.google.gson.Gson
 import java.io.File
 
@@ -54,6 +51,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
 
         override fun onProgress(pg: Double) {
             post {
+                mActionTv.text = "下载中"
                 progressUI(pg)
                 mOnProgress(pg)
             }
@@ -110,13 +108,24 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
         }, 100)
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        Log.e("FDB", "ONDETACHED")
+        release()
+    }
+
     fun release() {
-        ctx.unbindService(mConnection)
+        try {
+            if (this::mConnection.isInitialized)
+                ctx.applicationContext.unbindService(mConnection)
+        } catch (ex: Exception) {
+        }
     }
 
     /****INITIAL****/
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        Log.e("FDB", "ONATTACHED")
         cleanView()
     }
 
@@ -128,12 +137,12 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
 
     private fun initStatusBySP(tag: String) {
         postDelayed({
-            if (mServiceStub.hasTag(tag)) {
+            if (mServiceStub.hasTag(tag) || hasInfo(ctx, tag)) {
                 takeInfo(ctx, tag)?.run {
                     if (ptr != size)
                         mStatus = DownloadStatus.PAUSE
                     else if (File(filePath).exists())
-                        mStatus = DownloadStatus.COMPLETE
+                        mStatus = DownloadStatus.INSTALL_CHK
                     else {
                         deleteInfo(ctx, tag)
                         mStatus = DownloadStatus.IDLE
@@ -157,7 +166,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
                 mServiceStub.registerCK(mTag, mCK)
             }
         }
-        ctx.bindService(Intent(context, FishDownloaderSVC::class.java), mConnection, Service.BIND_AUTO_CREATE)
+        ctx.applicationContext.bindService(Intent(ctx.applicationContext, FishDownloaderSVC::class.java), mConnection, Service.BIND_AUTO_CREATE)
     }
 
 
@@ -172,7 +181,6 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
     }
 
     private fun pause() {
-        mStatus = DownloadStatus.PAUSE
         mServiceStub.pauseByTag(mTag)
     }
 
@@ -215,7 +223,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
                         text = "安装"
                         onceClick {
                             mStatus = DownloadStatus.COMPLETE
-                            installApp(ctx, takeInfo(ctx, mTag)?.filePath?:return@onceClick)
+                            installApp(ctx, takeInfo(ctx, mTag)?.filePath ?: return@onceClick)
                         }
                     }
                 }

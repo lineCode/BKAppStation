@@ -72,7 +72,7 @@ class AppActivity : BaseBarActivity() {
         tv_app_chat.text = "${mData.commentCnt}"
         rl_app_comment.setOnClickListener { CommentListActivity.open(this, mData.appId) }
         dlbar_iapp.run {
-            bindTag(mTag)
+            bindTag(mData.pkg)
             putInfo(mData.name, mData.dlUrl, 100)
         }
         changeTitle(mData.name)
@@ -121,6 +121,10 @@ class AppActivity : BaseBarActivity() {
         mAdsLoader.load()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+//        dlbar_iapp.release()
+    }
 
     private fun exit() {
         ZToast("应用信息错误")

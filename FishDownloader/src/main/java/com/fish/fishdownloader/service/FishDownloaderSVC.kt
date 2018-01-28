@@ -153,7 +153,7 @@ class FishDownloader {
                         break
                     fos.write(buf, 0, readCnt)
                     fos.flush()
-                    Log.e(TAG, "dptr:$downloadPtr, readCnt:$readCnt, BUF SIZE: $BUF_SIZE")
+                    Log.e(TAG, "total: ${mInfos[tag]!!.size} ,tag: $tag, dptr:$downloadPtr, readCnt:$readCnt, BUF SIZE: $BUF_SIZE")
                     downloadPtr += readCnt
                     mCKS[tag]?.onProgress(downloadPtr * 1.0 / mInfos[tag]!!.size)
                     mInfos[tag]?.ptr = downloadPtr

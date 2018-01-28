@@ -65,6 +65,7 @@ sealed class BaseAppListFragment : BaseFragment() {
             mData.safety {
                 clear()
                 addAll(this@AppListDataPresenterImpl)
+                mAdapter.notifyDataSetChanged()
             }
         }
         mCategoryLoader = CategoryPresenterImpl(mType) {
@@ -107,7 +108,7 @@ sealed class BaseAppListFragment : BaseFragment() {
             layoutManager = LinearLayoutManager(activity)
             adapter = mAdapter
         }
-        mSwiper.onSwipe({ mListLoader.load() }) { mListLoader.load(index = this) }
+        mSwiper.onSwipe({ mListLoader.load() }) { mListLoader.load(index = mData.size) }
     }
 
     private fun initEffects() {
@@ -126,6 +127,11 @@ sealed class BaseAppListFragment : BaseFragment() {
             mRvList.adapter = mCategoryAdapter
             mCategoryAdapter.notifyDataSetChanged()
         }
+    }
+
+    override fun onActivityResume() {
+        super.onActivityResume()
+        mAdapter.notifyDataSetChanged()
     }
 }
 

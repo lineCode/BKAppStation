@@ -108,7 +108,7 @@ class CommentVH(val v: View) : RecyclerView.ViewHolder(v) {
     val tvContent = v.findViewById<TextView>(R.id.tv_icomment_content)
     val mDrawableAgree = v.context.resources.getDrawable(R.drawable.icon_agreed).apply { setBounds(0, 0, minimumWidth, minimumHeight) }
     val mDrawableUnAgree = v.context.resources.getDrawable(R.drawable.icon_unagreed).apply { setBounds(0, 0, minimumWidth, minimumHeight) }
-    fun load(data: DataManager.Comment, tvAction: TextView.() -> Unit) {
+    fun load(data: DataManager.Comment, tvAction: TextView.(DataManager.Comment) -> Unit) {
         ImageLoaderHelper.loadImageWithCache(data.headIcon, imgIcon)
         tvName.text = data.name
         tvDate.text = data.time
@@ -116,7 +116,7 @@ class CommentVH(val v: View) : RecyclerView.ViewHolder(v) {
         tvAgree.safety {
             text = "${data.count}"
             setCompoundDrawables(null, null, if (data.isAgreed == 1) mDrawableAgree else mDrawableUnAgree, null)
-            if (data.isAgreed == 0) setOnClickListener { this.tvAction() }
+            setOnClickListener { this.tvAction(data) }
         }
     }
 }
@@ -133,9 +133,35 @@ class DownloadingVH(private val v: View) : RecyclerView.ViewHolder(v) {
 
     private val mTvName = v.findViewById<TextView>(R.id.tv_idl_name)
     private val mTvContent = v.findViewById<TextView>(R.id.tv_idl_content)
-    val mDownloader = v.findViewById<DownloadBar>(R.id.download_idl)
+    val mDownloader = v.findViewById<FDownloadBar>(R.id.download_idl)
     fun load(data: DownloadRecInfo) {
-
+        var mLastPG = 0.0
+        var mLastTS = System.currentTimeMillis()
+        var mCnt = 0
+        mDownloader.bindTag(data.tag)
+        mTvName.text = data.name
+        if (data.ptr == data.size) {
+            //downloaded
+            mTvContent.text = "下载完成"
+        } else {
+            //downloading
+            mDownloader.mOnProgress = { pg ->
+                if (mCnt % 50 == 0)
+                    mTvContent.text = "${Framework.Trans.Size((data.size * pg).toInt())}/${Framework.Trans.Size(data.size)} ${
+                    if (mLastPG == 0.0) {
+                        0.0
+                    } else {
+                        pg - mLastPG
+                    }.run {
+                        Framework.Trans.Size((this * data.size / ((System.currentTimeMillis() - mLastTS) / 1000.0)).toInt())
+                    }.also {
+                                mLastPG = pg
+                                mLastTS = System.currentTimeMillis()
+                            }
+                    }/s"
+                mCnt++
+            }
+        }
 //        mTvName.text = data.name
 //        if (data.size == data.ptr) {
 //            if (!File(data.path).exists()) {
@@ -158,6 +184,10 @@ class DownloadingVH(private val v: View) : RecyclerView.ViewHolder(v) {
 //            mDownloader.text("暂停")
 //            mDownloader.setOnClickListener { }
 //        }
+    }
+
+    fun release() {
+        mDownloader.release()
     }
 
     fun content(str: String) {
@@ -221,17 +251,21 @@ object DownloadBarImplement {
                 }
             } else {
                 initDownload(app.pkg, app.name, app.dlUrl, app.sizeInt.toLong())
-                init { type, data ->  when(type) {
-                    DownloadBar.CK_TYPE.CANCELED -> {}
-                    DownloadBar.CK_TYPE.FAILED -> {}
-                    DownloadBar.CK_TYPE.COMPLETE -> {
-                        try {
-                            Framework.App.installApp(File(data!!))
-                        }catch (ex:Exception) {
-                            ex.printStackTrace()
+                init { type, data ->
+                    when (type) {
+                        DownloadBar.CK_TYPE.CANCELED -> {
+                        }
+                        DownloadBar.CK_TYPE.FAILED -> {
+                        }
+                        DownloadBar.CK_TYPE.COMPLETE -> {
+                            try {
+                                Framework.App.installApp(File(data!!))
+                            } catch (ex: Exception) {
+                                ex.printStackTrace()
+                            }
                         }
                     }
-                }}
+                }
                 setOnClickListener { onceReDownload() }
             }
         }

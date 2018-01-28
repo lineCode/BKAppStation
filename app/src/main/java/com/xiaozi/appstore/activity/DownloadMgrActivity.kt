@@ -62,6 +62,11 @@ class DownloadMgrActivity : BaseBarActivity() {
             }
 
             override fun getItemCount() = mDownloadedList.size
+
+            override fun onViewRecycled(holder: DownloadingVH?) {
+                super.onViewRecycled(holder)
+                holder?.release()
+            }
         }
         mDownloadingAdapter = object : RecyclerView.Adapter<DownloadingVH>() {
             override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = DownloadingVH(parent)
@@ -71,8 +76,13 @@ class DownloadMgrActivity : BaseBarActivity() {
             }
 
             override fun getItemCount() = mDownloadingList.size
+            override fun onViewRecycled(holder: DownloadingVH?) {
+                super.onViewRecycled(holder)
+                holder?.release()
+            }
         }
         rv_download.layoutManager = LinearLayoutManager(this)
+
     }
 
     private fun flushList() {

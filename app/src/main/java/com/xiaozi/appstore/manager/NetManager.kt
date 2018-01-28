@@ -21,7 +21,7 @@ import java.io.Serializable
 object NetManager {
 
     val SUCCESS_CODE = 0
-//    private val _TEST_URL = "http://192.168.1.100:18079/v1"
+    //    private val _TEST_URL = "http://192.168.1.100:18079/v1"
     private val _TEST_URL = "http://222.128.15.95:18079/v1"
     private val _PRODUCT_URL = ""
     private val MAIN_URL = if (_DEBUG) _TEST_URL else _PRODUCT_URL
@@ -81,7 +81,7 @@ object NetManager {
             success()
         }) {
             activity?.ZToast(this)
-        }.ResultType(object : TypeToken<BaseResp<RespAppConf>>(){}).get(Framework._C, Framework._H)
+        }.ResultType(object : TypeToken<BaseResp<RespAppConf>>() {}).get(Framework._C, Framework._H)
     }
 
     fun loadAppList(type: String = AppListType.ALL.str, condition: String, keyword: String = "", index: Int = 0, success: RespAppList.() -> Unit, failed: String.() -> Unit) {
@@ -91,8 +91,8 @@ object NetManager {
                 .UrlParam("condition", condition)
                 .UrlPassNullParam("keyword", keyword)
                 .UrlParam("number", "20")
-                .UrlParam("start", "${1 + index * 20}")
-                .ResultType(object : TypeToken<BaseResp<RespAppList>>(){}).get(Framework._C, Framework._H)
+                .UrlParam("start", "${index + 1}")
+                .ResultType(object : TypeToken<BaseResp<RespAppList>>() {}).get(Framework._C, Framework._H)
     }
 
     fun loadAssociateApps(appId: String, success: RespAppList.() -> Unit, failed: String.() -> Unit) {
@@ -100,7 +100,7 @@ object NetManager {
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("associatedAppId", appId)
                 .UrlParam("condition", "associate")
-                .ResultType(object : TypeToken<BaseResp<RespAppList>>(){}).get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespAppList>>() {}).get(Framework._C, Framework._H)
     }
 
     fun loadCommentList(appId: Int, index: Int = 0, success: RespCommentList.() -> Unit, failed: String.() -> Unit) {
@@ -108,15 +108,15 @@ object NetManager {
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("appId", "$appId")
                 .UrlParam("number", "20")
-                .UrlParam("start", "${1 + index * 20}")
-                .ResultType(object : TypeToken<BaseResp<RespCommentList>>(){}).get(Framework._C, Framework._H)
+                .UrlParam("start", "${index + 1}")
+                .ResultType(object : TypeToken<BaseResp<RespCommentList>>() {}).get(Framework._C, Framework._H)
     }
 
     fun loadAppDetail(appId: Int, success: RespAppInfo.() -> Unit, failed: String.() -> Unit) {
         createBase<RespAppInfo>("$MAIN_URL/app/info", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("appId", "$appId")
-                .ResultType(object : TypeToken<BaseResp<RespAppInfo>>(){}).get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespAppInfo>>() {}).get(Framework._C, Framework._H)
     }
 
     fun loadUserInfo(activity: Activity, userId: Int) {
@@ -124,19 +124,19 @@ object NetManager {
         }, activity::ZToast)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("userId", "$userId")
-                .ResultType(object : TypeToken<BaseResp<RespUserInfo>>(){}).get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespUserInfo>>() {}).get(Framework._C, Framework._H)
     }
 
     fun loadBanners(success: RespBanners.() -> Unit, failed: String.() -> Unit) {
         createBase<RespBanners>("$MAIN_URL/ad", success, failed)
                 .Method(RequestHelper.Method.GET)
-                .ResultType(object : TypeToken<BaseResp<RespBanners>>(){}).get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespBanners>>() {}).get(Framework._C, Framework._H)
     }
 
     fun loadHotWords(success: RespHots.() -> Unit) {
         createBase<RespHots>("$MAIN_URL/topsearchkw", success, {})
                 .Method(RequestHelper.Method.GET)
-                .ResultType(object : TypeToken<BaseResp<RespHots>>(){}).get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespHots>>() {}).get(Framework._C, Framework._H)
     }
 
     fun applyComment(appId: Int, commentTxt: String, point: Int, userId: Int, userName: String, success: Any?.() -> Unit, failed: String.() -> Unit) {
@@ -147,7 +147,7 @@ object NetManager {
                 .UrlParam("point", "$point")
                 .UrlParam("userId", "$userId")
                 .UrlParam("userName", userName)
-                .ResultType(object : TypeToken<BaseResp<Any?>>(){}).get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<Any?>>() {}).get(Framework._C, Framework._H)
     }
 
     fun applyFeedback(content: String, success: Any?.() -> Unit, failed: String.() -> Unit) {
@@ -157,27 +157,27 @@ object NetManager {
                 .UrlParam("email", "")
                 .UrlParam("qq", "")
                 .UrlParam("userId", "")
-                .ResultType(object : TypeToken<BaseResp<Any?>>(){}).get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<Any?>>() {}).get(Framework._C, Framework._H)
     }
 
-    fun applyThumbsup(appId: Int, commentId: Int, userId: Int, success: Any?.() -> Unit, failed: String.() -> Unit) {
+    fun applyThumbsup(appId: Int, commentId: Int, userId: Int, isApply: Boolean, success: Any?.() -> Unit, failed: String.() -> Unit) {
         createBase<Any?>("$MAIN_URL/comment/thumbup", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("appId", "$appId")
-                .UrlParam("beThumbsup", "1")
+                .UrlParam("beThumbsup", if (isApply) "1" else "0")
                 .UrlParam("commentId", "$commentId")
                 .UrlParam("userId", "$userId")
-                .ResultType(object : TypeToken<BaseResp<Any?>>(){}).get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<Any?>>() {}).get(Framework._C, Framework._H)
     }
 
     fun login(openId: String, unionId: String, userName: String, imgUrl: String, success: RespLoginInfo.() -> Unit, failed: String.() -> Unit) {
-        createBase<RespLoginInfo>("$MAIN_URL/user/login", success, failed)
+        createBase<RespLoginInfo>("$MAIN_URL/user/login/wechat", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("openId", openId)
                 .UrlParam("unionId", unionId)
                 .UrlParam("userName", userName)
                 .UrlParam("userImageUrl", imgUrl)
-                .ResultType(object : TypeToken<BaseResp<RespLoginInfo>>(){}).get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespLoginInfo>>() {}).get(Framework._C, Framework._H)
     }
 
     fun RequestHelper<*>.UrlPassNullParam(key: String, value: String) = this.apply { if (value.isNotBlank()) UrlParam(key, value) }

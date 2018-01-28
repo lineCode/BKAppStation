@@ -49,7 +49,15 @@ class CommentListActivity : BaseBarActivity() {
     private fun initRV() {
         mAdapter = object : RecyclerView.Adapter<CommentVH>() {
             override fun onBindViewHolder(holder: CommentVH, position: Int) {
-                holder.load(mData[position]) {}
+                holder.load(mData[position]) {
+                    if (!AccountManager.isLoggedIn()) {
+                        startActivity(Intent(this@CommentListActivity, LoginActivity::class.java))
+                    } else {
+                        NetManager.applyThumbsup(mAppId, it.id, AccountManager.uid(), it.isAgreed == 0, {
+                            mLoader.load(true)
+                        }, this@CommentListActivity::ZToast)
+                    }
+                }
             }
 
             override fun getItemCount() = mData.size
@@ -59,7 +67,7 @@ class CommentListActivity : BaseBarActivity() {
         }
         rv_comment_list.layoutManager = LinearLayoutManager(this)
         rv_comment_list.adapter = mAdapter
-        swipe_comment_list.onSwipe({ mLoader.load() }) { mLoader.load(false, this) }
+        swipe_comment_list.onSwipe({ mLoader.load() }) { mLoader.load(false, mData.size) }
     }
 
     private fun initData() {
@@ -83,7 +91,6 @@ class CommentListActivity : BaseBarActivity() {
                 mAdapter.notifyDataSetChanged()
             }
         }
-        mLoader.load(true)
     }
 
     private fun initEffects() {
@@ -105,5 +112,10 @@ class CommentListActivity : BaseBarActivity() {
         tv_comment_cancel.setOnClickListener {
             fl_comment_page.visibility = View.GONE
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mLoader.load(true)
     }
 }
