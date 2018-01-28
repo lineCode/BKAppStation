@@ -64,6 +64,11 @@ class AppListActivity : BaseBarActivity() {
             }
 
             override fun getItemCount() = mData.size
+
+            override fun onViewRecycled(holder: TypedAppListVH?) {
+                super.onViewRecycled(holder)
+                holder?.release()
+            }
         }
         rv_applist.run {
             layoutManager = LinearLayoutManager(this@AppListActivity)

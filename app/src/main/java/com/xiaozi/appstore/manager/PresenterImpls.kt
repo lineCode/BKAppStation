@@ -106,9 +106,13 @@ class BannerPresenterImpl(private val onLoaded: List<DataManager.Banner>.() -> U
 
 class UserInfoPresenterImpl(private val activity: Activity, private val onLoaded: () -> Unit) : IDataPresenter {
     override fun load() {
+        if (!AccountManager.isLoggedIn()) {
+            return
+        }
         if (AccountManager.userHeadIcon.isEmpty() || AccountManager.userName.isEmpty()) {
             NetManager.loadUserInfo(activity, AccountManager.uid())
         }
+        onLoaded()
     }
 
 }

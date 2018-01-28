@@ -19,11 +19,6 @@ class WXHelper {
         val APP_ID = "wx1f714ed004c09b23"
         val APP_SECRET = "9816401d6f518c6e11758e0478f1dd6d"
 
-        val SHARE_TO_SESSION = SendMessageToWX.Req.WXSceneSession
-        val SHARE_TO_TIME_LINE = SendMessageToWX.Req.WXSceneTimeline
-
-        val SHARE_TITLE = "最能挣钱的安卓应用！"
-        val SHARE_CONTENT = "试玩应用就给钱，邀请徒弟就给钱，徒弟试玩就给钱，任务天天有，今天特别多，来试试最新最好玩的应用吧，顺便赚个零花钱！"
 
 
         fun login() {

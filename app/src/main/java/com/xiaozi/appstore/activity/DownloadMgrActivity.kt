@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import com.fish.fishdownloader.service.DownloadRecInfo
+import com.fish.fishdownloader.service.takeAllInfo
+import com.fish.fishdownloader.service.takeInfo
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.forkList
 import com.xiaozi.appstore.manager.DownloadInfoManager
@@ -22,8 +25,8 @@ class DownloadMgrActivity : BaseBarActivity() {
     val mDrawableTab by lazy { resources.getDrawable(R.drawable.icon_linebar).apply { setBounds(0, 0, minimumWidth, minimumHeight) } }
     val mDrawableTabWhite by lazy { resources.getDrawable(R.drawable.icon_linebar_white).apply { setBounds(0, 0, minimumWidth, minimumHeight) } }
 
-    val mDownloadingList = mutableListOf<DownloadInfoManager.DownloadInfo>()
-    val mDownloadedList = mutableListOf<DownloadInfoManager.DownloadInfo>()
+    val mDownloadingList = mutableListOf<DownloadRecInfo>()
+    val mDownloadedList = mutableListOf<DownloadRecInfo>()
     lateinit var mDownloadingAdapter: RecyclerView.Adapter<DownloadingVH>
     lateinit var mDownloadedAdapter: RecyclerView.Adapter<DownloadingVH>
     var mOB: TypedOB<Any> = object : TypedOB<Any> {
@@ -73,7 +76,7 @@ class DownloadMgrActivity : BaseBarActivity() {
     }
 
     private fun flushList() {
-        DownloadInfoManager.downloadInfos.forkList({ size == ptr }) { tList, fList ->
+        takeAllInfo(this@DownloadMgrActivity).forkList({ size == ptr }) { tList, fList ->
             run {
                 mDownloadedList.clear()
                 mDownloadingList.clear()

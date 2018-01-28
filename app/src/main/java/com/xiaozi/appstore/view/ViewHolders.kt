@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.fish.downloader.view.DownloadBar
+import com.fish.fishdownloader.service.DownloadRecInfo
 import com.fish.fishdownloader.view.FDownloadBar
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.xiaozi.appstore.*
@@ -56,7 +57,7 @@ class TypedAppListVH(val v: View) : RecyclerView.ViewHolder(v) {
     val mTvPos = v.findViewById<TextView>(R.id.tv_iapp_pos)
     val mTvCon = v.findViewById<TextView>(R.id.tv_iapp_content)
     val mImgIcon = v.findViewById<ImageView>(R.id.img_iapp_icon)
-    val mDL = v.findViewById<DownloadBar>(R.id.dlbar_iapp)
+    val mDL = v.findViewById<FDownloadBar>(R.id.dlbar_iapp)
 
     fun load(app: DataManager.AppInfo, poi: Int) {
         mTvName.text = app.name
@@ -68,6 +69,12 @@ class TypedAppListVH(val v: View) : RecyclerView.ViewHolder(v) {
         mTvCon.text = app.tip
         ImageLoaderHelper.loadImageWithCache(app.icon, mImgIcon)
         v.setOnClickListener { AppActivity.open(v.context, app.appId) }
+        mDL.bindTag(app.pkg)
+        mDL.putInfo(app.name, app.dlUrl, app.sizeInt)
+    }
+
+    fun release() {
+        mDL.release()
     }
 }
 
@@ -127,29 +134,30 @@ class DownloadingVH(private val v: View) : RecyclerView.ViewHolder(v) {
     private val mTvName = v.findViewById<TextView>(R.id.tv_idl_name)
     private val mTvContent = v.findViewById<TextView>(R.id.tv_idl_content)
     val mDownloader = v.findViewById<DownloadBar>(R.id.download_idl)
-    fun load(data: DownloadInfoManager.DownloadInfo) {
-        mTvName.text = data.name
-        if (data.size == data.ptr) {
-            if (!File(data.path).exists()) {
-                mTvContent.text = "文件已删除"
-                mDownloader.text("已删除")
-                return
-            }
-            mTvContent.text = "已完成"
-            mDownloader.apply {
-                if (Framework.Package.isInstalled(data.tag)) {
-                    text("打开")
-                    setOnClickListener { Framework.App.openOtherApp(data.tag) }
-                } else {
-                    text("安装")
-                    setOnClickListener { File(data.path).safety(Framework.App::installApp) }
-                }
-            }
-        } else {
-            mTvContent.text = "${Framework.Trans.Size(data.ptr)}/${Framework.Trans.Size(data.size)} 0B/s"
-            mDownloader.text("暂停")
-            mDownloader.setOnClickListener { }
-        }
+    fun load(data: DownloadRecInfo) {
+
+//        mTvName.text = data.name
+//        if (data.size == data.ptr) {
+//            if (!File(data.path).exists()) {
+//                mTvContent.text = "文件已删除"
+//                mDownloader.text("已删除")
+//                return
+//            }
+//            mTvContent.text = "已完成"
+//            mDownloader.apply {
+//                if (Framework.Package.isInstalled(data.tag)) {
+//                    text("打开")
+//                    setOnClickListener { Framework.App.openOtherApp(data.tag) }
+//                } else {
+//                    text("安装")
+//                    setOnClickListener { File(data.path).safety(Framework.App::installApp) }
+//                }
+////            }
+//        } else {
+//            mTvContent.text = "${Framework.Trans.Size(data.ptr)}/${Framework.Trans.Size(data.size)} 0B/s"
+//            mDownloader.text("暂停")
+//            mDownloader.setOnClickListener { }
+//        }
     }
 
     fun content(str: String) {

@@ -43,7 +43,6 @@ class MineFragment : BaseFragment() {
             mUserName.text = AccountManager.userName
         }
         initEffects(this)
-        mLoader.load()
     }
 
     private fun initEffects(view: View) {
@@ -61,11 +60,14 @@ class MineFragment : BaseFragment() {
 
 
     override fun onSelected() {
+        mLoader.load()
         if (!AccountManager.isLoggedIn()) {
             mLLLogin.setOnClickListener { WXHelper.login() }
             mUserAction.apply {
                 text = "登录"
-                setOnClickListener {}
+                setOnClickListener {
+                    WXHelper.login()
+                }
             }
         } else {
             mLLLogin.setOnClickListener {}

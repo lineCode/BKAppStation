@@ -223,7 +223,7 @@ data class RespAppInfoEntity(val adType: String, val appName: String, val commen
 data class RespUserInfoEntity(val userId: Int, val userImageUrl: String, val userName: String)
 
 data class RespCommentListEntity(val node: Array<RespComment>, val number: Int, val start: Int, val total: Int)
-data class RespComment(val authorName: String, val thumbsupSign: Int, val content: String, val date: Long, val thumbsupCount: Int, val commentId: Int)
+data class RespComment(val authorName: String, val thumbsupSign: Int, val content: String, val date: Long, val thumbsupCount: Int, val commentId: Int, val authorImg: String)
 
 data class RespBannersEntity(val banner: Array<RespBanner>)
 data class RespBanner(val image: String, val link: String, val sn: Int)

@@ -58,26 +58,26 @@ fun <T> Collection<T>.containsBy(data: Any, predicate: T.() -> Any?): Boolean = 
 
 
 fun DownloadBar.initDownload(pkg: String, appName: String, url: String, fileSize: Long) {
-    if (DownloadTagsManager.mTagsMap.containsKey(pkg)) {
-        DownloadTagsManager.mTagsMap[pkg]!!.apply {
-            text(text)
-            initInfo(pkg, name, fileSize, url)
-        }
-        return
-    }
-    DownloadTagsManager.store(pkg, url, appName, fileSize)
-    initInfo(pkg, appName, fileSize, url)
-    init { type, data ->
-        when (type) {
-            DownloadBar.CK_TYPE.COMPLETE -> {
-                DownloadTagsManager.mTagsMap[pkg]?.text = "安装中"
-            }
-            DownloadBar.CK_TYPE.FAILED -> {
-                DownloadTagsManager.mTagsMap[pkg]?.text = "下载失败"
-            }
-            DownloadBar.CK_TYPE.CANCELED -> {
-                DownloadTagsManager.mTagsMap[pkg]?.text = "下载"
-            }
-        }
-    }
+//    if (DownloadTagsManager.mTagsMap.containsKey(pkg)) {
+//        DownloadTagsManager.mTagsMap[pkg]!!.apply {
+//            text(text)
+//            initInfo(pkg, name, fileSize, url)
+//        }
+//        return
+//    }
+//    DownloadTagsManager.store(pkg, url, appName, fileSize)
+//    initInfo(pkg, appName, fileSize, url)
+//    init { type, data ->
+//        when (type) {
+//            DownloadBar.CK_TYPE.COMPLETE -> {
+//                DownloadTagsManager.mTagsMap[pkg]?.text = "安装中"
+//            }
+//            DownloadBar.CK_TYPE.FAILED -> {
+//                DownloadTagsManager.mTagsMap[pkg]?.text = "下载失败"
+//            }
+//            DownloadBar.CK_TYPE.CANCELED -> {
+//                DownloadTagsManager.mTagsMap[pkg]?.text = "下载"
+//            }
+//        }
+//    }
 }

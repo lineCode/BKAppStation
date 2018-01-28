@@ -20,6 +20,8 @@ import com.fish.fishdownloader.IFDownloadCallbacks
 import com.fish.fishdownloader.R
 import com.fish.fishdownloader.service.DownloadRecInfo
 import com.fish.fishdownloader.service.FishDownloaderSVC
+import com.fish.fishdownloader.service.deleteInfo
+import com.fish.fishdownloader.service.takeInfo
 import com.google.gson.Gson
 import java.io.File
 
@@ -105,7 +107,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
     fun putInfo(name: String, url: String, size: Int) {
         postDelayed({
             mServiceStub.initInfo(mTag, name, url, size)
-        }, 30)
+        }, 100)
     }
 
     fun release() {
@@ -140,7 +142,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
             } else {
                 mStatus = DownloadStatus.IDLE
             }
-        }, 35)
+        }, 105)
     }
 
     private fun initConnect() {
@@ -246,23 +248,6 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
     fun ZToast(msg: String) {
         Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
     }
-
-    @Synchronized
-    private fun takeInfo(ctx: Context, tag: String): DownloadRecInfo? {
-        ctx.getSharedPreferences("download_rec", Context.MODE_PRIVATE).all.run {
-            if (containsKey(tag))
-                return GSON.fromJson(this[tag] as? String
-                        ?: return null, DownloadRecInfo::class.java)
-            return null
-        }
-    }
-
-    @Synchronized
-    private fun hasInfo(ctx: Context, tag: String) = ctx.getSharedPreferences("download_rec", Context.MODE_PRIVATE).all.containsKey(tag)
-
-    @Synchronized
-    private fun deleteInfo(ctx: Context, tag: String) = ctx.getSharedPreferences("download_rec", Context.MODE_PRIVATE).edit().remove(tag).apply()
-
 }
 
 fun installApp(ctx: Context, filePath: String) = try {

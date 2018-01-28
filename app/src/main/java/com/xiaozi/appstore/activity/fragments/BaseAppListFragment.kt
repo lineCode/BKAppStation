@@ -85,6 +85,11 @@ sealed class BaseAppListFragment : BaseFragment() {
             }
 
             override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = TypedAppListVH(parent)
+
+            override fun onViewRecycled(holder: TypedAppListVH?) {
+                super.onViewRecycled(holder)
+                holder?.release()
+            }
         }
         mCategoryAdapter = object : RecyclerView.Adapter<CategoryVH>() {
             override fun getItemCount() = mCategoryData.size

@@ -48,7 +48,7 @@ class DataManager {
 
     object Transor {
         fun CommentTransor(data: RespCommentList)
-                = data.comments.node.map { Comment("need head icon", 0, it.authorName, Framework.Date.toYMD(it.date), it.content, it.thumbsupCount, it.thumbsupSign, it.commentId) }.toTypedArray()
+                = data.comments.node.map { Comment(it.authorImg, 0, it.authorName, Framework.Date.toYMD(it.date), it.content, it.thumbsupCount, it.thumbsupSign, it.commentId) }.toTypedArray()
 
         fun BannerTransor(data: RespBanners)
                 = data.banners.banner.map { Banner(it.image, it.link) }
