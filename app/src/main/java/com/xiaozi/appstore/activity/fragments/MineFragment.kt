@@ -11,7 +11,9 @@ import com.xiaozi.appstore.manager.AccountManager
 import com.xiaozi.appstore.manager.ConfManager
 import com.xiaozi.appstore.manager.IDataPresenter
 import com.xiaozi.appstore.manager.UserInfoPresenterImpl
+import com.xiaozi.appstore.plugin.ForceObb
 import com.xiaozi.appstore.plugin.ImageLoaderHelper
+import com.xiaozi.appstore.plugin.TypedOB
 import com.xiaozi.appstore.safety
 import com.xiaozi.appstore.safetySelf
 import com.xiaozi.appstore.wxapi.WXHelper
@@ -21,12 +23,26 @@ import com.xiaozi.appstore.wxapi.WXHelper
  */
 class MineFragment : BaseFragment() {
 
+    companion object {
+        val EventPoster = ForceObb<Any>()
+    }
+
     lateinit var mUserImg: ImageView
     lateinit var mWifiImg: ImageView
     lateinit var mUserName: TextView
     lateinit var mUserAction: TextView
     lateinit var mLLLogin: LinearLayout
     lateinit var mLoader: IDataPresenter
+
+    val mOb = object : TypedOB<Any> {
+        override fun update(o: ForceObb<Any>, arg: Any?) {
+            try {
+                mLoader.load()
+            } catch (ex: Exception) {
+            }
+        }
+
+    }
 
 
     override fun initView(inflater: LayoutInflater) = inflater.inflate(R.layout.f_mine, null).safetySelf {
@@ -40,6 +56,7 @@ class MineFragment : BaseFragment() {
             mUserName.text = AccountManager.userName
         }
         initEffects(this)
+        EventPoster.addObserver(mOb)
     }
 
     private fun initEffects(view: View) {
@@ -57,6 +74,7 @@ class MineFragment : BaseFragment() {
 
 
     override fun onSelected() {
+        mLoader.load()
         if (!AccountManager.isLoggedIn()) {
             mLLLogin.setOnClickListener { activity.startActivity(Intent(activity, LoginActivity::class.java)) }
             mUserAction.apply {
@@ -77,9 +95,9 @@ class MineFragment : BaseFragment() {
         }
     }
 
-    override fun onActivityResume() {
-        super.onActivityResume()
-        mLoader.load()
+    override fun onDestroy() {
+        super.onDestroy()
+        EventPoster.deleteObserver(mOb)
     }
 
 }

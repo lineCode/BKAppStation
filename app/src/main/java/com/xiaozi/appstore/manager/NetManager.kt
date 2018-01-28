@@ -109,6 +109,7 @@ object NetManager {
                 .UrlParam("appId", "$appId")
                 .UrlParam("number", "20")
                 .UrlParam("start", "${index + 1}")
+                .UrlPassNullParam("userId", "${AccountManager.uid()}")
                 .ResultType(object : TypeToken<BaseResp<RespCommentList>>() {}).get(Framework._C, Framework._H)
     }
 
@@ -121,6 +122,10 @@ object NetManager {
 
     fun loadUserInfo(activity: Activity, userId: Int) {
         createBase<RespUserInfo>("$MAIN_URL/user/getinfo", {
+            AccountManager.let {
+                it.userHeadIcon = userInfo.userImageUrl
+                it.userName = userInfo.userName
+            }
         }, activity::ZToast)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("userId", "$userId")
@@ -204,7 +209,7 @@ data class RespAppInfo(val appinfo: RespAppInfoEntity) : Serializable
 data class RespUserInfo(val userInfo: RespUserInfoEntity) : Serializable
 data class RespCommentList(val comments: RespCommentListEntity) : Serializable
 data class RespBanners(val banners: RespBannersEntity) : Serializable
-data class RespLoginInfo(val userId: Int, val userToken: String) : Serializable
+data class RespLoginInfo(val user: RespLoginUserInfo) : Serializable
 data class RespHots(val hotSearchWd: Array<String>) : Serializable
 
 data class RespAppConfEntity(val appClass: RespConfClz, val gameClass: RespConfClz, val timeStamp: Long)
@@ -220,6 +225,7 @@ data class RespAppInfoEntity(val adType: String, val appName: String, val commen
                              val appId: Int, val downloadUrl: String, val iconUrl: String, val imageUrls: Array<String>,
                              val packageName: String, val point: Int, val size: Int, val tips: String, val updateLog: String)
 
+data class RespLoginUserInfo(val unionId: String, val userId: Int, val userImageUrl: String, val userName: String)
 data class RespUserInfoEntity(val userId: Int, val userImageUrl: String, val userName: String)
 
 data class RespCommentListEntity(val node: Array<RespComment>, val number: Int, val start: Int, val total: Int)

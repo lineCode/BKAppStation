@@ -12,6 +12,7 @@ import com.tencent.mm.opensdk.openapi.IWXAPI
 import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler
 import com.tencent.mm.opensdk.openapi.WXAPIFactory
 import com.xiaozi.appstore.ZToast
+import com.xiaozi.appstore.activity.fragments.MineFragment
 import com.xiaozi.appstore.component.Framework
 import com.xiaozi.appstore.manager.AccountManager
 import com.xiaozi.appstore.manager.NetManager
@@ -90,9 +91,10 @@ class WXEntryActivity : IWXAPIEventHandler, Activity() {
         RequestHelper<WXUserInfo>().Success {
             NetManager.login(it.openid, it.unionid, it.nickname, it.headimgurl, {
                 AccountManager.apply {
-                    storeToken(userToken, userId)
-                    userHeadIcon = ""
-                    userName = ""
+                    storeToken(user.unionId, user.userId)
+                    userHeadIcon = user.userImageUrl
+                    userName = user.userName
+                    MineFragment.EventPoster.notifyObs()
                 }
             }) {}
         }.Url(URL_WX_USERINFO)
