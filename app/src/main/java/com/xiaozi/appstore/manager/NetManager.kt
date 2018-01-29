@@ -21,7 +21,7 @@ import java.io.Serializable
 object NetManager {
 
     val SUCCESS_CODE = 0
-        private val _TEST_URL = "http://192.168.1.100:18079/v1"
+        private val _TEST_URL = "http://101.201.28.127:18080/v1"
 //    private val _TEST_URL = "http://222.128.15.95:18079/v1"
     private val _PRODUCT_URL = ""
     private val MAIN_URL = if (_DEBUG) _TEST_URL else _PRODUCT_URL
@@ -212,7 +212,7 @@ data class RespBanners(val banners: RespBannersEntity) : Serializable
 data class RespLoginInfo(val user: RespLoginUserInfo) : Serializable
 data class RespHots(val hotSearchWd: Array<String>) : Serializable
 
-data class RespAppConfEntity(val appClass: RespConfClz, val gameClass: RespConfClz, val timeStamp: Long)
+data class RespAppConfEntity(val appClass: RespConfClz, val gameClass: RespConfClz, val aboutUs: String, val timeStamp: Long)
 data class RespConfClz(val `class`: Array<RespAppClass>)
 data class RespAppClass(val id: Int, val name: String, val imgUrl: String, val subclass: Array<RespClassSec>)
 data class RespClassSec(val id: Int, val name: String)

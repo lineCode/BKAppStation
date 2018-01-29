@@ -38,6 +38,24 @@ class MineFragment : BaseFragment() {
         override fun update(o: ForceObb<Any>, arg: Any?) {
             try {
                 mLoader.load()
+                if (!AccountManager.isLoggedIn()) {
+                    mLLLogin.setOnClickListener { activity.startActivity(Intent(activity, LoginActivity::class.java)) }
+                    mUserAction.apply {
+                        text = "登录"
+                        setOnClickListener {
+                            activity.startActivity(Intent(activity, LoginActivity::class.java))
+                        }
+                    }
+                } else {
+                    mLLLogin.setOnClickListener {}
+                    mUserAction.apply {
+                        text = "退出"
+                        setOnClickListener {
+                            AccountManager.logout()
+                            onSelected()
+                        }
+                    }
+                }
             } catch (ex: Exception) {
             }
         }
@@ -54,24 +72,6 @@ class MineFragment : BaseFragment() {
         mLoader = UserInfoPresenterImpl(activity) {
             ImageLoaderHelper.loadImageWithCache(AccountManager.userHeadIcon, mUserImg)
             mUserName.text = AccountManager.userName
-            if (!AccountManager.isLoggedIn()) {
-                mLLLogin.setOnClickListener { activity.startActivity(Intent(activity, LoginActivity::class.java)) }
-                mUserAction.apply {
-                    text = "登录"
-                    setOnClickListener {
-                        activity.startActivity(Intent(activity, LoginActivity::class.java))
-                    }
-                }
-            } else {
-                mLLLogin.setOnClickListener {}
-                mUserAction.apply {
-                    text = "退出"
-                    setOnClickListener {
-                        AccountManager.logout()
-                        onSelected()
-                    }
-                }
-            }
         }
         initEffects(this)
         EventPoster.addObserver(mOb)
@@ -93,6 +93,25 @@ class MineFragment : BaseFragment() {
 
     override fun onSelected() {
         mLoader.load()
+        if (!AccountManager.isLoggedIn()) {
+            mLLLogin.setOnClickListener { activity.startActivity(Intent(activity, LoginActivity::class.java)) }
+            mUserAction.apply {
+                text = "登录"
+                setOnClickListener {
+                    activity.startActivity(Intent(activity, LoginActivity::class.java))
+                }
+            }
+        } else {
+            mLLLogin.setOnClickListener {}
+            mUserAction.apply {
+                text = "退出"
+                setOnClickListener {
+                    AccountManager.logout()
+                    mUserImg.setImageResource(R.drawable.icon_unlogin_img)
+                    mUserName.text = "未登录"
+                }
+            }
+        }
 
     }
 

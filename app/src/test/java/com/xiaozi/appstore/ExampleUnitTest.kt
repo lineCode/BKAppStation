@@ -44,6 +44,22 @@ class ExampleUnitTest {
         return result
     }
 
+    var i = 10
+    fun oCall(call: Int.()-> Unit) {
+        i.call()
+    }
+    fun iCall(call: (Int) -> Unit) {
+        call(i)
+    }
+    @Test
+    fun test() {
+        println(i)
+        oCall { this + 1; println(i) }
+        println(i)
+        iCall { it + 1; println(i) }
+        println(i)
+
+    }
 
     data class AAA(val a: Int, val b: String)
 }
