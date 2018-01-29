@@ -47,8 +47,7 @@
             android:textColor="@color/text_dark"
             android:text="热门游戏"
             android:gravity="center"
-            android:drawableBottom="@drawable/icon_linebar_white
-"
+            android:drawableBottom="@drawable/icon_linebar_white"
             android:drawablePadding="16dp"/>
     </LinearLayout>
     <View

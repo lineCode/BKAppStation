@@ -27,8 +27,6 @@
             android:id="@+id/tv_dlmgr_tab_downloaded"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:layout_weight="1"
             android:drawableBottom="@drawable/icon_linebar_white"
             android:drawablePadding="8dp"

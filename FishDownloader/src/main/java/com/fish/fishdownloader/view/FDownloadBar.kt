@@ -206,7 +206,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
                 }
                 DownloadStatus.COMPLETE -> {
                     text = "安装中"
-                    postDelayed({ mStatus = DownloadStatus.INSTALL_CHK }, 1000)
+                    postDelayed({ mStatus = DownloadStatus.INSTALL_CHK }, 10000)
                 }
                 DownloadStatus.PAUSE -> {
                     text = "继续"

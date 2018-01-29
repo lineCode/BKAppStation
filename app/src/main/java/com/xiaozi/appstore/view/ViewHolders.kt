@@ -146,8 +146,9 @@ class DownloadingVH(private val v: View) : RecyclerView.ViewHolder(v) {
             mTvContent.text = "下载完成"
         } else {
             //downloading
+            mTvContent.text = "${Framework.Trans.Size(data.ptr)}/${Framework.Trans.Size(data.size)}"
             mDownloader.mOnProgress = { pg ->
-                if (mCnt % 200 == 0)
+                if (System.currentTimeMillis() - mLastTS > 1000)
                     mTvContent.text = "${Framework.Trans.Size((data.size * pg).toInt())}/${Framework.Trans.Size(data.size)} ${
                     if (mLastPG == 0.0) {
                         0.0
@@ -160,10 +161,11 @@ class DownloadingVH(private val v: View) : RecyclerView.ViewHolder(v) {
                                 mLastTS = System.currentTimeMillis()
                             }
                     }/s"
-                mCnt++
             }
             mDownloader.mOnComplete = {
-                DownloadMgrActivity.obb.notifyObs()
+                Call(1000) {
+                    DownloadMgrActivity.obb.notifyObs()
+                }
             }
         }
 //        mTvName.text = data.name

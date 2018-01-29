@@ -21,8 +21,8 @@ import java.io.Serializable
 object NetManager {
 
     val SUCCESS_CODE = 0
-    //    private val _TEST_URL = "http://192.168.1.100:18079/v1"
-    private val _TEST_URL = "http://222.128.15.95:18079/v1"
+        private val _TEST_URL = "http://192.168.1.100:18079/v1"
+//    private val _TEST_URL = "http://222.128.15.95:18079/v1"
     private val _PRODUCT_URL = ""
     private val MAIN_URL = if (_DEBUG) _TEST_URL else _PRODUCT_URL
 

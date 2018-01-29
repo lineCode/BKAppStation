@@ -179,8 +179,8 @@ class FishDownloader {
                     mCKS[tag]?.onPause(mInfos[tag]!!.filePath)
                     Log.e(TAG, "pause: ${tag}")
                 } else {
-                    mCKS[tag]?.onComplete(mInfos[tag]!!.filePath)
                     saveInfo(ctx, mInfos[tag]!!)
+                    mCKS[tag]?.onComplete(mInfos[tag]!!.filePath)
                     Log.e(TAG, "completed: ${tag}")
                 }
             } else {

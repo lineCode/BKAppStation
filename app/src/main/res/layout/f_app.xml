@@ -40,8 +40,6 @@
             android:id="@+id/tv_fapp_tab_category"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
             android:layout_weight="1"
             android:drawablePadding="8dp"
             android:drawableBottom="@drawable/icon_linebar_white"
@@ -50,6 +48,10 @@
             android:textColor="@color/text_dark"
             android:textSize="@dimen/title_text" />
     </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/line"/>
 
     <com.xiaozi.appstore.view.LoadableSwipeLayout
         android:id="@+id/sp_fapp"

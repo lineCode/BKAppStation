@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.ZToast
+import com.xiaozi.appstore.component.Framework
 import com.xiaozi.appstore.manager.AccountManager
 import com.xiaozi.appstore.manager.CommentListPresenterImpl
 import com.xiaozi.appstore.manager.DataManager
@@ -26,12 +27,17 @@ class CommentListActivity : BaseBarActivity() {
 
     companion object {
         val KEY_APPID = "APPID"
-        fun open(ctx: Context, appID: Int) {
-            ctx.startActivity(Intent(ctx, CommentListActivity::class.java).apply { putExtra(KEY_APPID, appID) })
+        val KEY_APP_PKG = "APPPKG"
+        fun open(ctx: Context, appID: Int, pkg: String) {
+            ctx.startActivity(Intent(ctx, CommentListActivity::class.java).apply {
+                putExtra(KEY_APPID, appID)
+                putExtra(KEY_APP_PKG, pkg)
+            })
         }
     }
 
     var mAppId: Int = -1
+    var mAppPkg = ""
     lateinit var mWaiter: AsyncWaiter
     lateinit var mLoader: CommentListPresenterImpl
     lateinit var mAdapter: RecyclerView.Adapter<CommentVH>
@@ -72,7 +78,8 @@ class CommentListActivity : BaseBarActivity() {
 
     private fun initData() {
         mAppId = intent.getIntExtra(KEY_APPID, -1)
-        if (mAppId == -1)
+        mAppPkg = intent.getStringExtra(KEY_APP_PKG)
+        if (mAppId == -1 || mAppPkg.isEmpty())
             exit()
     }
 
@@ -95,6 +102,14 @@ class CommentListActivity : BaseBarActivity() {
 
     private fun initEffects() {
         tv_comment_write.setOnClickListener {
+            if (!Framework.Package.isInstalled(mAppPkg)) {
+                ZToast("请先安装此应用")
+                return@setOnClickListener
+            }
+            if (!AccountManager.isLoggedIn()) {
+                startActivity(Intent(this@CommentListActivity, LoginActivity::class.java))
+                return@setOnClickListener
+            }
             fl_comment_page.visibility = View.VISIBLE
             et_comment.requestFocus()
 

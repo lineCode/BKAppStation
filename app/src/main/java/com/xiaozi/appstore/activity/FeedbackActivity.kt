@@ -23,7 +23,7 @@ class FeedbackActivity : BaseBarActivity() {
                     ZToast("请输入反馈内容")
                     return@setOnClickListener
                 }
-                NetManager.applyFeedback(this, { ZToast("反馈上报成功") }, this@FeedbackActivity::ZToast)
+                NetManager.applyFeedback(this, { ZToast("反馈上报成功");finish() }, this@FeedbackActivity::ZToast)
             }
         }
     }

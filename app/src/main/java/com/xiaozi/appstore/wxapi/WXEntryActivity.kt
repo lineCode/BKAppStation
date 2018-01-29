@@ -95,8 +95,9 @@ class WXEntryActivity : IWXAPIEventHandler, Activity() {
                     userHeadIcon = user.userImageUrl
                     userName = user.userName
                     MineFragment.EventPoster.notifyObs()
+                    ZToast("登录成功")
                 }
-            }) {}
+            }) {this@WXEntryActivity::ZToast}
         }.Url(URL_WX_USERINFO)
                 .Method(RequestHelper.Method.GET)
                 .Result(WXUserInfo::class.java)
