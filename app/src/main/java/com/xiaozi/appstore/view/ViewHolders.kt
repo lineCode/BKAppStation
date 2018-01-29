@@ -16,6 +16,7 @@ import com.nostra13.universalimageloader.core.ImageLoader
 import com.xiaozi.appstore.*
 import com.xiaozi.appstore.activity.AppActivity
 import com.xiaozi.appstore.activity.AppListActivity
+import com.xiaozi.appstore.activity.DownloadMgrActivity
 import com.xiaozi.appstore.component.Framework
 import com.xiaozi.appstore.manager.*
 import com.xiaozi.appstore.plugin.ImageLoaderHelper
@@ -146,7 +147,7 @@ class DownloadingVH(private val v: View) : RecyclerView.ViewHolder(v) {
         } else {
             //downloading
             mDownloader.mOnProgress = { pg ->
-                if (mCnt % 50 == 0)
+                if (mCnt % 200 == 0)
                     mTvContent.text = "${Framework.Trans.Size((data.size * pg).toInt())}/${Framework.Trans.Size(data.size)} ${
                     if (mLastPG == 0.0) {
                         0.0
@@ -160,6 +161,9 @@ class DownloadingVH(private val v: View) : RecyclerView.ViewHolder(v) {
                             }
                     }/s"
                 mCnt++
+            }
+            mDownloader.mOnComplete = {
+                DownloadMgrActivity.obb.notifyObs()
             }
         }
 //        mTvName.text = data.name
@@ -214,59 +218,6 @@ class RecyclerDividerDecor(private val ctx: Context, private val dividerSize: In
                 outRect?.set(mDividerSize, mDividerSize, mDividerSize, 0)
             } else {
                 outRect?.set(0, 0, 0, mDividerSize)
-            }
-        }
-    }
-}
-
-object DownloadBarImplement {
-    fun initDownloadBar(dlBar: DownloadBar, app: DataManager.AppInfo) {
-        dlBar.run {
-            if (Framework.Package.installed().contains(app.pkg)) {
-                text("打开")
-                setOnClickListener { Framework.App.openOtherApp(app.pkg) }
-            } else if (DownloadInfoManager.downloadInfos.containsBy(app.pkg, DownloadInfoManager.DownloadInfo::tag)) {
-                DownloadInfoManager.getInfoByTag(app.pkg)!!.run {
-                    if (size == ptr) {
-                        if (!File(path).exists()) {
-                            text("已删除")
-                            DownloadInfoManager.removeInfo(app.pkg)
-                            return
-                        }
-                        text("已完成")
-                        if (Framework.Package.isInstalled(tag)) {
-                            text("打开")
-                            setOnClickListener { Framework.App.openOtherApp(tag) }
-                        } else {
-                            text("安装")
-                            setOnClickListener { File(path).safety(Framework.App::installApp) }
-                        }
-                    } else {
-                        text("继续")
-                        setOnClickListener {
-                            initDownload(app.pkg, app.name, app.dlUrl, app.sizeInt.toLong())
-                            onceReDownload()
-                        }
-                    }
-                }
-            } else {
-                initDownload(app.pkg, app.name, app.dlUrl, app.sizeInt.toLong())
-                init { type, data ->
-                    when (type) {
-                        DownloadBar.CK_TYPE.CANCELED -> {
-                        }
-                        DownloadBar.CK_TYPE.FAILED -> {
-                        }
-                        DownloadBar.CK_TYPE.COMPLETE -> {
-                            try {
-                                Framework.App.installApp(File(data!!))
-                            } catch (ex: Exception) {
-                                ex.printStackTrace()
-                            }
-                        }
-                    }
-                }
-                setOnClickListener { onceReDownload() }
             }
         }
     }

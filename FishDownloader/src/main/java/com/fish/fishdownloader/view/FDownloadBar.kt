@@ -7,7 +7,9 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -28,6 +30,7 @@ import java.io.File
 class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx, attrs) {
     companion object {
         val GSON = Gson()
+        val H = Handler(Looper.getMainLooper())
     }
 
     init {
@@ -136,22 +139,20 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
     }
 
     private fun initStatusBySP(tag: String) {
-        postDelayed({
-            if (mServiceStub.hasTag(tag) || hasInfo(ctx, tag)) {
-                takeInfo(ctx, tag)?.run {
-                    if (ptr != size)
-                        mStatus = DownloadStatus.PAUSE
-                    else if (File(filePath).exists())
-                        mStatus = DownloadStatus.INSTALL_CHK
-                    else {
-                        deleteInfo(ctx, tag)
-                        mStatus = DownloadStatus.IDLE
-                    }
+        if (hasInfo(ctx, tag)) {
+            takeInfo(ctx, tag)?.run {
+                if (ptr != size)
+                    mStatus = DownloadStatus.PAUSE
+                else if (File(filePath).exists())
+                    mStatus = DownloadStatus.INSTALL_CHK
+                else {
+                    deleteInfo(ctx, tag)
+                    mStatus = DownloadStatus.IDLE
                 }
-            } else {
-                mStatus = DownloadStatus.IDLE
             }
-        }, 105)
+        } else {
+            mStatus = DownloadStatus.IDLE
+        }
     }
 
     private fun initConnect() {
@@ -192,7 +193,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
         }
     }
 
-    private fun flushUI() {
+    fun flushUI() {
         mActionTv.run {
             when (mStatus) {
                 DownloadStatus.IDLE -> {
