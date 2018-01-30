@@ -58,7 +58,7 @@ class LoadableSwipeLayout(ctx: Context, attrs: AttributeSet) : SwipeRefreshLayou
     }
 
     private fun canLoadMore(): Boolean {
-        if (mRecyclerView == null || mRecyclerView?.layoutManager !is LinearLayoutManager) return false
+        if (mRecyclerView == null || mRecyclerView?.layoutManager !is LinearLayoutManager || !isEnabled) return false
         return (mRecyclerView?.layoutManager as LinearLayoutManager).run { findLastVisibleItemPosition() == itemCount - 1 } && !isLoading
     }
 
@@ -126,5 +126,9 @@ class LoadableSwipeLayout(ctx: Context, attrs: AttributeSet) : SwipeRefreshLayou
 
     fun resetOffset() {
         mLimPoi = 0
+    }
+
+    fun setSwipeAble(allow: Boolean) {
+        isEnabled = allow
     }
 }

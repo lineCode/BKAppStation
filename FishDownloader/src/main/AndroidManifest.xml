@@ -12,6 +12,11 @@
             android:exported="false"
             android:process=":fdownload"/>
 
+        <!--<provider-->
+            <!--android:authorities="com.fish.download.provider"-->
+            <!--android:name=".service.DownloadInfoContentProvider"-->
+            <!--android:exported="false"/>-->
+
     </application>
 
 </manifest>

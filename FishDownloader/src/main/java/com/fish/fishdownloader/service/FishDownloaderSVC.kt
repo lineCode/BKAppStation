@@ -42,7 +42,7 @@ class FishDownloaderSVC : Service() {
         }
 
         override fun getAbsFilePath(tag: String): String {
-            return mInfos[tag]?.filePath ?: ""
+            return GSON.toJson(takeAllInfo(this@FishDownloaderSVC))
         }
 
         override fun startDownload(tag: String) {
@@ -95,6 +95,10 @@ class FishDownloaderSVC : Service() {
         Log.e(TAG, "ON BIND")
         return mActionBinder
     }
+
+    override fun onCreate() {
+        super.onCreate()
+    }
 }
 
 object FishDownloaderData {
@@ -132,6 +136,7 @@ class FishDownloader {
             mInfos[tag]!!.pauseSignal = false
             Log.e(TAG, "START ${mInfos[tag]!!.downloadUrl}")
             val connection = URL(mInfos[tag]!!.downloadUrl).openConnection() as HttpURLConnection
+            mInfos[tag]!!.ptr = File(mInfos[tag]!!.filePath).length().toInt()
             if (mInfos[tag]!!.ptr > 0) {
                 connection.addRequestProperty("Range", "bytes=${limit(mInfos[tag]!!.ptr, 0)}-")
             }

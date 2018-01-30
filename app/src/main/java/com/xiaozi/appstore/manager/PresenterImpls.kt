@@ -7,7 +7,7 @@ import com.xiaozi.appstore.view.AsyncWaiter
 /**
  * Created by fish on 18-1-7.
  */
-open class AppListDataPresenterImpl(private val waiter: AsyncWaiter, private val type: String, private val condition: String, private val keyword: String = "", private val onLoaded: Array<DataManager.AppInfo>.() -> Unit) : INetAppsPresenter {
+open class AppListDataPresenterImpl(private val waiter: AsyncWaiter, private val type: String, private val condition: String, private val keyword: String = "", private val onLoaded: List<DataManager.AppInfo>.(Boolean) -> Unit) : INetAppsPresenter {
     var isFirstLoad = true
     override fun load(showWaiter: Boolean, index: Int) {
         if (waiter.showing()) return
@@ -17,15 +17,11 @@ open class AppListDataPresenterImpl(private val waiter: AsyncWaiter, private val
             waiter.showHidden()
         isFirstLoad = false
         NetManager.loadAppList(type, condition, keyword, index, {
-            if (index == 0)
-                DataManager.AppInfoDM.importApps(this.appNodes.node)
-            else
-                DataManager.AppInfoDM.appendApps(this.appNodes.node)
-            DataManager.AppInfoDM.getAppInfos().onLoaded()
+            appNodes.node.map { DataManager.AppInfoDM.trans(it) }.onLoaded(index == 0)
             waiter.hide(200)
         }) {
             waiter.activity::ZToast
-            arrayOf<DataManager.AppInfo>().onLoaded()
+            listOf<DataManager.AppInfo>().onLoaded(true)
             waiter.hide(200)
         }
     }

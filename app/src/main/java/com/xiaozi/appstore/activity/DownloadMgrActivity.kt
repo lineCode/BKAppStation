@@ -10,6 +10,7 @@ import com.fish.fishdownloader.service.takeInfo
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.forkList
 import com.xiaozi.appstore.manager.DownloadInfoManager
+import com.xiaozi.appstore.manager.DownloadTagsManager
 import com.xiaozi.appstore.plugin.ForceObb
 import com.xiaozi.appstore.plugin.TypedOB
 import com.xiaozi.appstore.view.DownloadingVH
@@ -86,7 +87,7 @@ class DownloadMgrActivity : BaseBarActivity() {
     }
 
     private fun flushList() {
-        takeAllInfo(this@DownloadMgrActivity).forkList({ size == ptr }) { tList, fList ->
+        DownloadTagsManager.getAllInfo(this@DownloadMgrActivity).forkList({ size == ptr }) { tList, fList ->
             run {
                 mDownloadedList.clear()
                 mDownloadingList.clear()

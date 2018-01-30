@@ -121,7 +121,8 @@ class CommentListActivity : BaseBarActivity() {
                 fl_comment_page.visibility = View.GONE
                 NetManager.applyComment(mAppId, et_comment.text.toString(), 0, AccountManager.uid(), AccountManager.userName, {
                     ZToast("评论提交成功")
-                }) { this@CommentListActivity::ZToast }
+                    et_comment.text.clear()
+                }) { this@CommentListActivity.ZToast(this) }
             }
         }
         tv_comment_cancel.setOnClickListener {

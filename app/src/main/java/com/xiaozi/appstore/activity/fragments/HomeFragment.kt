@@ -60,14 +60,16 @@ class HomeFragment : BaseFragment() {
         mWaiter = AsyncWaiter(activity)
         mAppLoader = AppListDataPresenterImpl(mWaiter, AppListType.APP.str, AppCondition.HOT.str) {
             mData.safety {
-                clear()
+                if (it)
+                    clear()
                 addAll(this@AppListDataPresenterImpl)
             }
             mAdapter.notifyDataSetChanged()
         }
         mGameLoader = AppListDataPresenterImpl(mWaiter, AppListType.GAME.str, AppCondition.HOT.str) {
             mData.safety {
-                clear()
+                if (it)
+                    clear()
                 addAll(this@AppListDataPresenterImpl)
             }
             mAdapter.notifyDataSetChanged()

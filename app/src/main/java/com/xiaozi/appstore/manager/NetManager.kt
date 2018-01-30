@@ -45,7 +45,7 @@ object NetManager {
         HeadPassNullParam("userToken", AccountManager.token())
         ResultType(object : TypeToken<BaseResp<T>>() {})
         Success {
-            if (it?.data == null)
+            if (it == null)
                 "null response".failed()
             else if (it.code == SUCCESS_CODE)
                 it.data.success()

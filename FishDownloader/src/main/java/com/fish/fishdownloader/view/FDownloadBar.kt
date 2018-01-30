@@ -97,6 +97,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
     var mOnCanceled: (String) -> Unit = {}
     var mOnPause: (String) -> Unit = {}
     var mTag = ""
+    var mInfoDelay: Triple<String, String, Int>? = null
 
     /****PUBLIC FUNCS****/
     fun bindTag(tag: String) {
@@ -106,9 +107,11 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
     }
 
     fun putInfo(name: String, url: String, size: Int) {
-        postDelayed({
+        if (this::mServiceStub.isInitialized)
             mServiceStub.initInfo(mTag, name, url, size)
-        }, 100)
+        else {
+            mInfoDelay = Triple(name, url, size)
+        }
     }
 
     override fun onDetachedFromWindow() {
@@ -119,6 +122,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
 
     fun release() {
         try {
+            mInfoDelay = null
             if (this::mConnection.isInitialized)
                 ctx.applicationContext.unbindService(mConnection)
         } catch (ex: Exception) {
@@ -143,12 +147,8 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
             takeInfo(ctx, tag)?.run {
                 if (ptr != size)
                     mStatus = DownloadStatus.PAUSE
-                else if (File(filePath).exists())
+                else
                     mStatus = DownloadStatus.INSTALL_CHK
-                else {
-                    deleteInfo(ctx, tag)
-                    mStatus = DownloadStatus.IDLE
-                }
             }
         } else {
             mStatus = DownloadStatus.IDLE
@@ -165,6 +165,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
                 Log.e("remote service", "connected")
                 mServiceStub = IFDownloadAction.Stub.asInterface(service)
                 mServiceStub.registerCK(mTag, mCK)
+                mInfoDelay?.run { mServiceStub.initInfo(mTag, first, second, third) }
             }
         }
         ctx.applicationContext.bindService(Intent(ctx.applicationContext, FishDownloaderSVC::class.java), mConnection, Service.BIND_AUTO_CREATE)
@@ -221,10 +222,14 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
                         text = "打开"
                         setOnClickListener { open() }
                     } else {
-                        text = "安装"
-                        onceClick {
-                            mStatus = DownloadStatus.COMPLETE
-                            installApp(ctx, takeInfo(ctx, mTag)?.filePath ?: return@onceClick)
+                        if (takeInfo(ctx, mTag)?.filePath?.run { File(this).exists() } == true) {
+                            text = "安装"
+                            onceClick {
+                                mStatus = DownloadStatus.COMPLETE
+                                installApp(ctx, takeInfo(ctx, mTag)?.filePath ?: return@onceClick)
+                            }
+                        } else {
+                            mStatus = DownloadStatus.IDLE
                         }
                     }
                 }

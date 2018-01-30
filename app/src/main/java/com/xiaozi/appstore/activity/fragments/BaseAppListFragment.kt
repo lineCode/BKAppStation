@@ -63,7 +63,8 @@ sealed class BaseAppListFragment : BaseFragment() {
     fun initLoader() {
         mListLoader = AppListDataPresenterImpl(mWaiter, mType.str, AppCondition.TOP.str) {
             mData.safety {
-                clear()
+                if(it)
+                    clear()
                 addAll(this@AppListDataPresenterImpl)
                 mAdapter.notifyDataSetChanged()
             }
@@ -124,9 +125,11 @@ sealed class BaseAppListFragment : BaseFragment() {
         mTvChart.setCompoundDrawables(null, null, null, if (index == 0) mDrawableTab else mDrawableTabWhite)
         mTvCategory.setCompoundDrawables(null, null, null, if (index == 1) mDrawableTab else mDrawableTabWhite)
         if (index == 0) {
+            mSwiper.setSwipeAble(true)
             mRvList.adapter = mAdapter
             mAdapter.notifyDataSetChanged()
         } else if (index == 1) {
+            mSwiper.setSwipeAble(false)
             mRvList.adapter = mCategoryAdapter
             mCategoryAdapter.notifyDataSetChanged()
         }

@@ -6,6 +6,7 @@ import cc.fish.cld_ctrl.ad.CldAd
 import cc.fish.cld_ctrl.common.net.NetManager
 import com.xiaozi.appstore.component.Framework
 import com.xiaozi.appstore.component.GlobalData
+import com.xiaozi.appstore.manager.DownloadTagsManager
 
 /**
  * Created by fish on 18-1-2.
@@ -21,5 +22,6 @@ class App : Application() {
 
     private fun initEnv() {
         Framework.Package.installed()
+        DownloadTagsManager.initControlConnection(this)
     }
 }
