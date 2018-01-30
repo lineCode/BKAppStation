@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.fish.downloader.view.DownloadBar
 import com.fish.fishdownloader.service.DownloadRecInfo
@@ -37,7 +38,7 @@ class HomeVH(val v: View) : RecyclerView.ViewHolder(v) {
     fun load(app: DataManager.AppInfo) {
         mTvName.text = app.name
         mTvTip.text = app.tip
-        mTvInfo.text = "${app.installCnt}次安装/${app.size}"
+        mTvInfo.text = "${Framework.Trans.toWan(app.installCnt)}次安装/${app.size}"
         ImageLoaderHelper.loadImageWithCache(app.icon, mImgIcon)
         v.setOnClickListener { AppActivity.open(v.context, app.appId) }
         mDL.run {
@@ -84,18 +85,28 @@ class CategoryVH(val v: View) : RecyclerView.ViewHolder(v) {
 
     val mTvName = v.findViewById<TextView>(R.id.tv_icate_name)
     val mImgIcon = v.findViewById<ImageView>(R.id.img_icate_icon)
+    val mRlCate = v.findViewById<RelativeLayout>(R.id.rl_icate_cate)
     val mCateSecIdArray = arrayOf(R.id.tv_icate1, R.id.tv_icate2, R.id.tv_icate3, R.id.tv_icate4, R.id.tv_icate5, R.id.tv_icate6)
 
-    fun load(category: DataManager.Category, clk: DataManager.SecCategory.() -> Unit) {
+    fun load(category: DataManager.Category, type: AppListType) {
         mTvName.text = category.name
         ImageLoaderHelper.loadImageWithCache(category.icon, mImgIcon)
+        mRlCate.setOnClickListener { AppListActivity.open(v.context, category.name, type.str, "class", "${category.classId}") }
         for (i in category.tabs.indices)
             category.tabs[i].safety {
                 v.findViewById<TextView>(mCateSecIdArray[i]).run {
+                    visibility = View.VISIBLE
                     text = name
-                    onClick { this@safety.clk() }
+                    onClick {
+                        AppListActivity.open(v.context, name, type.str, "class", "$classId")
+                    }
                 }
             }
+    }
+
+    fun release() {
+        for(id in mCateSecIdArray)
+            v.findViewById<View>(id).visibility = View.INVISIBLE
     }
 }
 
@@ -168,28 +179,6 @@ class DownloadingVH(private val v: View) : RecyclerView.ViewHolder(v) {
                 }
             }
         }
-//        mTvName.text = data.name
-//        if (data.size == data.ptr) {
-//            if (!File(data.path).exists()) {
-//                mTvContent.text = "文件已删除"
-//                mDownloader.text("已删除")
-//                return
-//            }
-//            mTvContent.text = "已完成"
-//            mDownloader.apply {
-//                if (Framework.Package.isInstalled(data.tag)) {
-//                    text("打开")
-//                    setOnClickListener { Framework.App.openOtherApp(data.tag) }
-//                } else {
-//                    text("安装")
-//                    setOnClickListener { File(data.path).safety(Framework.App::installApp) }
-//                }
-////            }
-//        } else {
-//            mTvContent.text = "${Framework.Trans.Size(data.ptr)}/${Framework.Trans.Size(data.size)} 0B/s"
-//            mDownloader.text("暂停")
-//            mDownloader.setOnClickListener { }
-//        }
     }
 
     fun release() {

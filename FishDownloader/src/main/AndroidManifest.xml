@@ -9,7 +9,7 @@
             android:process=":download" />
 
         <service android:name=".service.FishDownloaderSVC"
-            android:exported="true"
+            android:exported="false"
             android:process=":fdownload"/>
 
     </application>

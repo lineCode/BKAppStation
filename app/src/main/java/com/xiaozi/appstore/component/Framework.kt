@@ -105,6 +105,12 @@ class Framework {
             }
             return String.format("%.2f%s", n, s)
         }
+        fun toWan(count: Int): String {
+            if (count < 10000) return count.toString()
+            var s = if (count > 100000000) "亿" else "万"
+            var f = if (count > 100000000) count / 100000000f else count / 10000f
+            return String.format("%.2f%s", f, s)
+        }
     }
 
     object Math {

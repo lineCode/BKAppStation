@@ -120,12 +120,13 @@ object NetManager {
                 .ResultType(object : TypeToken<BaseResp<RespAppInfo>>() {}).get(Framework._C, Framework._H)
     }
 
-    fun loadUserInfo(activity: Activity, userId: Int) {
+    fun loadUserInfo(activity: Activity, userId: Int, success: ()->Unit) {
         createBase<RespUserInfo>("$MAIN_URL/user/getinfo", {
             AccountManager.let {
                 it.userHeadIcon = userInfo.userImageUrl
                 it.userName = userInfo.userName
             }
+            success()
         }, activity::ZToast)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("userId", "$userId")

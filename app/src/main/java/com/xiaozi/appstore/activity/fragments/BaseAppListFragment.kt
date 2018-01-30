@@ -96,12 +96,15 @@ sealed class BaseAppListFragment : BaseFragment() {
             override fun getItemCount() = mCategoryData.size
 
             override fun onBindViewHolder(holder: CategoryVH, position: Int) {
-                holder.load(mCategoryData[position]) {
-                    AppListActivity.open(activity, name, mType.str, "class", "${mCategoryData[position].name}-$name")
-                }
+                holder.load(mCategoryData[position], mType)
             }
 
             override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = CategoryVH(parent)
+
+            override fun onViewRecycled(holder: CategoryVH?) {
+                super.onViewRecycled(holder)
+                holder?.release()
+            }
         }
         mRvList.run {
             addItemDecoration(DividerItemDecoration(activity, DividerItemDecoration.VERTICAL))

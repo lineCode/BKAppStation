@@ -37,25 +37,7 @@ class MineFragment : BaseFragment() {
     val mOb = object : TypedOB<Any> {
         override fun update(o: ForceObb<Any>, arg: Any?) {
             try {
-                mLoader.load()
-                if (!AccountManager.isLoggedIn()) {
-                    mLLLogin.setOnClickListener { activity.startActivity(Intent(activity, LoginActivity::class.java)) }
-                    mUserAction.apply {
-                        text = "登录"
-                        setOnClickListener {
-                            activity.startActivity(Intent(activity, LoginActivity::class.java))
-                        }
-                    }
-                } else {
-                    mLLLogin.setOnClickListener {}
-                    mUserAction.apply {
-                        text = "退出"
-                        setOnClickListener {
-                            AccountManager.logout()
-                            onSelected()
-                        }
-                    }
-                }
+               onSelected()
             } catch (ex: Exception) {
             }
         }
@@ -92,7 +74,6 @@ class MineFragment : BaseFragment() {
 
 
     override fun onSelected() {
-        mLoader.load()
         if (!AccountManager.isLoggedIn()) {
             mLLLogin.setOnClickListener { activity.startActivity(Intent(activity, LoginActivity::class.java)) }
             mUserAction.apply {
@@ -112,7 +93,7 @@ class MineFragment : BaseFragment() {
                 }
             }
         }
-
+        mLoader.load()
     }
 
     override fun onDestroy() {

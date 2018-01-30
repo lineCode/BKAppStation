@@ -110,9 +110,10 @@ class UserInfoPresenterImpl(private val activity: Activity, private val onLoaded
             return
         }
         if (AccountManager.userHeadIcon.isEmpty() || AccountManager.userName.isEmpty()) {
-            NetManager.loadUserInfo(activity, AccountManager.uid())
+            NetManager.loadUserInfo(activity, AccountManager.uid()) { onLoaded() }
+        } else {
+            onLoaded()
         }
-        onLoaded()
     }
 }
 
