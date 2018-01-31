@@ -120,6 +120,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
         release()
     }
 
+
     fun release() {
         try {
             mInfoDelay = null
@@ -137,6 +138,9 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
     }
 
     private fun cleanView() {
+//        mStatus = DownloadStatus.IDLE
+        mTag = ""
+        mInfoDelay = null
         mActionTv.text = "下载"
         progressUI(0.0)
         flushUI()

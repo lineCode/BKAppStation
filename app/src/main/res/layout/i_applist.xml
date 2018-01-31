@@ -7,10 +7,10 @@
 
     <TextView
         android:id="@+id/tv_iapp_pos"
-        android:layout_width="48dp"
+        android:layout_width="32dp"
         android:layout_height="wrap_content"
         android:maxLines="1"
-        android:gravity="center"
+        android:gravity="center_vertical"
         android:layout_gravity="center_vertical"
         android:textSize="@dimen/title_text"
         android:textColor="@color/text_dark"
@@ -20,8 +20,7 @@
     <FrameLayout
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="8dp">
+        android:layout_gravity="center_vertical">
 
         <ImageView
             android:id="@+id/img_iapp_icon"
@@ -69,7 +68,6 @@
         android:layout_width="62dp"
         android:layout_height="26dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="16dp" />
+        android:layout_marginLeft="8dp"/>
 
 </LinearLayout>

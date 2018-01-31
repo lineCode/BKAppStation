@@ -8,6 +8,7 @@ import cc.fish.cld_ctrl.appstate.CldApp
 import cc.fish.cld_ctrl.appstate.entity.RespUpdate
 import com.xiaozi.appstore.manager.NetManager
 import com.xiaozi.appstore.Call
+import com.xiaozi.appstore.R
 import com.xiaozi.appstore.plugin._GSON
 import com.xiaozi.appstore.safetyNullable
 
@@ -15,6 +16,7 @@ class SplashActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.a_splash)
         if (checkPermissions()) {
             checkUpdate()
         }

@@ -1,5 +1,7 @@
 package com.xiaozi.appstore.activity.fragments
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +19,7 @@ import com.xiaozi.appstore.plugin.TypedOB
 import com.xiaozi.appstore.safety
 import com.xiaozi.appstore.safetySelf
 import com.xiaozi.appstore.wxapi.WXHelper
+import kotlinx.android.synthetic.main.f_mine.*
 
 /**
  * Created by fish on 18-1-4.
@@ -41,7 +44,6 @@ class MineFragment : BaseFragment() {
             } catch (ex: Exception) {
             }
         }
-
     }
 
 
@@ -74,6 +76,7 @@ class MineFragment : BaseFragment() {
 
 
     override fun onSelected() {
+        flushMem()
         if (!AccountManager.isLoggedIn()) {
             mLLLogin.setOnClickListener { activity.startActivity(Intent(activity, LoginActivity::class.java)) }
             mUserAction.apply {
@@ -94,6 +97,12 @@ class MineFragment : BaseFragment() {
             }
         }
         mLoader.load()
+    }
+
+    fun flushMem() {
+        val mi = ActivityManager.MemoryInfo()
+        (activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(ActivityManager.MemoryInfo())
+        tv_fmine_mem.text = String.format("%.1f", mi.availMem * 1.0 / mi.totalMem)
     }
 
     override fun onDestroy() {

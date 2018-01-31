@@ -2,11 +2,13 @@ package com.xiaozi.appstore.activity
 
 import android.content.Context
 import android.content.Intent
+import android.inputmethodservice.InputMethodService
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.ZToast
 import com.xiaozi.appstore.component.Framework
@@ -119,6 +121,7 @@ class CommentListActivity : BaseBarActivity() {
                 ZToast("请输入评论内容")
             } else {
                 fl_comment_page.visibility = View.GONE
+                (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 NetManager.applyComment(mAppId, et_comment.text.toString(), 0, AccountManager.uid(), AccountManager.userName, {
                     ZToast("评论提交成功")
                     et_comment.text.clear()

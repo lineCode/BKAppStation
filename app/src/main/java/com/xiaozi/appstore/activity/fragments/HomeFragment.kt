@@ -51,6 +51,7 @@ class HomeFragment : BaseFragment() {
         mRV.layoutManager = LinearLayoutManager(activity)
         mRV.addItemDecoration(DividerItemDecoration(activity, VERTICAL))
         mRV.adapter = mAdapter
+        mRV.isNestedScrollingEnabled = false
         initDataLoader()
         checkTab(0)
         initEffects()
@@ -87,7 +88,7 @@ class HomeFragment : BaseFragment() {
                     ImageLoaderHelper.loadImageWithCache(banner[position].img, this)
                     scaleType = ImageView.ScaleType.CENTER_CROP
                     layoutParams = mDefaultItemLP
-                    setOnClickListener { WebActivity.start(activity, banner[position].link) }
+                    setOnClickListener { banner[position].link.run { if (isNotEmpty()) WebActivity.start(activity, this) } }
                 }
 
                 override fun getCount() = banner.size

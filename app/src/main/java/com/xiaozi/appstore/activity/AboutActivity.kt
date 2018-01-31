@@ -1,6 +1,7 @@
 package com.xiaozi.appstore.activity
 
 import android.os.Bundle
+import android.text.Html
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.component.GlobalData
 import kotlinx.android.synthetic.main.a_about.*
@@ -14,6 +15,6 @@ class AboutActivity : BaseBarActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        tv_about_us.text = GlobalData.getAppConfig()?.configs?.aboutUs ?: ""
+        tv_about_us.text = Html.fromHtml(GlobalData.getAppConfig()?.configs?.aboutUs ?: "")
     }
 }
