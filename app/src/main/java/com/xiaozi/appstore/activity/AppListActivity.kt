@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import com.fish.fishdownloader.service.CrossProcessDownloadDataManager
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.manager.AppListDataPresenterImpl
 import com.xiaozi.appstore.manager.DataManager
@@ -53,7 +54,7 @@ class AppListActivity : BaseBarActivity() {
     }
 
     private fun initRV() {
-        swipe_applist.onSwipe({ mLoader.load() }) { mLoader.load(false, mData.size) }
+        swipe_applist.onSwipe({}) { mLoader.load(false, mData.size) }
         mAdapter = object : RecyclerView.Adapter<TypedAppListVH>() {
             override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = TypedAppListVH(parent)
 

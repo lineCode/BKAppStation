@@ -1,24 +1,21 @@
-package com.xiaozi.appstore.manager
+package com.fish.fishdownloader.service
 
 import android.app.Service
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.IBinder
 import android.util.Log
 import com.fish.fishdownloader.IFDownloadAction
 import com.fish.fishdownloader.IFDownloadCallbacks
-import com.fish.fishdownloader.service.DownloadRecInfo
-import com.fish.fishdownloader.service.FishDownloaderSVC
 import com.google.gson.reflect.TypeToken
-import com.xiaozi.appstore.component.Framework
-import com.xiaozi.appstore.plugin._GSON
 
 /**
  * Created by fish on 18-1-25.
  */
-object DownloadTagsManager {
+object CrossProcessDownloadDataManager {
 
     lateinit var mConnection: ServiceConnection
     lateinit var mServiceStub: IFDownloadAction
@@ -56,14 +53,27 @@ object DownloadTagsManager {
     }
     fun getAllInfo(ctx: Context): List<DownloadRecInfo> {
         if (!this::mServiceStub.isInitialized) return listOf()
-        return _GSON.fromJson(mServiceStub.getAbsFilePath("control"), object : TypeToken<List<DownloadRecInfo>>(){}.type)
+        return FishDownloaderSVC.GSON.fromJson(mServiceStub.getAbsFilePath("all"), object : TypeToken<List<DownloadRecInfo>>(){}.type)
     }
-//    val mTagsMap = mutableMapOf<String, DownloadTagRec>()
-//
-//    fun store(pkg: String, url: String, name: String, size: Long, text: String = "下载") {
-//        mTagsMap.put(pkg, DownloadTagRec(pkg, url, name, size, text))
-//    }
-//
-//    data class DownloadTagRec(val pkg: String, val url: String, val name: String, val size: Long, var text: String)
+    fun getInfo(ctx: Context, pkg: String): DownloadRecInfo? {
+        if (!this::mServiceStub.isInitialized) return null
+        return FishDownloaderSVC.GSON.fromJson(mServiceStub.getAbsFilePath(pkg), DownloadRecInfo::class.java)
+    }
+    fun hasTag(pkg: String) = mServiceStub.hasTag(pkg)
 
+    fun clearCKS() = if (this::mServiceStub.isInitialized) {
+        mServiceStub.unregisterAllCKs()
+    } else {
+
+    }
+
+    lateinit var mInstallCK : () -> List<String>
+    lateinit var mSupportNet : () -> Boolean
+    fun installInfoCK(ck: () -> List<String>) {
+        mInstallCK = ck
+    }
+    fun netSupportCK(ck: () -> Boolean) {
+        mSupportNet = ck
+    }
+    fun isInstalled(pkg: String) = pkg in mInstallCK()
 }

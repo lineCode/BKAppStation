@@ -206,7 +206,7 @@ class RecyclerDividerDecor(private val ctx: Context, private val dividerSize: In
         if (parent?.layoutManager is LinearLayoutManager) {
 
             if ((parent.layoutManager as LinearLayoutManager).orientation == LinearLayoutManager.HORIZONTAL) {
-                outRect?.set(mDividerSize, mDividerSize, mDividerSize, 0)
+                outRect?.set(0, 0, mDividerSize, 0)
             } else {
                 outRect?.set(0, 0, 0, mDividerSize)
             }

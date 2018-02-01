@@ -5,7 +5,11 @@
     android:background="@color/common_bg"
     android:orientation="vertical">
 
-    <include layout="@layout/i_applist" />
+    <include layout="@layout/i_applist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"/>
 
     <ScrollView
         android:layout_width="match_parent"

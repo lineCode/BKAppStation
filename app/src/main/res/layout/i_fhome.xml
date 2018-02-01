@@ -31,6 +31,7 @@
             android:id="@+id/tv_ifhome_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:maxLines="1"
             android:textSize="@dimen/title_text"
             android:textColor="@color/text_dark"/>
@@ -47,6 +48,7 @@
             android:id="@+id/tv_ifhome_tip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:maxLines="1"
             android:textSize="@dimen/tip_text"
             android:textColor="@color/text_second"/>

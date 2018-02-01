@@ -28,7 +28,7 @@ fun takeAllInfo(ctx: Context): List<DownloadRecInfo> {
     return synchronized(DownloadSPLock) {
         ctx.applicationContext.getSharedPreferences("download_rec", Context.MODE_MULTI_PROCESS).all
                 .map {
-                    FishDownloaderSVC.GSON.fromJson(it.apply { Log.e("DSM", it.toString()) }.value.toString(), DownloadRecInfo::class.java)
+                    FishDownloaderSVC.GSON.fromJson(it.value.toString(), DownloadRecInfo::class.java)
                 }.filter { it != null }
     }
 }

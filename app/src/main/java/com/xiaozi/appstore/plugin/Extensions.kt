@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.Toast
 import com.fish.downloader.view.DownloadBar
 import com.xiaozi.appstore.component.Framework
-import com.xiaozi.appstore.manager.DownloadTagsManager
 
 /**
  * Created by fish on 18-1-2.

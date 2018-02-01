@@ -42,7 +42,10 @@ class FishDownloaderSVC : Service() {
         }
 
         override fun getAbsFilePath(tag: String): String {
-            return GSON.toJson(takeAllInfo(this@FishDownloaderSVC))
+            if (tag == "all")
+                return GSON.toJson(takeAllInfo(this@FishDownloaderSVC))
+            else
+                return GSON.toJson(takeInfo(this@FishDownloaderSVC, tag))
         }
 
         override fun startDownload(tag: String) {
@@ -82,17 +85,15 @@ class FishDownloaderSVC : Service() {
             mCKS.clear()
         }
 
-        override fun hasTag(tag: String) = mInfos[tag]?.ptr ?: -1 > 0
+        override fun hasTag(tag: String) = mInfos[tag]?.ptr ?: -1 > 0 || hasInfo(this@FishDownloaderSVC, tag)
 
         override fun pauseByTag(tag: String) {
             Log.e(TAG, "PAUSE  $tag")
             mInfos[tag]?.pauseSignal = true
-            Log.e(TAG, "signal  ${mInfos[tag]?.pauseSignal ?: "none"}")
         }
     }
 
     override fun onBind(intent: Intent): IBinder {
-        Log.e(TAG, "ON BIND")
         return mActionBinder
     }
 
@@ -134,7 +135,6 @@ class FishDownloader {
         try {
             if (mInfos[tag] == null) return@Runnable
             mInfos[tag]!!.pauseSignal = false
-            Log.e(TAG, "START ${mInfos[tag]!!.downloadUrl}")
             val connection = URL(mInfos[tag]!!.downloadUrl).openConnection() as HttpURLConnection
             mInfos[tag]!!.ptr = File(mInfos[tag]!!.filePath).length().toInt()
             if (mInfos[tag]!!.ptr > 0) {
@@ -142,7 +142,6 @@ class FishDownloader {
             }
             Log.e(TAG, "url connected!")
             if (connection.responseCode == 200 || connection.responseCode == 206 || connection.responseCode == 302) {
-                Log.e(TAG, "code:${connection.responseCode}")
                 if (connection.contentLength != 0) mInfos[tag]!!.size = connection.contentLength + limit(mInfos[tag]!!.ptr, 0)
                 Log.e(TAG, "lenth:${mInfos[tag]!!.size}")
                 val f = createFile(mInfos[tag]!!)
@@ -158,7 +157,7 @@ class FishDownloader {
                         break
                     fos.write(buf, 0, readCnt)
                     fos.flush()
-                    Log.e(TAG, "total: ${mInfos[tag]!!.size} ,tag: $tag, dptr:$downloadPtr, readCnt:$readCnt, BUF SIZE: $BUF_SIZE")
+//                    Log.e(TAG, "total: ${mInfos[tag]!!.size} ,tag: $tag, dptr:$downloadPtr, readCnt:$readCnt, BUF SIZE: $BUF_SIZE")
                     downloadPtr += readCnt
                     mCKS[tag]?.onProgress(downloadPtr * 1.0 / mInfos[tag]!!.size)
                     mInfos[tag]?.ptr = downloadPtr
@@ -167,13 +166,6 @@ class FishDownloader {
                                 ?: return@Runnable) && !(mInfos[tag]?.pauseSignal
                                 ?: return@Runnable))
                 Log.e(TAG, "exit looper")
-                try {
-                    fos.close()
-                    netIS.close()
-                    connection.disconnect()
-                } catch (ioex: IOException) {
-                    ioex.printStackTrace()
-                }
                 if (mInfos[tag]?.cancelSignal!!) {
                     mCKS[tag]?.onCanceled(tag)
                     deleteInfo(ctx, tag)
@@ -187,6 +179,13 @@ class FishDownloader {
                     saveInfo(ctx, mInfos[tag]!!)
                     mCKS[tag]?.onComplete(mInfos[tag]!!.filePath)
                     Log.e(TAG, "completed: ${tag}")
+                }
+                try {
+                    fos.close()
+                    netIS.close()
+                    connection.disconnect()
+                } catch (ioex: IOException) {
+                    ioex.printStackTrace()
                 }
             } else {
                 mCKS[tag]?.onFailed("REQUEST ERROR:${connection.responseCode}")

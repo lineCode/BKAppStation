@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import cc.fish.coreui.BaseFragment
+import com.fish.fishdownloader.service.CrossProcessDownloadDataManager
 import com.xiaozi.appstore.App
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.activity.AppListActivity
@@ -63,7 +64,7 @@ sealed class BaseAppListFragment : BaseFragment() {
     fun initLoader() {
         mListLoader = AppListDataPresenterImpl(mWaiter, mType.str, AppCondition.TOP.str) {
             mData.safety {
-                if(it)
+                if (it)
                     clear()
                 addAll(this@AppListDataPresenterImpl)
                 mAdapter.notifyDataSetChanged()
@@ -74,7 +75,6 @@ sealed class BaseAppListFragment : BaseFragment() {
             mCategoryData.addAll(this)
             mCategoryAdapter.notifyDataSetChanged()
         }
-        mListLoader.load()
         mCategoryLoader.load()
     }
 
@@ -112,7 +112,7 @@ sealed class BaseAppListFragment : BaseFragment() {
             layoutManager = LinearLayoutManager(activity)
             adapter = mAdapter
         }
-        mSwiper.onSwipe({ mListLoader.load() }) { mListLoader.load(index = mData.size) }
+        mSwiper.onSwipe({}) { mListLoader.load(index = mData.size) }
     }
 
     private fun initEffects() {
@@ -138,6 +138,11 @@ sealed class BaseAppListFragment : BaseFragment() {
     override fun onActivityResume() {
         super.onActivityResume()
         mAdapter.notifyDataSetChanged()
+    }
+
+    override fun onSelected() {
+        super.onSelected()
+        mListLoader.load()
     }
 }
 

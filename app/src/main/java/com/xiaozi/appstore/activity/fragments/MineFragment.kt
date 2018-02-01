@@ -18,8 +18,6 @@ import com.xiaozi.appstore.plugin.ImageLoaderHelper
 import com.xiaozi.appstore.plugin.TypedOB
 import com.xiaozi.appstore.safety
 import com.xiaozi.appstore.safetySelf
-import com.xiaozi.appstore.wxapi.WXHelper
-import kotlinx.android.synthetic.main.f_mine.*
 
 /**
  * Created by fish on 18-1-4.
@@ -31,9 +29,11 @@ class MineFragment : BaseFragment() {
     }
 
     lateinit var mUserImg: ImageView
+    lateinit var mMemIcon: ImageView
     lateinit var mWifiImg: ImageView
     lateinit var mUserName: TextView
     lateinit var mUserAction: TextView
+    lateinit var mMem: TextView
     lateinit var mLLLogin: LinearLayout
     lateinit var mLoader: IDataPresenter
 
@@ -53,6 +53,8 @@ class MineFragment : BaseFragment() {
         mUserName = findViewById(R.id.tv_fmine_name)
         mUserAction = findViewById(R.id.tv_fmine_action)
         mLLLogin = findViewById<LinearLayout>(R.id.ll_fmine_login)
+        mMem = findViewById(R.id.tv_fmine_mem)
+        mMemIcon = findViewById(R.id.img_fmine_mem)
         mLoader = UserInfoPresenterImpl(activity) {
             ImageLoaderHelper.loadImageWithCache(AccountManager.userHeadIcon, mUserImg)
             mUserName.text = AccountManager.userName
@@ -72,6 +74,7 @@ class MineFragment : BaseFragment() {
                 ConfManager.setOnlyWifi(!ConfManager.isOnlyWifi())
             }
         }
+        mMemIcon.setOnClickListener { flushMem() }
     }
 
 
@@ -101,8 +104,9 @@ class MineFragment : BaseFragment() {
 
     fun flushMem() {
         val mi = ActivityManager.MemoryInfo()
-        (activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(ActivityManager.MemoryInfo())
-        tv_fmine_mem.text = String.format("%.1f", mi.availMem * 1.0 / mi.totalMem)
+        (activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
+        mMem.text = String.format("%.1f%%", mi.availMem * 100.0 / mi.totalMem)
+        mMemIcon.setImageResource(if (mi.availMem * 1.0 / mi.totalMem > 0.2) R.drawable.wode1 else R.drawable.wode2)
     }
 
     override fun onDestroy() {

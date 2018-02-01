@@ -67,7 +67,7 @@ class DownloadService : Service() {
 
         override fun registerCB(ck: IBinder?) {
             mCKs.add(IDownloadCK.Stub.asInterface(ck))
-            Log.e(TAG, "CKS LEN:${mCKs.size}")
+//            Log.e(TAG, "CKS LEN:${mCKs.size}")
         }
 
         override fun unregisterCB(ck: IBinder?) {

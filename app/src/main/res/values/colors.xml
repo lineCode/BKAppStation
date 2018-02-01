@@ -19,6 +19,6 @@
     <color name="button_pg_unused">#fff1ba</color>
 
     <color name="button_action">#ffd820</color>
-
+    <color name="dialogWindowBG">#30000000</color>
 
 </resources>

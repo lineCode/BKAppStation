@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.ZToast
+import com.xiaozi.appstore.dp2px
 import com.xiaozi.appstore.manager.*
 import com.xiaozi.appstore.plugin.ImageLoaderHelper
 import com.xiaozi.appstore.safetyNullable
@@ -81,7 +82,10 @@ class AppActivity : BaseBarActivity() {
 
     private fun initRV() {
         mAdapter = object : RecyclerView.Adapter<ImageVH>() {
-            override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = ImageVH(ImageView(this@AppActivity))
+            override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int) = ImageVH(ImageView(this@AppActivity).apply {
+                layoutParams = ViewGroup.LayoutParams(dp2px(140), dp2px(240))
+                scaleType = ImageView.ScaleType.FIT_XY
+            })
 
             override fun getItemCount() = mData.imgs.size
 

@@ -4,13 +4,10 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
+import com.fish.fishdownloader.service.CrossProcessDownloadDataManager
 import com.fish.fishdownloader.service.DownloadRecInfo
-import com.fish.fishdownloader.service.takeAllInfo
-import com.fish.fishdownloader.service.takeInfo
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.forkList
-import com.xiaozi.appstore.manager.DownloadInfoManager
-import com.xiaozi.appstore.manager.DownloadTagsManager
 import com.xiaozi.appstore.plugin.ForceObb
 import com.xiaozi.appstore.plugin.TypedOB
 import com.xiaozi.appstore.view.DownloadingVH
@@ -87,7 +84,7 @@ class DownloadMgrActivity : BaseBarActivity() {
     }
 
     private fun flushList() {
-        DownloadTagsManager.getAllInfo(this@DownloadMgrActivity).forkList({ size == ptr }) { tList, fList ->
+         CrossProcessDownloadDataManager.getAllInfo(this@DownloadMgrActivity).forkList({ size == ptr }) { tList, fList ->
             run {
                 mDownloadedList.clear()
                 mDownloadingList.clear()

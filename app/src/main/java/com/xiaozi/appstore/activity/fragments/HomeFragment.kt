@@ -88,7 +88,7 @@ class HomeFragment : BaseFragment() {
                     ImageLoaderHelper.loadImageWithCache(banner[position].img, this)
                     scaleType = ImageView.ScaleType.CENTER_CROP
                     layoutParams = mDefaultItemLP
-                    setOnClickListener { banner[position].link.run { if (isNotEmpty()) WebActivity.start(activity, this) } }
+                    setOnClickListener { banner[position].link.run { if (isNotBlank()) WebActivity.start(activity, this) } }
                 }
 
                 override fun getCount() = banner.size
@@ -108,9 +108,9 @@ class HomeFragment : BaseFragment() {
         mTvTabApp.setCompoundDrawables(null, null, null, if (index == 0) mDrawableTab else mDrawableTabWhite)
         mTvTabGame.setCompoundDrawables(null, null, null, if (index == 1) mDrawableTab else mDrawableTabWhite)
         if (index == 0) {
-            mAppLoader.load()
+            mAppLoader.load(true)
         } else if (index == 1) {
-            mGameLoader.load()
+            mGameLoader.load(true)
         }
     }
 

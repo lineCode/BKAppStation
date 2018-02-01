@@ -9,13 +9,13 @@
         android:id="@+id/tv_iapp_pos"
         android:layout_width="32dp"
         android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:gravity="center_vertical"
         android:layout_gravity="center_vertical"
-        android:textSize="@dimen/title_text"
-        android:textColor="@color/text_dark"
+        android:gravity="center_vertical"
+        android:maxLines="1"
         android:text="1"
-        android:visibility="gone"/>
+        android:textColor="@color/text_dark"
+        android:textSize="@dimen/title_text"
+        android:visibility="gone" />
 
     <FrameLayout
         android:layout_width="56dp"
@@ -46,6 +46,7 @@
             android:id="@+id/tv_iapp_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:maxLines="1"
             android:text=""
             android:textColor="@color/text_dark"
@@ -56,6 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:ellipsize="end"
             android:maxLines="1"
             android:text=""
             android:textColor="@color/text_second"
@@ -68,6 +70,6 @@
         android:layout_width="62dp"
         android:layout_height="26dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="8dp"/>
+        android:layout_marginLeft="8dp" />
 
 </LinearLayout>

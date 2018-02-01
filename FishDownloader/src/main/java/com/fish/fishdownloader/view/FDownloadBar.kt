@@ -21,7 +21,6 @@ import com.fish.fishdownloader.IFDownloadAction
 import com.fish.fishdownloader.IFDownloadCallbacks
 import com.fish.fishdownloader.R
 import com.fish.fishdownloader.service.*
-import com.google.gson.Gson
 import java.io.File
 
 /**
@@ -29,7 +28,6 @@ import java.io.File
  */
 class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx, attrs) {
     companion object {
-        val GSON = Gson()
         val H = Handler(Looper.getMainLooper())
     }
 
@@ -48,7 +46,17 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
                 flushUI()
             }
         }
-    val mCK = object : IFDownloadCallbacks.Stub() {
+    var mOnProgress: (Double) -> Unit = {}
+    var mOnComplete: (String) -> Unit = {}
+    var mOnFailed: (String) -> Unit = {}
+    var mOnCanceled: (String) -> Unit = {}
+    var mOnPause: (String) -> Unit = {}
+    var mTag = ""
+    var mInfoDelay: Triple<String, String, Int>? = null
+    lateinit var mCK: IFDownloadCallbacks.Stub
+
+
+    inner class DefaultDownloadSVCCallback : IFDownloadCallbacks.Stub() {
         override fun basicTypes(anInt: Int, aLong: Long, aBoolean: Boolean, aFloat: Float, aDouble: Double, aString: String?) {
         }
 
@@ -91,16 +99,18 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
             }
         }
     }
-    var mOnProgress: (Double) -> Unit = {}
-    var mOnComplete: (String) -> Unit = {}
-    var mOnFailed: (String) -> Unit = {}
-    var mOnCanceled: (String) -> Unit = {}
-    var mOnPause: (String) -> Unit = {}
-    var mTag = ""
-    var mInfoDelay: Triple<String, String, Int>? = null
 
     /****PUBLIC FUNCS****/
     fun bindTag(tag: String) {
+        mCK = DefaultDownloadSVCCallback()
+        mInfoDelay = null
+        mStatus = DownloadStatus.IDLE
+        progressUI(0.0)
+        mOnProgress = {}
+        mOnComplete = {}
+        mOnFailed = {}
+        mOnCanceled = {}
+        mOnPause = {}
         mTag = tag
         initStatusBySP(mTag)
         initConnect()
@@ -114,19 +124,23 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
         }
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        Log.e("FDB", "ONDETACHED")
-        release()
-    }
-
-
     fun release() {
         try {
+            mServiceStub.unregisterCK(mTag)
+            mTag = ""
             mInfoDelay = null
+            mStatus = DownloadStatus.IDLE
+            mOnProgress = {}
+            mOnComplete = {}
+            mOnFailed = {}
+            mOnCanceled = {}
+            mOnPause = {}
+            flushUI()
+            progressUI(0.0)
             if (this::mConnection.isInitialized)
                 ctx.applicationContext.unbindService(mConnection)
         } catch (ex: Exception) {
+            ex.printStackTrace()
         }
     }
 
@@ -137,18 +151,24 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
         cleanView()
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        Log.e("FDB", "ONDETACHED")
+        release()
+    }
+
+
     private fun cleanView() {
-//        mStatus = DownloadStatus.IDLE
-        mTag = ""
-        mInfoDelay = null
-        mActionTv.text = "下载"
-        progressUI(0.0)
         flushUI()
     }
 
     private fun initStatusBySP(tag: String) {
-        if (hasInfo(ctx, tag)) {
-            takeInfo(ctx, tag)?.run {
+        if (CrossProcessDownloadDataManager.isInstalled(tag)) {
+            mStatus = DownloadStatus.INSTALL_CHK
+            return
+        }
+        if (CrossProcessDownloadDataManager.hasTag(tag)) {
+            CrossProcessDownloadDataManager.getInfo(ctx, tag)?.run {
                 if (ptr != size)
                     mStatus = DownloadStatus.PAUSE
                 else
@@ -178,10 +198,14 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
 
     /****Inner funcs****/
     private fun progressUI(pg: Double) {
-        mProgress.layoutParams = mProgress.layoutParams.apply { this@apply.width = (this@FDownloadBar.width * pg).toInt() }
+        post { mProgress.layoutParams = mProgress.layoutParams.apply { this@apply.width = (this@FDownloadBar.width * pg).toInt() } }
     }
 
     private fun download() {
+        if (!CrossProcessDownloadDataManager.mSupportNet()) {
+            ZToast("正在使用数据流量，目前仅在WIFI环境下下载")
+            return
+        }
         mStatus = DownloadStatus.DOWNLOADING
         mServiceStub.startDownload(mTag)
     }
@@ -199,38 +223,41 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
     }
 
     fun flushUI() {
-        mActionTv.run {
+        mActionTv.post {
+            progressUI(0.0)
             when (mStatus) {
                 DownloadStatus.IDLE -> {
-                    text = "下载"
+                    mActionTv.text = "下载"
                     onceClick(this@FDownloadBar::download)
                 }
                 DownloadStatus.DOWNLOADING -> {
-                    text = "下载中"
+                    mActionTv.text = "下载中"
                     onceClick(this@FDownloadBar::pause)
                 }
                 DownloadStatus.COMPLETE -> {
-                    text = "安装中"
+                    mActionTv.text = "安装中"
                     postDelayed({ mStatus = DownloadStatus.INSTALL_CHK }, 10000)
                 }
                 DownloadStatus.PAUSE -> {
-                    text = "继续"
+                    mActionTv.text = "继续"
                     onceClick(this@FDownloadBar::download)
-                    progressUI(takeInfo(ctx, mTag)?.run { 1.0 * ptr / size } ?: return@run)
+                    progressUI(CrossProcessDownloadDataManager.getInfo(ctx, mTag)?.run { 1.0 * ptr / size }
+                            ?: return@post)
                 }
                 DownloadStatus.FAILED -> {
-                    text = "失败"
+                    mActionTv.text = "失败"
                 }
                 DownloadStatus.INSTALL_CHK -> {
-                    if (isInstalled(ctx, mTag)) {
-                        text = "打开"
+                    if (CrossProcessDownloadDataManager.isInstalled(mTag)) {
+                        mActionTv.text = "打开"
                         setOnClickListener { open() }
                     } else {
-                        if (takeInfo(ctx, mTag)?.filePath?.run { File(this).exists() } == true) {
-                            text = "安装"
+                        if (CrossProcessDownloadDataManager.getInfo(ctx, mTag)?.filePath?.run { File(this).exists() } == true) {
+                            mActionTv.text = "安装"
                             onceClick {
                                 mStatus = DownloadStatus.COMPLETE
-                                installApp(ctx, takeInfo(ctx, mTag)?.filePath ?: return@onceClick)
+                                installApp(ctx, CrossProcessDownloadDataManager.getInfo(ctx, mTag)?.filePath
+                                        ?: return@onceClick)
                             }
                         } else {
                             mStatus = DownloadStatus.IDLE
@@ -276,7 +303,3 @@ fun installApp(ctx: Context, filePath: String) = try {
 } catch (ex: Exception) {
     ex.printStackTrace()
 }
-
-fun isInstalled(ctx: Context, pkg: String) = pkg in ctx.packageManager
-        .getInstalledPackages(PackageManager.MATCH_UNINSTALLED_PACKAGES)
-        .filter { it != null }.map { it.packageName } ?: listOf<String>()

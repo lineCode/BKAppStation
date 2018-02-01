@@ -1,12 +1,10 @@
 package com.xiaozi.appstore
 
 import android.app.Application
-import android.content.pm.PackageManager
 import cc.fish.cld_ctrl.ad.CldAd
-import cc.fish.cld_ctrl.common.net.NetManager
+import com.fish.fishdownloader.service.CrossProcessDownloadDataManager
 import com.xiaozi.appstore.component.Framework
-import com.xiaozi.appstore.component.GlobalData
-import com.xiaozi.appstore.manager.DownloadTagsManager
+import com.xiaozi.appstore.plugin.netSupportByWifi
 
 /**
  * Created by fish on 18-1-2.
@@ -22,6 +20,8 @@ class App : Application() {
 
     private fun initEnv() {
         Framework.Package.installed()
-        DownloadTagsManager.initControlConnection(this)
+        CrossProcessDownloadDataManager.initControlConnection(this)
+        CrossProcessDownloadDataManager.installInfoCK { Framework.Package.installed() }
+        CrossProcessDownloadDataManager.netSupportCK { netSupportByWifi() }
     }
 }

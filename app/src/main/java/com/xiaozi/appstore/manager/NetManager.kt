@@ -21,8 +21,8 @@ import java.io.Serializable
 object NetManager {
 
     val SUCCESS_CODE = 0
-        private val _TEST_URL = "http://101.201.28.127:18080/v1"
-//    private val _TEST_URL = "http://222.128.15.95:18079/v1"
+    private val _TEST_URL = "http://101.201.28.127:18080/v1"
+    //    private val _TEST_URL = "http://222.128.15.95:18079/v1"
     private val _PRODUCT_URL = ""
     private val MAIN_URL = if (_DEBUG) _TEST_URL else _PRODUCT_URL
 
@@ -119,7 +119,7 @@ object NetManager {
                 .ResultType(object : TypeToken<BaseResp<RespAppInfo>>() {}).get(Framework._C, Framework._H)
     }
 
-    fun loadUserInfo(activity: Activity, userId: Int, success: ()->Unit) {
+    fun loadUserInfo(activity: Activity, userId: Int, success: () -> Unit) {
         createBase<RespUserInfo>("$MAIN_URL/user/getinfo", {
             AccountManager.let {
                 it.userHeadIcon = userInfo.userImageUrl
@@ -183,6 +183,13 @@ object NetManager {
                 .UrlParam("userName", userName)
                 .UrlParam("userImageUrl", imgUrl)
                 .ResultType(object : TypeToken<BaseResp<RespLoginInfo>>() {}).get(Framework._C, Framework._H)
+    }
+
+    fun callInstalledUpload(pkg: String) {
+        createBase<Any?>("$MAIN_URL/app/checkdl", {}, {})
+                .Method(RequestHelper.Method.GET)
+                .UrlParam("packageName", pkg)
+                .get(Framework._C, Framework._H)
     }
 
     fun RequestHelper<*>.UrlPassNullParam(key: String, value: String) = this.apply { if (value.isNotBlank()) UrlParam(key, value) }

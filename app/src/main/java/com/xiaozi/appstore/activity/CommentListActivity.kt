@@ -125,6 +125,7 @@ class CommentListActivity : BaseBarActivity() {
                 NetManager.applyComment(mAppId, et_comment.text.toString(), 0, AccountManager.uid(), AccountManager.userName, {
                     ZToast("评论提交成功")
                     et_comment.text.clear()
+                    mLoader.load()
                 }) { this@CommentListActivity.ZToast(this) }
             }
         }
