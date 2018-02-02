@@ -165,14 +165,14 @@ object NetManager {
                 .ResultType(object : TypeToken<BaseResp<Any?>>() {}).get(Framework._C, Framework._H)
     }
 
-    fun applyThumbsup(appId: Int, commentId: Int, userId: Int, isApply: Boolean, success: Any?.() -> Unit, failed: String.() -> Unit) {
-        createBase<Any?>("$MAIN_URL/comment/thumbup", success, failed)
+    fun applyThumbsup(appId: Int, commentId: Int, userId: Int, isApply: Boolean, success: RespThumb?.() -> Unit, failed: String.() -> Unit) {
+        createBase<RespThumb>("$MAIN_URL/comment/thumbup", success, failed)
                 .Method(RequestHelper.Method.GET)
                 .UrlParam("appId", "$appId")
                 .UrlParam("beThumbsup", if (isApply) "1" else "0")
                 .UrlParam("commentId", "$commentId")
                 .UrlParam("userId", "$userId")
-                .ResultType(object : TypeToken<BaseResp<Any?>>() {}).get(Framework._C, Framework._H)
+                .ResultType(object : TypeToken<BaseResp<RespThumb>>() {}).get(Framework._C, Framework._H)
     }
 
     fun login(openId: String, unionId: String, userName: String, imgUrl: String, success: RespLoginInfo.() -> Unit, failed: String.() -> Unit) {
@@ -218,6 +218,7 @@ data class RespCommentList(val comments: RespCommentListEntity) : Serializable
 data class RespBanners(val banners: RespBannersEntity) : Serializable
 data class RespLoginInfo(val user: RespLoginUserInfo) : Serializable
 data class RespHots(val hotSearchWd: Array<String>) : Serializable
+data class RespThumb(val thumbsup: RespThumbsup) : Serializable
 
 data class RespAppConfEntity(val appClass: RespConfClz, val gameClass: RespConfClz, val aboutUs: String, val timeStamp: Long)
 data class RespConfClz(val `class`: Array<RespAppClass>)
@@ -240,3 +241,5 @@ data class RespComment(val authorName: String, val thumbsupSign: Int, val conten
 
 data class RespBannersEntity(val banner: Array<RespBanner>)
 data class RespBanner(val image: String, val link: String, val sn: Int)
+
+data class RespThumbsup(val beThumbsup: Int, val commentId: Int, val userId: Int)

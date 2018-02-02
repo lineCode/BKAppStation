@@ -1,6 +1,7 @@
 package com.xiaozi.appstore.activity
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
@@ -89,6 +90,9 @@ object WebViewKit : DownloadListener {
                 try {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                     activity.startActivity(intent)
+                } catch (ex: ActivityNotFoundException) {
+                    ex.printStackTrace()
+                    return true
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                 }

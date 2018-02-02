@@ -62,7 +62,11 @@ class CommentListActivity : BaseBarActivity() {
                         startActivity(Intent(this@CommentListActivity, LoginActivity::class.java))
                     } else {
                         NetManager.applyThumbsup(mAppId, it.id, AccountManager.uid(), it.isAgreed == 0, {
-                            mLoader.load(true)
+                            (this?.thumbsup?.beThumbsup == 1).apply {
+                                mData[position].count = mData[position].count + if (this) 1 else -1
+                                mData[position].isAgreed = if (this) 1 else 0
+                            }
+                            mAdapter.notifyItemChanged(position)
                         }, this@CommentListActivity::ZToast)
                     }
                 }
