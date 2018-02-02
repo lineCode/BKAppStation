@@ -82,9 +82,11 @@ class AppListActivity : BaseBarActivity() {
         intent.apply {
             mLoader = AppListDataPresenterImpl(mWaiter, intent.getStringExtra(KEY_TYPE), intent.getStringExtra(KEY_CONDITION), intent.getStringExtra(KEY_KEYWORD)) {
                 mData.safety {
-                    if (it)
-                        clear()
+                    if (it) clear()
+                    if (this@AppListDataPresenterImpl.isEmpty()) return@safety
                     addAll(this@AppListDataPresenterImpl)
+                    if (it) mAdapter.notifyDataSetChanged()
+                    else mAdapter.notifyItemRangeInserted(this.size - this@AppListDataPresenterImpl.size, this@AppListDataPresenterImpl.size)
                     img_applist_none.visibility = if (mData.isEmpty()) View.VISIBLE else View.GONE
                 }
                 mAdapter.notifyDataSetChanged()

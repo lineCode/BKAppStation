@@ -140,7 +140,6 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
             if (this::mConnection.isInitialized)
                 ctx.applicationContext.unbindService(mConnection)
         } catch (ex: Exception) {
-            ex.printStackTrace()
         }
     }
 

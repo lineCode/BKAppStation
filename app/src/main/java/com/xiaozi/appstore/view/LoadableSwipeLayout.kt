@@ -72,14 +72,14 @@ class LoadableSwipeLayout(ctx: Context, attrs: AttributeSet) : SwipeRefreshLayou
             setOnRefreshListener {
                 refresh()
                 Log.e("refresh", "ok")
-                mAdapterOBB.notifyObs()
+//                mAdapterOBB.notifyObs()
                 mLimPoi = 0
                 isRefreshing = false
             }
             mLoadData = {
                 (++mLimPoi).load()
                 Log.e("load", "ok")
-                mAdapterOBB.notifyObs()
+//                mAdapterOBB.notifyObs()
                 isLoading = false
             }
         }

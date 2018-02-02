@@ -225,7 +225,7 @@ data class RespAppClass(val id: Int, val name: String, val imgUrl: String, val s
 data class RespClassSec(val id: Int, val name: String)
 
 data class RespAppListEntity(val node: Array<RespAppListInfo>, val number: Int, val start: Int)
-data class RespAppListInfo(val tips: String, val appName: String, val downloadCount: Int, val iconUrl: String,
+data class RespAppListInfo(val tips: String, val appName: String, val downloadCount: Long, val iconUrl: String,
                            val packageName: String, val size: Int, val sn: Int, val appId: Int, val downloadUrl: String)
 
 data class RespAppInfoEntity(val adType: String, val appName: String, val commentCount: Int, val appDesc: String,

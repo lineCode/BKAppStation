@@ -64,10 +64,11 @@ sealed class BaseAppListFragment : BaseFragment() {
     fun initLoader() {
         mListLoader = AppListDataPresenterImpl(mWaiter, mType.str, AppCondition.TOP.str) {
             mData.safety {
-                if (it)
-                    clear()
+                if (it) clear()
+                if (this@AppListDataPresenterImpl.isEmpty()) return@safety
                 addAll(this@AppListDataPresenterImpl)
-                mAdapter.notifyDataSetChanged()
+                if (it) mAdapter.notifyDataSetChanged()
+                else mAdapter.notifyItemRangeInserted(this.size - this@AppListDataPresenterImpl.size, this@AppListDataPresenterImpl.size)
             }
         }
         mCategoryLoader = CategoryPresenterImpl(mType) {
@@ -112,7 +113,9 @@ sealed class BaseAppListFragment : BaseFragment() {
             layoutManager = LinearLayoutManager(activity)
             adapter = mAdapter
         }
-        mSwiper.onSwipe({}) { mListLoader.load(index = mData.size) }
+        mSwiper.onSwipe({}) {
+            mListLoader.load(index = mData.size)
+        }
     }
 
     private fun initEffects() {
