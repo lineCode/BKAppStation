@@ -9,6 +9,7 @@ import cc.fish.cld_ctrl.appstate.entity.RespUpdate
 import com.xiaozi.appstore.manager.NetManager
 import com.xiaozi.appstore.Call
 import com.xiaozi.appstore.R
+import com.xiaozi.appstore.component.Analisys
 import com.xiaozi.appstore.plugin._GSON
 import com.xiaozi.appstore.safetyNullable
 
@@ -59,4 +60,15 @@ class SplashActivity : Activity() {
             finish()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        Analisys.resume(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Analisys.pause(this)
+    }
+
 }

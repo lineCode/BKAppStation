@@ -96,6 +96,7 @@ class MineFragment : BaseFragment() {
                     AccountManager.logout()
                     mUserImg.setImageResource(R.drawable.icon_unlogin_img)
                     mUserName.text = "未登录"
+                    onSelected()
                 }
             }
         }

@@ -21,9 +21,9 @@ import java.io.Serializable
 object NetManager {
 
     val SUCCESS_CODE = 0
-    private val _TEST_URL = "http://101.201.28.127:18080/v1"
+    private val _TEST_URL = "http://tapi.yz070.com/v1"
     //    private val _TEST_URL = "http://222.128.15.95:18079/v1"
-    private val _PRODUCT_URL = ""
+    private val _PRODUCT_URL = "http://api.yz070.com/v1"
     private val MAIN_URL = if (_DEBUG) _TEST_URL else _PRODUCT_URL
 
     inline fun <reified T> fastCall(url: String, crossinline success: T.() -> Unit = {}, crossinline failed: String.() -> Unit = {}) = createOri<T>(url, success, failed).get(Framework._C, Framework._H)

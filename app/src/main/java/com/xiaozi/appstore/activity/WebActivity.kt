@@ -14,6 +14,7 @@ import com.google.gson.Gson
 import com.umeng.analytics.MobclickAgent
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.ZToast
+import com.xiaozi.appstore.component.Analisys
 import com.xiaozi.appstore.component.Device
 import com.xiaozi.appstore.component.Framework
 import kotlinx.android.synthetic.main.a_web.*
@@ -61,12 +62,12 @@ class WebActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        MobclickAgent.onResume(this)
+        Analisys.resume(this)
     }
 
     override fun onPause() {
         super.onPause()
-        MobclickAgent.onPause(this)
+        Analisys.pause(this)
     }
 }
 
@@ -116,6 +117,7 @@ object WebViewKit : DownloadListener {
             data = Uri.parse(url)
         })
     }
+
     class JSInterface(val activity: Activity, val web: WebView?) {
 
         @JavascriptInterface

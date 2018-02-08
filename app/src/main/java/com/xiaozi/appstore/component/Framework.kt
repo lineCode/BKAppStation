@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import com.fish.fishdownloader.view.FromFileMultiApis
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,7 +30,7 @@ class Framework {
 
         fun installApp(f: File) =
                 mContext?.startActivity(Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(Uri.fromFile(f), "application/vnd.android.package-archive")
+                    setDataAndType(FromFileMultiApis(_C, f), "application/vnd.android.package-archive")
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 })
     }

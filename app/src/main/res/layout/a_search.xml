@@ -36,6 +36,7 @@
                 android:hint="搜索"
                 android:maxLines="1"
                 android:textColor="@color/text_dark"
+                android:inputType="text"
                 android:textSize="@dimen/common_text" />
 
             <ImageView

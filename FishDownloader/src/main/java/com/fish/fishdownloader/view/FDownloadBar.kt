@@ -4,12 +4,16 @@ import android.app.Service
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.support.v4.content.FileProvider
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -114,6 +118,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
         mTag = tag
         initStatusBySP(mTag)
         initConnect()
+        flushUI()
     }
 
     fun putInfo(name: String, url: String, size: Int) {
@@ -222,7 +227,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
     }
 
     fun flushUI() {
-        mActionTv.post {
+        H.post {
             progressUI(0.0)
             when (mStatus) {
                 DownloadStatus.IDLE -> {
@@ -296,9 +301,19 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
 
 fun installApp(ctx: Context, filePath: String) = try {
     ctx.startActivity(Intent(Intent.ACTION_VIEW).run {
-        setDataAndType(Uri.fromFile(File(filePath)), "application/vnd.android.package-archive")
+        setDataAndType(FromFileMultiApis(ctx, File(filePath)), "application/vnd.android.package-archive")
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
     })
 } catch (ex: Exception) {
     ex.printStackTrace()
+}
+
+fun FromFileMultiApis(context: Context, f: File): Uri{
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+        return Uri.fromFile(f)
+    } else {
+        return FileProvider.getUriForFile(context, "com.xiaozi.appstore.provider", f).apply { Log.e("URI PARSER", this.toString()) }
+    }
 }

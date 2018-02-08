@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.xiaozi.appstore.R
 import com.xiaozi.appstore.ZToast
+import com.xiaozi.appstore.component.Analisys
 import com.xiaozi.appstore.dp2px
 import com.xiaozi.appstore.manager.SearchPresenterImpl
 import com.xiaozi.appstore.view.SearchVH
@@ -40,7 +41,7 @@ class SearchActivity : Activity() {
             AppListActivity.open(this@SearchActivity, "搜索结果", "", "search", et_search.text.toString())
         }
         img_search_back.setOnClickListener { finish() }
-        img_search_clear.setOnClickListener{et_search.text.clear() }
+        img_search_clear.setOnClickListener { et_search.text.clear() }
     }
 
     private fun initRV() {
@@ -49,6 +50,7 @@ class SearchActivity : Activity() {
             val params = RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, dp2px(32)).apply {
                 dp2px(4).let { setMargins(it, it, it, it) }
             }
+
             override fun onBindViewHolder(holder: SearchVH, position: Int) {
                 holder.load(mData[position])
             }
@@ -63,5 +65,15 @@ class SearchActivity : Activity() {
 
         }
         rv_search.adapter = mAdapter
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Analisys.resume(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Analisys.pause(this)
     }
 }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import com.umeng.analytics.MobclickAgent
 import com.xiaozi.appstore.R
+import com.xiaozi.appstore.component.Analisys
 import kotlinx.android.synthetic.main.a_base_bar.*
 
 /**
@@ -33,11 +34,11 @@ abstract class BaseBarActivity : Activity(){
     }
     override fun onResume() {
         super.onResume()
-        MobclickAgent.onResume(this)
+        Analisys.resume(this)
     }
 
     override fun onPause() {
         super.onPause()
-        MobclickAgent.onPause(this)
+        Analisys.pause(this)
     }
 }
