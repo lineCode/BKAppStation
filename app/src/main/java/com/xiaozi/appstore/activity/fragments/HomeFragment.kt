@@ -138,4 +138,9 @@ class HomeFragment : BaseFragment() {
         super.onActivityResume()
         mAdapter.notifyDataSetChanged()
     }
+
+    override fun onSelected() {
+        super.onSelected()
+        mAdapter.notifyDataSetChanged()
+    }
 }

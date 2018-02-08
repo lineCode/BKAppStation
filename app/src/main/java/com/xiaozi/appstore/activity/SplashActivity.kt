@@ -9,6 +9,7 @@ import cc.fish.cld_ctrl.appstate.entity.RespUpdate
 import com.xiaozi.appstore.manager.NetManager
 import com.xiaozi.appstore.Call
 import com.xiaozi.appstore.R
+import com.xiaozi.appstore.ZToast
 import com.xiaozi.appstore.component.Analisys
 import com.xiaozi.appstore.plugin._GSON
 import com.xiaozi.appstore.safetyNullable
@@ -53,6 +54,7 @@ class SplashActivity : Activity() {
             if (requestCode == 200 && grantResults!![0] == PackageManager.PERMISSION_GRANTED) {
                 checkUpdate()
             } else {
+                ZToast("请到系统的应用权限设置管理中打开‘读取存储文件’权限")
                 finish()
             }
         } catch (ex: Exception) {
