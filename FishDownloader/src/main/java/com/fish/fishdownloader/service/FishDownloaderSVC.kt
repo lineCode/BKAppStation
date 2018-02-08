@@ -12,6 +12,7 @@ import com.fish.fishdownloader.IFDownloadCallbacks
 import com.fish.fishdownloader.service.FishDownloaderData.mCKS
 import com.fish.fishdownloader.service.FishDownloaderData.mInfos
 import com.fish.fishdownloader.service.FishDownloaderSVC.Companion.DOWNLOAD_DIR
+import com.fish.fishdownloader.view.installApp
 import com.google.gson.Gson
 import java.io.File
 import java.io.FileOutputStream
@@ -177,6 +178,7 @@ class FishDownloader {
                     Log.e(TAG, "pause: ${tag}")
                 } else {
                     saveInfo(ctx, mInfos[tag]!!)
+                    installApp(ctx, mInfos[tag]!!.filePath)
                     mCKS[tag]?.onComplete(mInfos[tag]!!.filePath)
                     Log.e(TAG, "completed: ${tag}")
                 }

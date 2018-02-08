@@ -76,7 +76,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
             post {
                 progressUI(0.0)
                 mOnComplete(filePath)
-                installApp(ctx, filePath)
+//                installApp(ctx, filePath)
                 mStatus = DownloadStatus.COMPLETE
             }
         }
@@ -208,6 +208,7 @@ class FDownloadBar(val ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx
     private fun download() {
         if (!CrossProcessDownloadDataManager.mSupportNet()) {
             ZToast("正在使用数据流量，目前仅在WIFI环境下下载")
+            flushUI()
             return
         }
         mStatus = DownloadStatus.DOWNLOADING
